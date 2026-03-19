@@ -1,0 +1,383 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Verify SCTMS tickets by booking ID or QR scan.">
+<title>Verify Ticket - SCTMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=Figtree:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#FDFBF8;--bg2:#F7F4EF;--sf:#fff;--nv:#0F1729;--nv2:#1B2340;--gd:#A07828;--gd2:#C49A32;--tx:#0F1729;--tx2:#5C6478;--tx3:rgba(15,23,41,0.28);--br:rgba(15,23,41,0.09);--gn:#2A7A4B;--rd:#C0392B;--og:#D97706}
+body{background:var(--bg);color:var(--tx);font-family:'Figtree','Noto Sans Bengali',sans-serif;min-height:100vh;display:flex;flex-direction:column}
+button{font-family:inherit}
+button:focus-visible,a:focus-visible{outline:2px solid var(--gd2);outline-offset:2px}
+nav{height:62px;display:flex;align-items:center;padding:0 40px;border-bottom:1px solid var(--br);background:rgba(253,251,248,0.95);position:sticky;top:0;z-index:100}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo-mark{width:26px;height:26px;border-radius:5px;background:var(--nv);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:.85rem;font-weight:700;color:#fff}
+.logo-word{font-family:'Fraunces',serif;font-size:.95rem;font-weight:600;color:var(--nv);letter-spacing:2px;text-transform:uppercase}
+.logo-word em{color:var(--gd2);font-style:normal}
+.nav-r{margin-left:auto;display:flex;gap:8px;align-items:center}
+.badge-staff{background:rgba(160,120,40,.08);color:var(--gd);border:1px solid rgba(160,120,40,.2);font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:3px 10px;border-radius:4px;letter-spacing:1px}
+.lang-toggle{padding:7px 10px;border-radius:8px;border:1px solid var(--br);background:#fff;color:var(--nv);font-size:.74rem;cursor:pointer;font-family:'JetBrains Mono',monospace}
+.lang-toggle:hover{border-color:var(--nv);background:var(--bg2)}
+
+main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px}
+.wrap{width:100%;max-width:560px}
+.etag{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
+.page-title{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:600;color:var(--nv);margin-bottom:6px;letter-spacing:-.3px}
+.page-sub{font-size:.84rem;color:var(--tx2);margin-bottom:28px;font-weight:300}
+
+/* INPUT CARD */
+.input-card{background:var(--sf);border:1px solid var(--br);border-radius:14px;padding:28px;box-shadow:0 2px 8px rgba(15,23,41,0.05),0 12px 32px rgba(15,23,41,0.06);margin-bottom:20px}
+.ic-tabs{display:flex;gap:8px;margin-bottom:20px}
+.ic-tab{flex:1;padding:10px;border-radius:8px;border:1.5px solid var(--br);background:var(--bg2);font-family:'Figtree',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;color:var(--tx2);transition:all .18s}
+.ic-tab.active{border-color:var(--nv);background:var(--nv);color:#fff}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-family:'JetBrains Mono',monospace;font-size:.55rem;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:6px}
+.fg input{width:100%;background:var(--bg2);border:1.5px solid var(--br);border-radius:8px;padding:11px 14px;color:var(--nv);font-family:'JetBrains Mono',monospace;font-size:.96rem;outline:none;transition:all .18s;letter-spacing:2px}
+.fg input:focus{border-color:var(--nv);background:var(--sf);box-shadow:0 0 0 3px rgba(15,23,41,0.06)}
+.btn-verify{width:100%;padding:13px;border-radius:8px;border:none;background:var(--nv);color:#fff;font-family:'Figtree',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-verify:hover{background:var(--nv2);transform:translateY(-1px)}
+.btn-verify:disabled{background:var(--bg2);color:var(--tx3);border:1px solid var(--br);cursor:not-allowed;transform:none}
+
+/* QR SCANNER */
+.qr-box{width:100%;aspect-ratio:1;background:var(--bg2);border:2px dashed var(--br);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;margin-bottom:14px;position:relative;overflow:hidden;cursor:pointer}
+.qr-box:hover{border-color:var(--nv)}
+.qr-scan-line{position:absolute;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--gd2),transparent);animation:scan 2s ease-in-out infinite;display:none}
+.qr-box.scanning .qr-scan-line{display:block}
+@keyframes scan{0%{top:15%}50%{top:80%}100%{top:15%}}
+.qr-txt{font-size:.8rem;color:var(--tx2);text-align:center}
+#qr-video{width:100%;height:100%;object-fit:cover;display:none;position:absolute;inset:0;border-radius:10px}
+.qr-box.scanning #qr-video{display:block}
+
+/* RESULT */
+.result-card{background:var(--sf);border:1px solid var(--br);border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,41,0.05),0 12px 32px rgba(15,23,41,0.08);animation:up .3s ease both}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.rc-head{padding:20px 24px;display:flex;align-items:center;gap:14px}
+.rc-head.valid{background:linear-gradient(135deg,rgba(42,122,75,.06),rgba(42,122,75,.12));border-bottom:1px solid rgba(42,122,75,.15)}
+.rc-head.invalid{background:linear-gradient(135deg,rgba(192,57,43,.06),rgba(192,57,43,.1));border-bottom:1px solid rgba(192,57,43,.12)}
+.rc-head.used{background:linear-gradient(135deg,rgba(217,119,6,.06),rgba(217,119,6,.1));border-bottom:1px solid rgba(217,119,6,.12)}
+.rc-status-label{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700}
+.valid .rc-status-label{color:var(--gn)}
+.invalid .rc-status-label{color:var(--rd)}
+.used .rc-status-label{color:var(--og)}
+.rc-status-sub{font-size:.78rem;color:var(--tx2);margin-top:2px}
+.rc-body{padding:20px 24px}
+.rc-route{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--nv);margin-bottom:14px}
+.rc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.rc-cell .rcl{font-family:'JetBrains Mono',monospace;font-size:.52rem;text-transform:uppercase;letter-spacing:1px;color:var(--tx3);margin-bottom:3px}
+.rc-cell .rcv{font-weight:600;font-size:.84rem;color:var(--nv)}
+.rc-cell .rcv.mono{font-family:'JetBrains Mono',monospace;color:var(--gd)}
+.rc-pax{display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:8px;padding:12px 14px}
+.rc-av{width:36px;height:36px;border-radius:50%;background:var(--nv);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:.9rem;color:#fff;flex-shrink:0}
+.rc-pax-name{font-weight:600;font-size:.88rem;color:var(--nv)}
+.rc-pax-email{font-size:.72rem;color:var(--tx2)}
+.btn-mark-used{width:100%;padding:12px;border-radius:8px;border:none;background:var(--gn);color:#fff;font-family:'Figtree',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:14px}
+.btn-mark-used:hover{background:#1f5e38}
+
+/* HISTORY */
+.hist-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--sf);border:1px solid var(--br);border-radius:10px;margin-bottom:8px}
+.hi-st{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.hi-st.valid{background:var(--gn)}.hi-st.invalid{background:var(--rd)}.hi-st.used{background:var(--og)}
+.hi-info{flex:1;font-size:.8rem;color:var(--tx)}
+.hi-time{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--tx3)}
+
+.spinner{width:24px;height:24px;border:2px solid var(--br);border-top-color:var(--nv);border-radius:50%;animation:spin .8s linear infinite;margin:30px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">S</div>
+    <div class="logo-word">SC<em>T</em>MS</div>
+  </a>
+  <div class="nav-r">
+    <span class="badge-staff" id="staff-badge" style="display:none">STAFF</span>
+    <a href="dashboard-admin.html" id="admin-link" style="display:none;font-size:.8rem;color:var(--tx2);text-decoration:none;padding:6px 12px;border-radius:6px;border:1px solid var(--br)">Admin Panel</a>
+    <button class="lang-toggle" id="lang-toggle" type="button">বাংলা</button>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap">
+    <div class="etag" id="etag">// Ticket Verification</div>
+    <div class="page-title" id="title">Verify Ticket</div>
+    <div class="page-sub" id="sub">Scan QR code or enter Booking ID to verify a passenger's ticket.</div>
+
+    <div class="input-card">
+      <div class="ic-tabs">
+        <button class="ic-tab active" onclick="switchTab('manual',this)" id="tab-manual">Manual ID</button>
+        <button class="ic-tab" onclick="switchTab('qr',this)" id="tab-qr">Scan QR</button>
+      </div>
+
+      <!-- Manual -->
+      <div class="tab-panel active" id="tab-manual-panel">
+        <div class="fg">
+          <label id="lbl-bk">Booking ID</label>
+          <input type="text" id="bk-input" placeholder="e.g. 1042" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')" onkeydown="if(event.key==='Enter')verifyManual()">
+        </div>
+        <button class="btn-verify" onclick="verifyManual()" id="btn-manual">Verify</button>
+      </div>
+
+      <!-- QR -->
+      <div class="tab-panel" id="tab-qr-panel">
+        <div class="qr-box" id="qr-box" onclick="startCamera()">
+          <video id="qr-video" playsinline></video>
+          <div class="qr-scan-line"></div>
+          <div class="qr-txt" id="qr-txt">Click to start camera<br><span style="font-size:.7rem;color:var(--tx3)" id="qr-sub">Allow camera access when prompted</span></div>
+        </div>
+        <button class="btn-verify" onclick="stopCamera()" id="btn-stop-cam" style="display:none;background:var(--rd)">Stop Camera</button>
+      </div>
+    </div>
+
+    <div id="result-area"></div>
+
+    <div id="scan-history" style="margin-top:24px;display:none">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:2px;color:var(--tx3);margin-bottom:10px" id="hist-title">Recent Verifications</div>
+      <div id="hist-list"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = 'http://localhost:5000/api';
+const token = localStorage.getItem('sctms_token');
+const user = JSON.parse(localStorage.getItem('sctms_user')||'{}');
+let scanHistory = [], camStream = null, scanInterval = null;
+
+const I18N = {
+  en: {
+    etag: '// Ticket Verification',
+    title: 'Verify Ticket',
+    sub: 'Scan QR code or enter Booking ID to verify a passenger\'s ticket.',
+    tab_manual: 'Manual ID',
+    tab_qr: 'Scan QR',
+    lbl_bk: 'Booking ID',
+    btn_verify: 'Verify',
+    qr_txt: 'Click to start camera',
+    qr_sub: 'Allow camera access when prompted',
+    btn_stop: 'Stop Camera',
+    hist: 'Recent Verifications',
+    admin: 'Admin Panel',
+    staff: 'STAFF'
+  },
+  bn: {
+    etag: '// টিকিট ভেরিফিকেশন',
+    title: 'টিকিট যাচাই',
+    sub: 'কিউআর স্ক্যান করুন অথবা বুকিং আইডি দিয়ে টিকিট যাচাই করুন।',
+    tab_manual: 'ম্যানুয়াল আইডি',
+    tab_qr: 'কিউআর স্ক্যান',
+    lbl_bk: 'বুকিং আইডি',
+    btn_verify: 'ভেরিফাই',
+    qr_txt: 'ক্যামেরা চালু করতে ক্লিক করুন',
+    qr_sub: 'অনুমতি চাইলে ক্যামেরা অ্যাক্সেস দিন',
+    btn_stop: 'ক্যামেরা বন্ধ',
+    hist: 'সাম্প্রতিক যাচাই',
+    admin: 'অ্যাডমিন প্যানেল',
+    staff: 'স্টাফ'
+  }
+};
+let lang = localStorage.getItem('sctms_lang') || 'en';
+function t(k){return (I18N[lang]&&I18N[lang][k])||I18N.en[k]||k;}
+function applyLang(){
+  document.documentElement.lang = lang === 'bn' ? 'bn' : 'en';
+  document.getElementById('etag').textContent = t('etag');
+  document.getElementById('title').textContent = t('title');
+  document.getElementById('sub').textContent = t('sub');
+  document.getElementById('tab-manual').textContent = t('tab_manual');
+  document.getElementById('tab-qr').textContent = t('tab_qr');
+  document.getElementById('lbl-bk').textContent = t('lbl_bk');
+  document.getElementById('btn-manual').textContent = t('btn_verify');
+  document.getElementById('qr-txt').firstChild.textContent = t('qr_txt');
+  document.getElementById('qr-sub').textContent = t('qr_sub');
+  document.getElementById('btn-stop-cam').textContent = t('btn_stop');
+  document.getElementById('hist-title').textContent = t('hist');
+  document.getElementById('lang-toggle').textContent = (lang==='en') ? 'বাংলা' : 'English';
+  if(document.getElementById('admin-link')) document.getElementById('admin-link').textContent = t('admin');
+  if(document.getElementById('staff-badge')) document.getElementById('staff-badge').textContent = t('staff');
+}
+function toggleLang(){lang = (lang === 'en') ? 'bn' : 'en'; localStorage.setItem('sctms_lang', lang); applyLang();}
+applyLang();
+
+// Auth check
+if(!token){ location.href = 'login.html'; }
+if(user.role === 'admin' || user.role === 'staff'){
+  document.getElementById('staff-badge').style.display = 'block';
+  if(user.role === 'admin') document.getElementById('admin-link').style.display = 'block';
+}
+
+function H(){ return {'Authorization':'Bearer '+token,'Content-Type':'application/json'}; }
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fdate(t){ if(!t) return ''; const d=new Date(t); return `${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}`; }
+function ftime(){ const n=new Date(); return n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0')+':'+n.getSeconds().toString().padStart(2,'0'); }
+
+function switchTab(tab, el){
+  document.querySelectorAll('.ic-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+tab+'-panel').classList.add('active');
+  if(tab !== 'qr') stopCamera();
+}
+
+async function verifyManual(){
+  const id = document.getElementById('bk-input').value.trim();
+  if(!id){ shake('bk-input'); return; }
+  document.getElementById('btn-manual').disabled = true;
+  document.getElementById('result-area').innerHTML = '<div class="spinner"></div>';
+  await verifyBooking(id);
+  document.getElementById('btn-manual').disabled = false;
+}
+
+async function verifyBooking(bookingID){
+  try{
+    const res = await fetch(`${API}/bookings/${bookingID}`, {headers:H()});
+    if(!res.ok){
+      const e = await res.json().catch(()=>({}));
+      showResult('invalid','Invalid Ticket', e.message||`Booking #${bookingID} not found.`, null);
+      addHistory(bookingID, 'invalid');
+      return;
+    }
+    const b = await res.json();
+    const bk = b.booking || b;
+    const status = bk.BookingStatus || bk.Status;
+
+    if(status === 'cancelled'){
+      showResult('invalid','Cancelled Ticket','This booking was cancelled.', bk);
+      addHistory(bookingID,'invalid');
+    } else if(status === 'used' || bk.IsUsed){
+      showResult('used','Already Used','This ticket was already scanned.', bk);
+      addHistory(bookingID,'used');
+    } else if(status !== 'confirmed'){
+      showResult('invalid','Not Confirmed',`Booking status: ${status}`, bk);
+      addHistory(bookingID,'invalid');
+    } else {
+      showResult('valid','Valid Ticket','Passenger may board.', bk);
+      addHistory(bookingID,'valid');
+    }
+  } catch(err){
+    document.getElementById('result-area').innerHTML=`<div style="text-align:center;padding:24px;color:var(--rd);font-size:.84rem">Server error: ${err.message}</div>`;
+  }
+}
+
+function showResult(type, label, sub, bk){
+  document.getElementById('result-area').innerHTML = `
+    <div class="result-card">
+      <div class="rc-head ${type}">
+        <div>
+          <div class="rc-status-label">${label}</div>
+          <div class="rc-status-sub">${sub}</div>
+        </div>
+      </div>
+      ${bk ? `<div class="rc-body">
+        <div class="rc-route">${bk.Origin||''} -> ${bk.Destination||''}</div>
+        <div class="rc-grid">
+          <div class="rc-cell"><div class="rcl">Booking ID</div><div class="rcv mono">#${bk.BookingID}</div></div>
+          <div class="rc-cell"><div class="rcl">Journey Date</div><div class="rcv">${fdate(bk.JourneyDate)}</div></div>
+          <div class="rc-cell"><div class="rcl">Seat</div><div class="rcv mono">${bk.SeatNumber||''}</div></div>
+          <div class="rc-cell"><div class="rcl">Vehicle</div><div class="rcv">${bk.VehicleName||''}</div></div>
+          <div class="rc-cell"><div class="rcl">Fare</div><div class="rcv mono">BDT ${Number(bk.TotalFare||0).toLocaleString()}</div></div>
+          <div class="rc-cell"><div class="rcl">Payment</div><div class="rcv">${bk.PaymentMethod||''}</div></div>
+        </div>
+        <div class="rc-pax">
+          <div class="rc-av">${(bk.FirstName||'P')[0].toUpperCase()}</div>
+          <div>
+            <div class="rc-pax-name">${bk.FirstName||''} ${bk.LastName||''}</div>
+            <div class="rc-pax-email">${bk.Email||''}</div>
+          </div>
+        </div>
+        ${type==='valid'?`<button class="btn-mark-used" onclick="markUsed(${bk.BookingID})">Mark as Boarded</button>`:''}
+      </div>` : ''}
+    </div>`;
+}
+
+async function markUsed(id){
+  if(!confirm('Mark ticket as boarded?')) return;
+  try{
+    const res = await fetch(`${API}/bookings/${id}/mark-used`,{method:'PUT',headers:H()});
+    if(res.ok || res.status===404){
+      document.querySelector('.result-card .btn-mark-used')?.remove();
+      document.querySelector('.result-card .rc-head').className='rc-head used';
+      document.querySelector('.rc-status-label').textContent='USED';
+      document.querySelector('.rc-status-sub').textContent='Marked as boarded at '+ftime();
+    }
+  } catch{}
+}
+
+function addHistory(id, status){
+  scanHistory.unshift({id, status, time:ftime()});
+  if(scanHistory.length > 10) scanHistory.pop();
+  const wrap = document.getElementById('scan-history');
+  const list = document.getElementById('hist-list');
+  wrap.style.display = 'block';
+  list.innerHTML = scanHistory.map(h=>`
+    <div class="hist-item">
+      <div class="hi-st ${h.status}"></div>
+      <div class="hi-info">Booking #${h.id} <strong style="color:${h.status==='valid'?'var(--gn)':h.status==='used'?'var(--og)':'var(--rd)'}">${h.status.toUpperCase()}</strong></div>
+      <div class="hi-time">${h.time}</div>
+    </div>`).join('');
+}
+
+function shake(id){
+  const el=document.getElementById(id);
+  el.style.animation='none';
+  el.style.border='1.5px solid var(--rd)';
+  setTimeout(()=>el.style.border='',1200);
+}
+
+// QR Camera (jsQR)
+async function startCamera(){
+  const box = document.getElementById('qr-box');
+  const video = document.getElementById('qr-video');
+  const stopBtn = document.getElementById('btn-stop-cam');
+  try{
+    camStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    video.srcObject = camStream;
+    await video.play();
+    box.classList.add('scanning');
+    stopBtn.style.display = 'block';
+
+    if(!window.jsQR){
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js';
+      document.head.appendChild(script);
+      await new Promise(r=>script.onload=r);
+    }
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    scanInterval = setInterval(()=>{
+      if(video.readyState !== video.HAVE_ENOUGH_DATA) return;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video,0,0);
+      const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+      const code = jsQR(imgData.data,imgData.width,imgData.height);
+      if(code){
+        stopCamera();
+        const qrData = code.data;
+        const match = qrData.match(/(\d+)/);
+        if(match){
+          document.getElementById('result-area').innerHTML='<div class="spinner"></div>';
+          verifyBooking(match[1]);
+        }
+      }
+    },200);
+  } catch(err){
+    box.innerHTML+=`<div style="color:var(--rd);font-size:.76rem;padding:8px;text-align:center">Camera access denied. Use manual entry.</div>`;
+  }
+}
+
+function stopCamera(){
+  if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+  if(scanInterval){ clearInterval(scanInterval); scanInterval=null; }
+  document.getElementById('qr-box').classList.remove('scanning');
+  document.getElementById('btn-stop-cam').style.display='none';
+}
+
+document.getElementById('lang-toggle').addEventListener('click',toggleLang);
+</script>
+</body>
+</html>

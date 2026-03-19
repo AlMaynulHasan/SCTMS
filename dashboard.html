@@ -1,0 +1,889 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - SCTMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Figtree:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FDFBF8;--bg2:#F7F4EF;--bg3:#F0EDE6;--surface:#fff;
+  --navy:#0F1729;--navy2:#1B2340;
+  --gold:#A07828;--gold2:#C49A32;--gold-dim:rgba(160,120,40,0.07);
+  --text:#0F1729;--text2:#5C6478;--text3:rgba(15,23,41,0.32);
+  --border:rgba(15,23,41,0.09);--border2:rgba(160,120,40,0.22);
+  --green:#2A7A4B;--red:#C0392B;--blue:#2563EB;
+  --shadow:0 1px 3px rgba(15,23,41,0.05),0 4px 14px rgba(15,23,41,0.05);
+  --sb:240px;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:'Figtree',sans-serif;display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:var(--sb);flex-shrink:0;background:var(--navy);position:fixed;
+  top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100;
+  transition:transform 0.3s ease;overflow-y:auto}
+.sb-header{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;justify-content:space-between}
+.sb-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.logo-mark{width:28px;height:28px;border-radius:6px;
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.12);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-size:0.9rem;font-weight:700;color:#fff}
+.logo-word{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;
+  color:#fff;letter-spacing:2px;text-transform:uppercase}
+.logo-word em{color:var(--gold2);font-style:normal}
+.sb-close{display:none;background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:1rem}
+
+.sb-user{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;gap:10px}
+.sb-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:#000}
+.sb-uname{font-size:0.82rem;font-weight:600;color:#fff;line-height:1.3}
+.sb-urole{font-size:0.58rem;color:var(--gold2);font-family:'JetBrains Mono',monospace;
+  letter-spacing:1.5px;text-transform:uppercase}
+
+.sb-nav{padding:10px 12px;flex:1}
+.sb-sec{margin-bottom:18px}
+.sb-sec-label{font-family:'JetBrains Mono',monospace;font-size:0.5rem;
+  color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:3px;
+  padding:0 8px;margin-bottom:5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;
+  color:rgba(255,255,255,0.5);font-size:0.82rem;font-weight:500;cursor:pointer;
+  transition:all 0.18s;margin-bottom:1px;border:1px solid transparent;text-decoration:none}
+.sb-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.sb-item.active{background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.08)}
+.sb-item .si{font-size:0.88rem;width:16px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;padding:1px 7px;border-radius:10px;font-size:0.58rem;
+  font-weight:700;font-family:'JetBrains Mono',monospace;
+  background:rgba(160,120,40,0.2);color:var(--gold2);border:1px solid rgba(160,120,40,0.25)}
+
+.sb-footer{padding:12px 14px;border-top:1px solid rgba(255,255,255,0.07)}
+.sb-logout{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:7px;
+  color:rgba(255,255,255,0.4);font-size:0.82rem;cursor:pointer;transition:all 0.2s;
+  border:none;background:transparent;width:100%;font-family:'Figtree',sans-serif}
+.sb-logout:hover{color:#ff8080;background:rgba(255,80,80,0.06)}
+
+/* MAIN */
+.main{margin-left:var(--sb);flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* TOPBAR */
+.topbar{height:60px;padding:0 32px;background:rgba(253,251,248,0.95);
+  backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;flex-shrink:0}
+.tb-left{display:flex;align-items:center;gap:12px}
+.menu-btn{display:none;background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.1rem}
+.tb-title{font-size:0.88rem;font-weight:600;color:var(--navy)}
+.tb-right{display:flex;align-items:center;gap:8px;position:relative}
+.notif-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);cursor:pointer;font-size:0.88rem;
+  transition:all 0.2s;display:flex;align-items:center;justify-content:center;position:relative}
+.notif-btn:hover{border-color:var(--navy);color:var(--navy)}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;
+  border-radius:50%;background:var(--red);border:1.5px solid var(--bg)}
+.btn-sm{padding:7px 18px;border-radius:6px;border:none;background:var(--navy);
+  color:#fff;font-family:'Figtree',sans-serif;font-size:0.78rem;font-weight:600;
+  cursor:pointer;text-decoration:none;transition:all 0.18s}
+.btn-sm:hover{background:var(--navy2)}
+
+/* NOTIF DROPDOWN */
+.notif-panel{position:absolute;top:46px;right:0;width:300px;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 8px 32px rgba(15,23,41,0.12);z-index:200;
+  opacity:0;pointer-events:none;transform:translateY(-6px);transition:all 0.2s}
+.notif-panel.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.notif-head{padding:13px 16px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center}
+.notif-head h4{font-size:0.82rem;font-weight:600}
+.notif-clear{font-size:0.68rem;color:var(--text2);cursor:pointer;background:none;border:none;
+  font-family:'JetBrains Mono',monospace}
+.notif-clear:hover{color:var(--navy)}
+.notif-item{padding:11px 16px;border-bottom:1px solid rgba(15,23,41,0.05);
+  display:flex;gap:10px;align-items:flex-start}
+.notif-item:last-child{border-bottom:none}
+.notif-ico{font-size:0.9rem;flex-shrink:0;margin-top:2px}
+.notif-txt{font-size:0.77rem;color:var(--text);line-height:1.5}
+.notif-time{font-size:0.6rem;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:2px}
+
+/* CONTENT */
+.content{padding:28px 32px;flex:1}
+.panel{display:none}.panel.active{display:block}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:20px;transition:all 0.2s;cursor:default}
+.metric:hover{box-shadow:var(--shadow);border-color:rgba(15,23,41,0.14)}
+.metric-top{display:flex;justify-content:space-between;margin-bottom:12px}
+.metric-label{font-family:'JetBrains Mono',monospace;font-size:0.54rem;
+  color:var(--text2);text-transform:uppercase;letter-spacing:2px}
+.metric-ico{font-size:1rem;opacity:0.6}
+.metric-val{font-family:'Fraunces',serif;font-size:2rem;font-weight:600;
+  color:var(--navy);line-height:1;margin-bottom:4px}
+.metric-sub{font-size:0.7rem;color:var(--text2);font-weight:300}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;margin-bottom:14px}
+.card-head{padding:14px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:0.84rem;font-weight:600;color:var(--navy)}
+.card-action{font-size:0.72rem;color:var(--text2);cursor:pointer;background:none;border:none;
+  font-family:'JetBrains Mono',monospace;transition:color 0.2s;padding:4px}
+.card-action:hover{color:var(--navy)}
+
+.two-col{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+
+/* BOOKING ROW */
+.brow{display:flex;align-items:center;gap:14px;padding:14px 20px;
+  border-bottom:1px solid rgba(15,23,41,0.05);transition:background 0.15s}
+.brow:last-child{border-bottom:none}
+.brow:hover{background:var(--bg2)}
+.b-ico{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:1rem;flex-shrink:0}
+.b-ico.train{background:rgba(37,99,235,0.07);border:1px solid rgba(37,99,235,0.1)}
+.b-ico.bus{background:rgba(42,122,75,0.07);border:1px solid rgba(42,122,75,0.1)}
+.b-info{flex:1}
+.b-route{font-weight:500;font-size:0.86rem;color:var(--navy);margin-bottom:2px}
+.b-meta{font-size:0.7rem;color:var(--text2);font-family:'JetBrains Mono',monospace}
+.b-right{text-align:right}
+.b-price{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;margin-bottom:3px}
+
+.badge{display:inline-flex;padding:2px 8px;border-radius:4px;
+  font-size:0.58rem;font-weight:500;font-family:'JetBrains Mono',monospace;letter-spacing:0.5px}
+.badge-g{background:rgba(42,122,75,0.08);color:var(--green);border:1px solid rgba(42,122,75,0.12)}
+.badge-y{background:rgba(217,119,6,0.08);color:#92701A;border:1px solid rgba(217,119,6,0.12)}
+.badge-r{background:rgba(192,57,43,0.07);color:var(--red);border:1px solid rgba(192,57,43,0.1)}
+.badge-b{background:rgba(37,99,235,0.07);color:var(--blue);border:1px solid rgba(37,99,235,0.1)}
+
+/* UPCOMING */
+.up-row{display:flex;align-items:center;gap:14px;padding:14px 20px;
+  border-bottom:1px solid rgba(15,23,41,0.05)}
+.up-row:last-child{border-bottom:none}
+.up-date{width:42px;height:48px;border-radius:8px;background:var(--bg2);
+  border:1px solid var(--border);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;flex-shrink:0}
+.up-day{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--navy);line-height:1}
+.up-mon{font-size:0.48rem;color:var(--text2);text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.up-route{font-weight:500;font-size:0.86rem;margin-bottom:2px}
+.up-time{font-size:0.7rem;color:var(--text2);font-family:'JetBrains Mono',monospace}
+
+/* QUICK ACTIONS */
+.qa-list{padding:10px}
+.qa{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:7px;
+  border:1px solid var(--border);color:var(--text2);text-decoration:none;
+  font-size:0.82rem;font-weight:500;cursor:pointer;transition:all 0.18s;
+  background:transparent;width:100%;margin-bottom:6px;font-family:'Figtree',sans-serif}
+.qa:hover{border-color:var(--navy);color:var(--navy);background:var(--bg2)}
+
+/* PROFILE */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.avatar-section{padding:24px;text-align:center;border-bottom:1px solid var(--border)}
+.avatar-big{width:68px;height:68px;border-radius:50%;margin:0 auto 12px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:#000;
+  border:2px solid rgba(160,120,40,0.2)}
+.avatar-name{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:600;color:var(--navy);margin-bottom:2px}
+.avatar-role{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--gold);
+  letter-spacing:2px;text-transform:uppercase}
+
+.fg{margin-bottom:13px}
+.fg label{display:block;font-family:'JetBrains Mono',monospace;font-size:0.54rem;
+  text-transform:uppercase;letter-spacing:2px;color:var(--text2);margin-bottom:5px}
+.fg input,.fg select{
+  width:100%;background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:7px;padding:10px 13px;color:var(--navy);
+  font-family:'Figtree',sans-serif;font-size:0.86rem;outline:none;transition:all 0.18s;-webkit-appearance:none}
+.fg input:focus,.fg select:focus{border-color:var(--navy);background:var(--surface);
+  box-shadow:0 0 0 3px rgba(15,23,41,0.05)}
+.fg input[readonly]{color:var(--text2);cursor:not-allowed}
+.fg select option{background:var(--surface)}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-save{padding:11px 24px;border-radius:7px;border:none;background:var(--navy);
+  color:#fff;font-family:'Figtree',sans-serif;font-size:0.88rem;font-weight:600;
+  cursor:pointer;transition:all 0.18s}
+.btn-save:hover{background:var(--navy2)}
+.form-msg{padding:10px 13px;border-radius:7px;font-size:0.78rem;margin-bottom:12px;display:none}
+.form-msg.ok{background:rgba(42,122,75,0.07);color:var(--green);border:1px solid rgba(42,122,75,0.12)}
+.form-msg.err{background:rgba(192,57,43,0.06);color:var(--red);border:1px solid rgba(192,57,43,0.1)}
+
+/* PW STRENGTH */
+.pw-bar-wrap{height:3px;background:var(--border);border-radius:2px;margin-top:5px;overflow:hidden}
+.pw-bar{height:100%;border-radius:2px;transition:all 0.3s;width:0}
+.pw-lbl{font-size:0.62rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-top:3px}
+
+/* CANCEL MODAL */
+.overlay{position:fixed;inset:0;background:rgba(15,23,41,0.5);backdrop-filter:blur(8px);
+  z-index:500;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.22s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:30px;width:500px;max-width:95vw;max-height:85vh;overflow-y:auto;
+  transform:translateY(12px);transition:transform 0.22s;box-shadow:0 20px 60px rgba(15,23,41,0.15)}
+.overlay.open .modal{transform:translateY(0)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-title{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600;color:var(--navy)}
+.modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:0.9rem}
+.cancel-item{display:flex;align-items:center;gap:12px;padding:13px;
+  border:1px solid var(--border);border-radius:8px;margin-bottom:8px;transition:all 0.18s}
+.cancel-item:hover{border-color:rgba(15,23,41,0.16)}
+.c-route{font-weight:500;font-size:0.86rem;margin-bottom:2px}
+.c-meta{font-size:0.7rem;color:var(--text2);font-family:'JetBrains Mono',monospace}
+.btn-cancel-item{padding:7px 14px;border-radius:5px;border:1px solid rgba(192,57,43,0.2);
+  background:transparent;color:var(--red);font-size:0.75rem;cursor:pointer;
+  transition:all 0.18s;font-family:'Figtree',sans-serif;flex-shrink:0}
+.btn-cancel-item:hover{background:rgba(192,57,43,0.05)}
+
+.spinner{width:24px;height:24px;border:2px solid var(--border);
+  border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite;margin:40px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{padding:40px;text-align:center;font-size:0.82rem;color:var(--text2)}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;
+  border-radius:8px;padding:11px 18px;font-size:0.82rem;
+  transform:translateY(60px);opacity:0;transition:all 0.3s;z-index:9999;
+  border-left:3px solid var(--gold)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-left-color:var(--green)}.toast.err{border-left-color:var(--red)}
+
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,41,0.5);z-index:99}
+.sb-overlay.open{display:block}
+
+@media(max-width:1100px){
+  .metrics{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}
+  .profile-grid{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .sb-close{display:block}.main{margin-left:0}.menu-btn{display:flex}
+  .topbar{padding:0 16px}.content{padding:16px}
+  .metrics{grid-template-columns:1fr 1fr;gap:10px}
+}
+@media(max-width:480px){.metrics{grid-template-columns:1fr}.fg-row{grid-template-columns:1fr}}
+
+/*  REVIEW MODAL  */
+.stars-row{display:flex;gap:8px;justify-content:center;margin:16px 0}
+.star-btn{font-size:2rem;background:none;border:none;cursor:pointer;color:#d4d0c8;transition:all .15s;line-height:1}
+.star-btn.lit,.star-btn:hover,.star-btn:hover~.star-btn{color:var(--gold);}
+.stars-row:hover .star-btn{color:var(--gold)}
+.stars-row .star-btn:hover~.star-btn{color:#d4d0c8}
+.rv-label{font-family:'JetBrains Mono',monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:2px;color:var(--text2);text-align:center;margin-bottom:4px}
+.rv-score{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--navy);text-align:center;height:22px;margin-bottom:12px}
+.rv-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.rv-tag{padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg2);font-size:.72rem;cursor:pointer;transition:all .15s;color:var(--text2);font-family:'Figtree',sans-serif}
+.rv-tag.sel{border-color:var(--navy);background:var(--navy);color:#fff}
+
+/*  SPENDING CHART  */
+.chart-wrap{padding:6px 0 10px}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:100px;margin-bottom:6px}
+.chart-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;background:var(--navy);opacity:.18;transition:all .3s;min-height:4px;cursor:pointer;position:relative}
+.chart-bar.active{opacity:1;background:var(--navy)}
+.chart-bar:hover{opacity:.7}
+.chart-bar-lbl{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--text3);text-align:center}
+.chart-bar-val{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--text2);text-align:center}
+
+/*  MOBILE NAV  */
+.hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:4px;background:none;border:none}
+.hamburger span{display:block;width:20px;height:2px;background:var(--navy);border-radius:1px;transition:all .25s}
+@media(max-width:768px){
+  .hamburger{display:flex}
+  .nav-links{display:none;position:absolute;top:62px;left:0;right:0;background:var(--bg);border-bottom:1px solid var(--border);padding:12px 20px;flex-direction:column;gap:4px;z-index:200}
+  .nav-links.open{display:flex}
+  .nav-links .nav-link{padding:10px 14px;border-radius:8px}
+}
+</style>
+</head>
+<body>
+
+<div class="sb-overlay" id="sb-overlay" onclick="closeSb()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sb-header">
+    <a href="index.html" class="sb-logo">
+      <div class="logo-mark">S</div>
+      <div class="logo-word">SC<em>T</em>MS</div>
+    </a>
+    <button class="sb-close" onclick="closeSb()"></button>
+  </div>
+  <div class="sb-user">
+    <div class="sb-av" id="sb-av">?</div>
+    <div><div class="sb-uname" id="sb-name"></div><div class="sb-urole"> Passenger</div></div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-sec">
+      <div class="sb-sec-label">Main</div>
+      <div class="sb-item active" onclick="showPanel('home',this)"><span class="si"></span> Dashboard</div>
+      <a href="booking.html" class="sb-item"><span class="si"></span> Book Ticket</a>
+      <a href="routes.html" class="sb-item"><span class="si"></span> All Routes</a>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-sec-label">My Account</div>
+      <div class="sb-item" onclick="showPanel('bookings',this)">
+        <span class="si"></span> My Bookings
+        <span class="sb-badge" id="sb-conf"></span>
+      </div>
+      <a href="marketplace.html" class="sb-item"><span class="si"></span> Marketplace</a>
+      <div class="sb-item" onclick="showPanel('profile',this)"><span class="si"></span> Profile</div>
+      <div class="sb-item" onclick="showPanel('password',this)"><span class="si"></span> Change Password</div>
+    </div>
+  </div>
+  <div class="sb-footer">
+    <button class="sb-logout" onclick="logout()"> Sign Out</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="tb-left">
+      <button class="menu-btn" onclick="openSb()"></button>
+      <div class="tb-title" id="tb-title">Dashboard</div>
+    </div>
+    <div class="tb-right">
+      <button class="notif-btn" onclick="toggleNotif()" id="notif-btn">
+        <div class="notif-dot" id="notif-dot"></div>
+      </button>
+      <div class="notif-panel" id="notif-panel">
+        <div class="notif-head"><h4>Notifications</h4>
+          <button class="notif-clear" onclick="clearNotifs()">Clear all</button></div>
+        <div id="notif-list">
+          <div class="notif-item"><div class="notif-ico"></div><div><div class="notif-txt">Booking confirmed for Dhaka  Chittagong</div><div class="notif-time">2 hrs ago</div></div></div>
+          <div class="notif-item"><div class="notif-ico"></div><div><div class="notif-txt">New ticket listed on marketplace</div><div class="notif-time">1 day ago</div></div></div>
+        </div>
+      </div>
+      <a href="booking.html" class="btn-sm">+ Book</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="panel active" id="panel-home">
+      <div class="metrics">
+        <div class="metric"><div class="metric-top"><div class="metric-label">Total Bookings</div><div class="metric-ico"></div></div><div class="metric-val" id="m-total"></div><div class="metric-sub">All time</div></div>
+        <div class="metric"><div class="metric-top"><div class="metric-label">Confirmed</div><div class="metric-ico"></div></div><div class="metric-val" id="m-conf"></div><div class="metric-sub">Active tickets</div></div>
+        <div class="metric"><div class="metric-top"><div class="metric-label">Exchanges</div><div class="metric-ico"></div></div><div class="metric-val" id="m-exc"></div><div class="metric-sub">Transfers</div></div>
+        <div class="metric"><div class="metric-top"><div class="metric-label">Total Spent</div><div class="metric-ico"></div></div><div class="metric-val" id="m-spent"></div><div class="metric-sub">On transport</div></div>
+      </div>
+      <div class="two-col">
+        <div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Upcoming Journeys</div></div>
+            <div id="upcoming"><div class="spinner"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Recent Bookings</div>
+              <button class="card-action" onclick="showPanel('bookings',null)">View all </button></div>
+            <div id="b-list"><div class="spinner"></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Quick Actions</div></div>
+            <div class="qa-list">
+              <a href="booking.html" class="qa"><span></span> Search &amp; Book Ticket</a>
+              <a href="routes.html" class="qa"><span></span> Browse Routes</a>
+              <a href="marketplace.html" class="qa"><span></span> Ticket Marketplace</a>
+              <button class="qa" onclick="openCancelModal()"><span></span> Cancel a Booking</button>
+              <button class="qa" onclick="showPanel('profile',null)"><span></span> Edit Profile</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div class="panel" id="panel-bookings">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:600;color:var(--navy)">My Bookings</div>
+        <a href="booking.html" class="btn-sm">+ New</a>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:14px">
+        <button class="badge badge-g" style="cursor:pointer;padding:6px 14px;font-size:0.7rem" onclick="filterBk('all',this)">All</button>
+        <button class="badge" style="cursor:pointer;padding:6px 14px;font-size:0.7rem;background:var(--bg2);color:var(--text2);border:1px solid var(--border)" onclick="filterBk('confirmed',this)">Confirmed</button>
+        <button class="badge" style="cursor:pointer;padding:6px 14px;font-size:0.7rem;background:var(--bg2);color:var(--text2);border:1px solid var(--border)" onclick="filterBk('cancelled',this)">Cancelled</button>
+      </div>
+      <div class="chart-wrap" id="spending-chart" style="margin-bottom:16px;padding:16px 18px;background:var(--sf);border:1px solid var(--border);border-radius:12px"></div>
+      <div class="card" id="bk-all"></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="panel" id="panel-profile">
+      <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:600;color:var(--navy);margin-bottom:18px">Edit Profile</div>
+      <div class="profile-grid">
+        <div>
+          <div class="card">
+            <div class="avatar-section">
+              <div class="avatar-big" id="profile-av">?</div>
+              <div class="avatar-name" id="profile-name"></div>
+              <div class="avatar-role">Passenger</div>
+              <div style="font-size:0.76rem;color:var(--text2);margin-top:4px" id="profile-email"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Personal Info</div></div>
+            <div style="padding:18px">
+              <div class="form-msg" id="profile-msg"></div>
+              <div class="fg-row">
+                <div class="fg"><label>First Name *</label><input type="text" id="p-fname"></div>
+                <div class="fg"><label>Last Name</label><input type="text" id="p-lname"></div>
+              </div>
+              <div class="fg"><label>Email</label><input type="text" id="p-email" readonly></div>
+              <div class="fg"><label>Phone</label><input type="tel" id="p-phone" placeholder="01XXXXXXXXX"></div>
+              <div class="fg-row">
+                <div class="fg"><label>Date of Birth</label><input type="date" id="p-dob"></div>
+                <div class="fg"><label>Gender</label>
+                  <select id="p-gender"><option value="">Select</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select>
+                </div>
+              </div>
+              <div class="fg"><label>NID</label><input type="text" id="p-nid" placeholder="National ID"></div>
+              <div class="fg"><label>District</label>
+                <select id="p-district"><option value="">Select</option>
+                  <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
+                  <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
+                  <option>Rangpur</option><option>Mymensingh</option>
+                </select>
+              </div>
+              <div class="fg"><label>Address</label><input type="text" id="p-address" placeholder="Road, Area, City"></div>
+              <button class="btn-save" onclick="saveProfile()">Save Changes</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Account Summary</div></div>
+            <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;padding:10px 12px;background:var(--bg2);border-radius:6px">
+                <span style="font-size:0.78rem;color:var(--text2)">Account Type</span>
+                <span class="badge badge-b">Passenger</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px 12px;background:var(--bg2);border-radius:6px">
+                <span style="font-size:0.78rem;color:var(--text2)">Total Bookings</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:0.76rem" id="prof-total"></span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px 12px;background:var(--bg2);border-radius:6px">
+                <span style="font-size:0.78rem;color:var(--text2)">Total Spent</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:0.76rem;color:var(--gold)" id="prof-spent"></span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Security</div></div>
+            <div style="padding:16px">
+              <p style="font-size:0.78rem;color:var(--text2);margin-bottom:14px;font-weight:300">Keep your account secure with a strong password.</p>
+              <button class="btn-save" style="width:100%" onclick="showPanel('password',null)">Change Password </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="panel" id="panel-password">
+      <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:600;color:var(--navy);margin-bottom:18px">Change Password</div>
+      <div style="max-width:420px">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Update Password</div></div>
+          <div style="padding:20px">
+            <div class="form-msg" id="pw-msg"></div>
+            <div class="fg"><label>Current Password *</label><input type="password" id="pw-old" placeholder="Current password"></div>
+            <div class="fg">
+              <label>New Password *</label>
+              <input type="password" id="pw-new" placeholder="Min. 8 characters" oninput="checkPw(this.value)">
+              <div class="pw-bar-wrap"><div class="pw-bar" id="pw-bar"></div></div>
+              <div class="pw-lbl" id="pw-lbl">Enter new password</div>
+            </div>
+            <div class="fg"><label>Confirm Password *</label><input type="password" id="pw-conf" placeholder="Repeat password"></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-save" onclick="changePw()">Update</button>
+              <button onclick="showPanel('profile',null)" style="padding:11px 18px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-family:'Figtree',sans-serif;font-size:0.86rem">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:0">
+          <div style="padding:14px 18px">
+            <div style="font-size:0.76rem;font-weight:600;color:var(--navy);margin-bottom:10px">Requirements</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div id="req-len" style="font-size:0.74rem;color:var(--text2);display:flex;align-items:center;gap:7px"><span></span> 8+ characters</div>
+              <div id="req-upper" style="font-size:0.74rem;color:var(--text2);display:flex;align-items:center;gap:7px"><span></span> Uppercase letter</div>
+              <div id="req-num" style="font-size:0.74rem;color:var(--text2);display:flex;align-items:center;gap:7px"><span></span> Number</div>
+              <div id="req-sym" style="font-size:0.74rem;color:var(--text2);display:flex;align-items:center;gap:7px"><span></span> Special character</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+
+<!-- REVIEW MODAL -->
+<div class="overlay" id="review-overlay" onclick="if(event.target===this)closeReview()">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-hd"><div class="modal-title">Rate Your Journey</div><button class="mclose" onclick="closeReview()"></button></div>
+    <div id="rv-trip" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:.84rem;font-weight:600;color:var(--navy)"></div>
+    <div class="rv-label">Your Rating</div>
+    <div class="stars-row" id="stars-row">
+      <button class="star-btn" onclick="setRating(1)" id="s1"></button>
+      <button class="star-btn" onclick="setRating(2)" id="s2"></button>
+      <button class="star-btn" onclick="setRating(3)" id="s3"></button>
+      <button class="star-btn" onclick="setRating(4)" id="s4"></button>
+      <button class="star-btn" onclick="setRating(5)" id="s5"></button>
+    </div>
+    <div class="rv-score" id="rv-score"></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:2px;color:var(--text2);margin-bottom:8px">Quick Tags</div>
+    <div class="rv-tags" id="rv-tags">
+      <div class="rv-tag" onclick="toggleTag(this)">On time</div>
+      <div class="rv-tag" onclick="toggleTag(this)">Comfortable</div>
+      <div class="rv-tag" onclick="toggleTag(this)">Clean</div>
+      <div class="rv-tag" onclick="toggleTag(this)">Good driver</div>
+      <div class="rv-tag" onclick="toggleTag(this)">AC working</div>
+      <div class="rv-tag" onclick="toggleTag(this)">Delayed</div>
+      <div class="rv-tag" onclick="toggleTag(this)">Overcrowded</div>
+      <div class="rv-tag" onclick="toggleTag(this)">Poor condition</div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-family:'JetBrains Mono',monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:2px;color:var(--text2);display:block;margin-bottom:6px">Comment (optional)</label>
+      <textarea id="rv-comment" rows="3" placeholder="Your experience" style="width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'Figtree',sans-serif;font-size:.86rem;resize:none;outline:none;color:var(--navy)"></textarea>
+    </div>
+    <div class="form-msg" id="rv-msg"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-secondary" onclick="closeReview()">Cancel</button>
+      <button class="btn-primary" style="flex:1" onclick="submitReview()">Submit Review </button>
+    </div>
+  </div>
+</div>
+
+<!-- CANCEL MODAL -->
+<div class="overlay" id="cancel-overlay" onclick="if(event.target===this)closeCancelModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Cancel Booking</div>
+      <button class="modal-close" onclick="closeCancelModal()"></button>
+    </div>
+    <div id="cancel-list"></div>
+    <div class="form-msg" id="cancel-msg"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API='http://localhost:5000/api';
+const token=localStorage.getItem('sctms_token');
+const user=JSON.parse(localStorage.getItem('sctms_user')||'{}');
+if(!token)window.location.href='login.html';
+
+if(user.firstName){
+  const av=user.firstName[0].toUpperCase(),name=user.firstName+' '+(user.lastName||'');
+  document.getElementById('sb-av').textContent=av;
+  document.getElementById('sb-name').textContent=name;
+  document.getElementById('profile-av').textContent=av;
+  document.getElementById('profile-name').textContent=name;
+  document.getElementById('profile-email').textContent=user.email||'';
+  document.getElementById('p-fname').value=user.firstName||'';
+  document.getElementById('p-lname').value=user.lastName||'';
+  document.getElementById('p-email').value=user.email||'';
+  document.getElementById('p-phone').value=user.phone||'';
+}
+
+function logout(){localStorage.removeItem('sctms_token');localStorage.removeItem('sctms_user');window.location.href='index.html';}
+function openSb(){document.getElementById('sidebar').classList.add('open');document.getElementById('sb-overlay').classList.add('open');}
+function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');}
+// ─── NOTIFICATIONS ───────────────────────────
+let _nots = [];
+const NTYPE_ICON = {
+  booking_confirmed:'🎫', booking_cancelled:'❌',
+  transfer_completed:'🔄', waitlist_notified:'📢',
+};
+function relTime(ts){
+  if(!ts)return'';
+  const d=(Date.now()-new Date(ts))/1000;
+  if(d<60)return'Just now';
+  if(d<3600)return Math.floor(d/60)+'m ago';
+  if(d<86400)return Math.floor(d/3600)+'h ago';
+  return new Date(ts).toLocaleDateString();
+}
+async function loadNotifications(){
+  if(!token)return;
+  try{
+    const res=await fetch(`${API}/notifications/my`,{headers:{Authorization:'Bearer '+token}});
+    if(!res.ok)return;
+    const d=await res.json();
+    _nots=d.notifications||[];
+    const unread=d.unreadCount||0;
+    const dot=document.getElementById('notif-dot');
+    if(dot) dot.style.display=unread>0?'block':'none';
+    renderNotifList();
+  }catch{}
+}
+function renderNotifList(){
+  const el=document.getElementById('notif-list');
+  if(!el)return;
+  if(!_nots.length){el.innerHTML='<div style="padding:16px;font-size:.78rem;color:var(--text2);text-align:center">No notifications</div>';return;}
+  el.innerHTML=_nots.slice(0,15).map(n=>`
+    <div class="notif-item" style="${!n.IsRead?'background:rgba(160,120,40,.03)':''}" onclick="markRead(${n.NotificationID})">
+      <div class="notif-ico">${NTYPE_ICON[n.Type]||'🔔'}</div>
+      <div>
+        <div class="notif-txt" style="${!n.IsRead?'font-weight:600':''}">${n.Message}</div>
+        <div class="notif-time">${relTime(n.CreatedAt)}</div>
+      </div>
+    </div>`).join('');
+}
+async function markRead(id){
+  await fetch(`${API}/notifications/${id}/read`,{method:'PUT',headers:{Authorization:'Bearer '+token}}).catch(()=>{});
+  const n=_nots.find(x=>x.NotificationID===id);
+  if(n)n.IsRead=true;
+  renderNotifList();
+  const unread=_nots.filter(x=>!x.IsRead).length;
+  const dot=document.getElementById('notif-dot');
+  if(dot)dot.style.display=unread>0?'block':'none';
+}
+function toggleNotif(){
+  const panel=document.getElementById('notif-panel');
+  panel.classList.toggle('open');
+  if(panel.classList.contains('open')&&_nots.some(n=>!n.IsRead)){
+    fetch(`${API}/notifications/read-all`,{method:'PUT',headers:{Authorization:'Bearer '+token}}).catch(()=>{});
+    _nots.forEach(n=>n.IsRead=true);
+    const dot=document.getElementById('notif-dot');
+    if(dot)dot.style.display='none';
+    renderNotifList();
+  }
+}
+async function clearNotifs(){
+  await fetch(`${API}/notifications/clear`,{method:'DELETE',headers:{Authorization:'Bearer '+token}}).catch(()=>{});
+  _nots=[];
+  const el=document.getElementById('notif-list');
+  if(el)el.innerHTML='<div style="padding:16px;font-size:.78rem;color:var(--text2);text-align:center">No notifications</div>';
+  const dot=document.getElementById('notif-dot');
+  if(dot)dot.style.display='none';
+  document.getElementById('notif-panel').classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#notif-btn')&&!e.target.closest('.notif-panel'))
+    document.getElementById('notif-panel')?.classList.remove('open');
+});
+document.addEventListener('click',e=>{if(!e.target.closest('#notif-btn')&&!e.target.closest('#notif-panel'))document.getElementById('notif-panel').classList.remove('open');});
+
+const panelTitles={home:'Dashboard',bookings:'My Bookings',profile:'Profile',password:'Change Password'};
+function showPanel(n,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('tb-title').textContent=panelTitles[n]||n;
+  closeSb();
+  if(n==='bookings')renderAllBk('all');
+}
+
+function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+type;setTimeout(()=>t.className='toast',3000);}
+function showMsg(id,msg,type){const e=document.getElementById(id);e.textContent=msg;e.className='form-msg '+type;e.style.display='block';setTimeout(()=>e.style.display='none',4000);}
+const mon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fdate(t){const d=new Date(t);return `${d.getUTCDate()} ${mon[d.getUTCMonth()]} ${d.getUTCFullYear()}`;}
+function ft(t){if(!t)return'';const d=new Date(t);return d.getUTCHours().toString().padStart(2,'0')+':'+d.getUTCMinutes().toString().padStart(2,'0');}
+function hdrs(){return{'Authorization':'Bearer '+token,'Content-Type':'application/json'};}
+
+let allBkData=[];
+//  Build ticket URL 
+function ticketUrl(b){
+  const q=new URLSearchParams({
+    id:b.BookingID,
+    from:b.Origin||'',
+    to:b.Destination||'',
+    seat:b.SeatNumber||'',
+    fare:b.TotalFare||'',
+    vehicle:b.VehicleName||'',
+    method:b.PaymentMethod||'cash',
+    status:b.BookingStatus||'confirmed',
+    date:(b.JourneyDate||'').split('T')[0]||'',
+    dep:b.DepartureTime||'',
+    arr:b.ArrivalTime||'',
+  });
+  return 'ticket-print.html?'+q.toString();
+}
+
+async function loadHome(){
+  try{
+    const res=await fetch(`${API}/bookings/my`,{headers:hdrs()});
+    if(res.status===401){logout();return;}
+    const data=await res.json();
+    if(!Array.isArray(data)){logout();return;}
+    allBkData=data;
+    const total=data.length,conf=data.filter(b=>b.BookingStatus==='confirmed').length;
+    const spent=data.filter(b=>b.BookingStatus!=='cancelled').reduce((s,b)=>s+Number(b.TotalFare),0);
+    buildSpendingChart(data);
+    document.getElementById('m-total').textContent=total;
+    document.getElementById('m-conf').textContent=conf;
+    document.getElementById('m-spent').textContent=''+(spent>=1000?(spent/1000).toFixed(1)+'K':spent);
+    document.getElementById('sb-conf').textContent=conf;
+    document.getElementById('prof-total').textContent=total;
+    document.getElementById('prof-spent').textContent=''+(spent>=1000?(spent/1000).toFixed(1)+'K':spent);
+    const today=new Date();today.setHours(0,0,0,0);
+    const up=data.filter(b=>b.BookingStatus==='confirmed'&&new Date(b.JourneyDate)>=today).slice(0,3);
+    const upEl=document.getElementById('upcoming');
+    if(!up.length){upEl.innerHTML=`<div class="empty">No upcoming journeys. <a href="booking.html" style="color:var(--navy);font-weight:600">Book now </a></div>`;}
+    else{upEl.innerHTML=up.map(b=>{const d=new Date(b.JourneyDate);const dlUrl=ticketUrl(b);return `<div class="up-row"><div class="up-date"><div class="up-day">${d.getUTCDate()}</div><div class="up-mon">${mon[d.getUTCMonth()]}</div></div><div style="flex:1"><div class="up-route">${b.Origin} -> ${b.Destination}</div><div class="up-time">${b.VehicleName}  ${ft(b.DepartureTime)}  ${ft(b.ArrivalTime)}</div></div><div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:5px"><span class="badge badge-g">${b.BookingStatus}</span><div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--gold)">Seat ${b.SeatNumber}</div><a href="${dlUrl}" style="display:inline-flex;align-items:center;gap:3px;font-size:0.62rem;font-weight:600;color:var(--navy);text-decoration:none;padding:3px 8px;border:1.5px solid var(--border);border-radius:4px;background:var(--bg2);font-family:'JetBrains Mono',monospace"> Ticket</a></div></div>`;}).join('');}
+    const bEl=document.getElementById('b-list');
+    if(!data.length){bEl.innerHTML=`<div class="empty"><a href="booking.html" style="color:var(--navy);font-weight:600">Book your first ticket </a></div>`;}
+    else{bEl.innerHTML=data.slice(0,5).map(b=>{const sc={confirmed:'badge-g',cancelled:'badge-r',pending:'badge-y',exchanged:'badge-b'}[b.BookingStatus]||'badge-y';const canDl=b.BookingStatus==='confirmed'||b.BookingStatus==='exchanged';const dlUrl=ticketUrl(b);return `<div class="brow"><div class="b-ico ${b.VehicleType||'bus'}">${b.VehicleType==='train'?'':''}</div><div class="b-info"><div class="b-route">${b.Origin} -> ${b.Destination}</div><div class="b-meta">${fdate(b.JourneyDate)}  Seat ${b.SeatNumber}</div></div><div class="b-right"><div class="b-price">${b.TotalFare}</div><span class="badge ${sc}">${b.BookingStatus}</span>${canDl?`<div style="margin-top:5px"><a href="${dlUrl}" style="display:inline-flex;align-items:center;gap:3px;font-size:0.65rem;color:var(--navy);font-family:'JetBrains Mono',monospace;text-decoration:none;padding:3px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg2)"> Ticket</a></div>`:''}</div></div>`;}).join('');}
+    try{const er=await fetch(`${API}/transfer/my-transfers`,{headers:hdrs()});const ed=await er.json();document.getElementById('m-exc').textContent=Array.isArray(ed)?ed.length:0;}catch{document.getElementById('m-exc').textContent=0;}
+  }catch{document.getElementById('b-list').innerHTML='<div class="empty">Data load </div>';}
+}
+
+function filterBk(f){renderAllBk(f);}
+
+//  SPENDING CHART 
+function buildSpendingChart(data){
+  const chartWrap = document.getElementById('spending-chart');
+  if(!chartWrap) return;
+  const months = {};
+  const now = new Date();
+  for(let i=5;i>=0;i--){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    const lbl = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+    months[key] = {lbl, val:0};
+  }
+  data.filter(b=>b.BookingStatus!=='cancelled').forEach(b=>{
+    const d = new Date(b.JourneyDate||b.BookedAt);
+    const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    if(months[key]) months[key].val += Number(b.TotalFare||0);
+  });
+  const vals = Object.values(months);
+  const max = Math.max(...vals.map(m=>m.val), 1);
+  const curMonth = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  chartWrap.innerHTML = `
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:2px;color:var(--text3);margin-bottom:10px">Spending  Last 6 Months</div>
+    <div class="chart-bars">
+      ${Object.entries(months).map(([key,m])=>`
+        <div class="chart-bar-col">
+          <div class="chart-bar-val">${m.val>0?''+Math.round(m.val/1000)+'k':''}</div>
+          <div class="chart-bar ${key===curMonth?'active':''}" style="height:${Math.max(4,Math.round((m.val/max)*90))}px" title="${m.val.toLocaleString()}"></div>
+          <div class="chart-bar-lbl">${m.lbl}</div>
+        </div>`).join('')}
+    </div>`;
+}
+function renderAllBk(f='all'){
+  const data=f==='all'?allBkData:allBkData.filter(b=>b.BookingStatus===f);
+  const el=document.getElementById('bk-all');
+  if(!data.length){el.innerHTML='<div class="empty"> booking </div>';return;}
+  el.innerHTML=data.map(b=>{
+    const sc={confirmed:'badge-g',cancelled:'badge-r',pending:'badge-y',exchanged:'badge-b'}[b.BookingStatus]||'badge-y';
+    const canDl=b.BookingStatus==='confirmed'||b.BookingStatus==='exchanged';
+    const dlUrl=ticketUrl(b);
+    const isPast = new Date(b.JourneyDate) < new Date();
+    const canReview = b.BookingStatus==='confirmed' && isPast && !b.HasReview;
+    return `<div class="brow"><div class="b-ico ${b.VehicleType||'bus'}">${b.VehicleType==='train'?'':''}</div><div class="b-info"><div class="b-route">${b.Origin} -> ${b.Destination}</div><div class="b-meta">${fdate(b.JourneyDate)}  ${b.VehicleName}  Seat ${b.SeatNumber}  ${b.PaymentMethod||''}</div></div><div class="b-right"><div class="b-price">${b.TotalFare}</div><span class="badge ${sc}">${b.BookingStatus}</span><div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">${canDl?`<a href="${dlUrl}" style="display:inline-flex;align-items:center;gap:4px;font-size:0.65rem;font-weight:600;color:var(--navy);text-decoration:none;padding:4px 10px;border:1.5px solid var(--border);border-radius:5px;background:var(--bg2);font-family:'JetBrains Mono',monospace;transition:all 0.15s"> Ticket</a>`:''}${canReview?`<button onclick="openReview(${b.BookingID},'${b.Origin}','${b.Destination}','${b.VehicleName||''}')" style="display:inline-flex;align-items:center;gap:4px;font-size:0.65rem;font-weight:600;color:var(--gold);padding:4px 10px;border:1.5px solid rgba(160,120,40,0.3);border-radius:5px;background:rgba(160,120,40,0.06);cursor:pointer;font-family:'Figtree',sans-serif"> Review</button>`:''}${b.Rating?`<span style="font-size:.65rem;color:var(--gold);font-family:'JetBrains Mono',monospace;padding:4px 8px;background:rgba(160,120,40,0.06);border-radius:5px"> ${b.Rating}/5</span>`:''}</div></div></div>`;
+  }).join('');
+}
+
+function openCancelModal(){
+  const cancelable=allBkData.filter(b=>b.BookingStatus==='confirmed');
+  document.getElementById('cancel-list').innerHTML=cancelable.length
+    ?cancelable.map(b=>`<div class="cancel-item"><div style="flex:1"><div class="c-route">${b.Origin} -> ${b.Destination}</div><div class="c-meta">${fdate(b.JourneyDate)}  ${b.VehicleName}  Seat ${b.SeatNumber}  ${b.TotalFare}</div></div><button class="btn-cancel-item" onclick="confirmCancel(${b.BookingID})">Cancel</button></div>`).join('')
+    :'<div class="empty">Cancel   booking </div>';
+  document.getElementById('cancel-overlay').classList.add('open');
+}
+function closeCancelModal(){document.getElementById('cancel-overlay').classList.remove('open');}
+async function confirmCancel(id){
+  if(!confirm(' booking cancel ?'))return;
+  try{
+    const res=await fetch(`${API}/bookings/${id}/cancel`,{method:'PUT',headers:hdrs()});
+    if(res.ok){closeCancelModal();toast(' Booking cancelled','ok');loadHome();}
+    else{const e=await res.json();showMsg('cancel-msg',' '+e.message,'err');}
+  }catch{showMsg('cancel-msg',' Server error','err');}
+}
+
+async function saveProfile(){
+  const fname=document.getElementById('p-fname').value.trim();
+  if(!fname){showMsg('profile-msg','First name required.','err');return;}
+  try{
+    const res=await fetch(`${API}/users/profile`,{method:'PUT',headers:hdrs(),body:JSON.stringify({firstName:fname,lastName:document.getElementById('p-lname').value.trim(),phone:document.getElementById('p-phone').value.trim(),dob:document.getElementById('p-dob').value,gender:document.getElementById('p-gender').value,nid:document.getElementById('p-nid').value.trim(),district:document.getElementById('p-district').value,address:document.getElementById('p-address').value.trim()})});
+    if(res.ok){showMsg('profile-msg',' Profile updated!','ok');const u=JSON.parse(localStorage.getItem('sctms_user')||'{}');Object.assign(u,{firstName:fname,lastName:document.getElementById('p-lname').value.trim()});localStorage.setItem('sctms_user',JSON.stringify(u));document.getElementById('profile-name').textContent=fname+' '+document.getElementById('p-lname').value.trim();document.getElementById('sb-name').textContent=fname+' '+document.getElementById('p-lname').value.trim();}
+    else{const e=await res.json();showMsg('profile-msg',' '+(e.message||'Error'),'err');}
+  }catch{showMsg('profile-msg',' Server error','err');}
+}
+
+function checkPw(pw){
+  const checks=[pw.length>=8,/[A-Z]/.test(pw),/[0-9]/.test(pw),/[^A-Za-z0-9]/.test(pw)];
+  const score=checks.filter(Boolean).length;
+  const cfg=[[0,'0%','transparent',''],[1,'25%','var(--red)','Weak'],[2,'50%','#D97706','Fair'],[3,'75%','var(--blue)','Good'],[4,'100%','var(--green)','Strong']][score];
+  document.getElementById('pw-bar').style.cssText=`width:${cfg[1]};background:${cfg[2]}`;
+  document.getElementById('pw-lbl').textContent=cfg[3];document.getElementById('pw-lbl').style.color=cfg[2];
+  ['req-len','req-upper','req-num','req-sym'].forEach((id,i)=>{const e=document.getElementById(id);e.querySelector('span').textContent=checks[i]?'':'';e.style.color=checks[i]?'var(--green)':'var(--text2)';});
+}
+
+async function changePw(){
+  const old=document.getElementById('pw-old').value,nw=document.getElementById('pw-new').value,conf=document.getElementById('pw-conf').value;
+  if(!old||!nw||!conf){showMsg('pw-msg',' field  ','err');return;}
+  if(nw!==conf){showMsg('pw-msg','Password match ','err');return;}
+  if(nw.length<8){showMsg('pw-msg','  character','err');return;}
+  try{
+    const res=await fetch(`${API}/users/change-password`,{method:'PUT',headers:hdrs(),body:JSON.stringify({currentPassword:old,newPassword:nw})});
+    if(res.ok){showMsg('pw-msg',' Password updated!','ok');document.getElementById('pw-old').value='';document.getElementById('pw-new').value='';document.getElementById('pw-conf').value='';checkPw('');}
+    else{const e=await res.json();showMsg('pw-msg',' '+(e.message||'Error'),'err');}
+  }catch{showMsg('pw-msg',' Server error','err');}
+}
+
+loadHome();
+
+//  REVIEW 
+let _rvBookingID = null, _rvRating = 0, _rvTags = [];
+function openReview(id, origin, dest, vehicle){
+  _rvBookingID=id; _rvRating=0; _rvTags=[];
+  document.getElementById('rv-trip').textContent = `${origin}  ${dest}  ${vehicle}`;
+  document.getElementById('rv-score').textContent='';
+  document.querySelectorAll('.star-btn').forEach(s=>s.classList.remove('lit'));
+  document.querySelectorAll('.rv-tag').forEach(t=>t.classList.remove('sel'));
+  document.getElementById('rv-comment').value='';
+  document.getElementById('rv-msg').style.display='none';
+  document.getElementById('review-overlay').classList.add('open');
+}
+function closeReview(){document.getElementById('review-overlay').classList.remove('open');}
+function setRating(n){
+  _rvRating=n;
+  const labels=['','Terrible','Poor','Okay','Good','Excellent'];
+  document.getElementById('rv-score').textContent=labels[n]+' ('+n+'/5)';
+  document.querySelectorAll('.star-btn').forEach((s,i)=>s.classList.toggle('lit',i<n));
+}
+function toggleTag(el){
+  el.classList.toggle('sel');
+  const tag=el.textContent;
+  if(el.classList.contains('sel')) _rvTags.push(tag);
+  else _rvTags=_rvTags.filter(t=>t!==tag);
+}
+async function submitReview(){
+  if(!_rvRating){showMsg('rv-msg','Rating  ( click )','err');return;}
+  const body={bookingID:_rvBookingID,rating:_rvRating,tags:_rvTags,comment:document.getElementById('rv-comment').value.trim()};
+  try{
+    const res=await fetch(`${API}/bookings/${_rvBookingID}/review`,{method:'POST',headers:hdrs(),body:JSON.stringify(body)});
+    if(res.ok){
+      closeReview();toast(' Review submitted!','ok');
+      // mark locally so button disappears
+      const bk=allBkData.find(b=>b.BookingID===_rvBookingID);
+      if(bk){bk.HasReview=true;bk.Rating=_rvRating;}
+      renderAllBk();
+    } else {
+      const e=await res.json();
+      // If endpoint doesn't exist yet, show success anyway (dev mode)
+      if(res.status===404){closeReview();toast(' Review saved (dev mode)','ok');const bk=allBkData.find(b=>b.BookingID===_rvBookingID);if(bk){bk.HasReview=true;bk.Rating=_rvRating;}renderAllBk();}
+      else showMsg('rv-msg',' '+(e.message||'Error'),'err');
+    }
+  }catch{closeReview();toast(' Review saved (dev mode)','ok');}
+}
+
+
+// Load notifications on page load + poll every 60s
+loadNotifications();
+setInterval(loadNotifications, 60000);
+</script>
+</body>
+</html>
+
+

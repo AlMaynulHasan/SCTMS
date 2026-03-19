@@ -1,0 +1,490 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Routes - SCTMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Figtree:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FDFBF8;--bg2:#F7F4EF;--bg3:#F0EDE6;--surface:#fff;
+  --navy:#0F1729;--navy2:#1B2340;--navy3:#2C3659;
+  --gold:#A07828;--gold2:#C49A32;--gold-dim:rgba(160,120,40,0.07);
+  --text:#0F1729;--text2:#5C6478;--text3:rgba(15,23,41,0.32);
+  --border:rgba(15,23,41,0.09);--border2:rgba(160,120,40,0.22);
+  --green:#2A7A4B;--red:#C0392B;--blue:#2563EB;
+  --shadow:0 1px 3px rgba(15,23,41,0.05),0 4px 16px rgba(15,23,41,0.05);
+}
+body{background:var(--bg);color:var(--text);font-family:'Figtree','Noto Sans Bengali',sans-serif;min-height:100vh}
+
+/* NAV */
+nav{height:62px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 64px;background:rgba(253,251,248,0.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{width:30px;height:30px;border-radius:7px;background:var(--navy);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-size:0.9rem;font-weight:700;color:#fff}
+.logo-word{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;
+  color:var(--navy);letter-spacing:2px;text-transform:uppercase}
+.logo-word em{color:var(--gold);font-style:normal}
+.nav-links{display:flex;gap:4px}
+.nav-link{padding:6px 14px;border-radius:6px;color:var(--text2);text-decoration:none;
+  font-size:0.72rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;transition:all 0.18s}
+.nav-link:hover,.nav-link.active{background:var(--bg3);color:var(--navy)}
+.nav-right{display:flex;gap:8px}
+.btn-ghost{padding:8px 18px;border-radius:7px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);font-family:'Figtree',sans-serif;
+  font-size:0.82rem;cursor:pointer;text-decoration:none;transition:all 0.18s}
+.btn-ghost:hover{border-color:var(--navy);color:var(--navy)}
+.btn-solid{padding:8px 20px;border-radius:7px;border:none;background:var(--navy);
+  color:#fff;font-family:'Figtree',sans-serif;font-size:0.82rem;font-weight:600;
+  cursor:pointer;text-decoration:none;transition:all 0.18s}
+.btn-solid:hover{background:var(--navy2)}
+.lang-toggle{
+  padding:8px 12px;border-radius:7px;border:1px solid var(--border);
+  background:var(--surface);color:var(--navy);font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;letter-spacing:1px;cursor:pointer;transition:all 0.18s
+}
+.lang-toggle:hover{border-color:var(--navy);background:var(--bg2)}
+
+/* PAGE HEADER */
+.page-header{background:var(--navy);padding:48px 64px 44px;position:relative;overflow:hidden}
+.page-header::after{content:'';position:absolute;top:-80px;right:-60px;width:320px;height:320px;
+  border-radius:50%;background:radial-gradient(circle,rgba(160,120,40,0.1),transparent 70%)}
+.ph-tag{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:rgba(255,255,255,0.35);
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:10px}
+.ph-title{font-family:'Fraunces',serif;font-size:2.4rem;font-weight:300;color:#fff;
+  letter-spacing:-0.5px;margin-bottom:6px}
+.ph-title strong{font-weight:700}
+.ph-sub{font-size:0.84rem;color:rgba(255,255,255,0.45);font-weight:300}
+.ph-stats{display:flex;gap:32px;margin-top:24px}
+.phs{font-family:'JetBrains Mono',monospace}
+.phs-val{font-size:1.3rem;font-weight:500;color:#fff;line-height:1}
+.phs-label{font-size:0.54rem;color:rgba(255,255,255,0.3);letter-spacing:2px;
+  text-transform:uppercase;margin-top:3px}
+
+/* FILTER BAR */
+.filter-bar{background:var(--surface);border-bottom:1px solid var(--border);
+  padding:16px 64px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.filter-alert{
+  width:100%;display:none;padding:10px 12px;border-radius:7px;
+  background:rgba(192,57,43,0.06);border:1px solid rgba(192,57,43,0.15);
+  color:var(--red);font-size:0.8rem
+}
+.field-error{border-color:var(--red)!important;background:#fff7f6}
+.filter-select,.filter-input{
+  background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+  padding:9px 13px;color:var(--navy);font-family:'Figtree',sans-serif;
+  font-size:0.82rem;outline:none;transition:all 0.18s;-webkit-appearance:none;cursor:pointer}
+.filter-select:focus,.filter-input:focus{border-color:var(--navy);background:var(--surface)}
+.btn-search{padding:9px 22px;border-radius:7px;border:none;background:var(--navy);
+  color:#fff;font-family:'Figtree',sans-serif;font-size:0.82rem;font-weight:600;
+  cursor:pointer;transition:all 0.18s}
+.btn-search:hover{background:var(--navy2)}
+.btn-clear{padding:9px 16px;border-radius:7px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);font-family:'Figtree',sans-serif;
+  font-size:0.82rem;cursor:pointer;transition:all 0.18s}
+.btn-clear:hover{border-color:var(--navy);color:var(--navy)}
+.filter-spacer{flex:1}
+
+/* TYPE TABS */
+.type-tabs{background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 64px;display:flex;align-items:center;justify-content:space-between}
+.tabs{display:flex}
+.tab{padding:14px 20px;border-bottom:2px solid transparent;cursor:pointer;
+  font-size:0.8rem;font-weight:500;color:var(--text2);transition:all 0.18s;
+  font-family:'Figtree',sans-serif}
+.tab:hover{color:var(--navy)}
+.tab.active{color:var(--navy);border-bottom-color:var(--navy);font-weight:600}
+.result-count{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text2)}
+
+/* CONTENT */
+.content{padding:28px 64px;max-width:1400px;margin:0 auto}
+
+/* SCHEDULE CARD */
+.sched-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:0;margin-bottom:10px;transition:all 0.2s;overflow:hidden;
+  display:grid;grid-template-columns:1fr 1px 1fr 1px 140px 1px 100px 1px 110px;
+  align-items:center;
+}
+.sched-card:hover{border-color:rgba(15,23,41,0.2);box-shadow:var(--shadow)}
+.sc-cell{padding:20px 24px}
+.sc-divider{background:var(--border);align-self:stretch}
+.sc-route{}
+.sc-vtype{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;
+  border-radius:4px;margin-bottom:10px;font-family:'JetBrains Mono',monospace;
+  font-size:0.56rem;font-weight:500;letter-spacing:1px;text-transform:uppercase}
+.vt{background:rgba(37,99,235,0.07);color:var(--blue);border:1px solid rgba(37,99,235,0.1)}
+.vb{background:rgba(42,122,75,0.07);color:var(--green);border:1px solid rgba(42,122,75,0.1)}
+.sc-cities{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;
+  color:var(--navy);display:flex;align-items:center;gap:8px}
+.sc-arrow{color:var(--gold);font-size:0.9rem}
+.sc-vehicle{font-size:0.75rem;color:var(--text2);margin-top:3px;font-weight:300}
+.sc-time-block{text-align:center}
+.sc-time{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600;color:var(--navy);line-height:1}
+.sc-city-sm{font-size:0.68rem;color:var(--text2);margin-top:3px;font-family:'JetBrains Mono',monospace}
+.sc-duration{text-align:center}
+.sc-dur-line{display:flex;align-items:center;gap:4px;justify-content:center;margin-bottom:4px}
+.dl{flex:1;height:1px;background:var(--border)}
+.sc-dur-val{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--text2);white-space:nowrap}
+.sc-amen{font-size:0.62rem;color:var(--text2);text-align:center;font-weight:300}
+.sc-seats{text-align:center}
+.sc-seats-num{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:600;color:var(--navy)}
+.sc-seats-label{font-size:0.6rem;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.sc-fare{text-align:center}
+.sc-fare-num{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--navy)}
+.sc-fare-label{font-size:0.6rem;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.sc-action{padding:16px 20px;text-align:center}
+.btn-book{
+  padding:10px 18px;border-radius:7px;border:none;background:var(--navy);
+  color:#fff;font-family:'Figtree',sans-serif;font-size:0.8rem;font-weight:600;
+  cursor:pointer;transition:all 0.18s;white-space:nowrap;text-decoration:none;display:inline-block}
+.btn-book:hover{background:var(--navy2);transform:translateY(-1px)}
+.btn-book.sold{background:var(--bg3);color:var(--text3);cursor:not-allowed;transform:none}
+.btn-book.signin{background:var(--bg2);color:var(--navy2);border:1px solid var(--border)}
+.btn-book.signin:hover{background:var(--bg3)}
+.avail-badge{display:inline-block;padding:2px 8px;border-radius:4px;
+  font-family:'JetBrains Mono',monospace;font-size:0.58px;margin-top:5px}
+
+/* LOGIN BANNER */
+.login-banner{
+  background:var(--navy);border-radius:10px;padding:16px 24px;margin-bottom:20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.login-banner p{font-size:0.84rem;color:rgba(255,255,255,0.7);font-weight:300}
+.login-banner a{color:var(--gold2);font-weight:600;text-decoration:none}
+.login-banner a:hover{text-decoration:underline}
+
+.spinner{width:28px;height:28px;border:2px solid var(--border);
+  border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite;margin:60px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{padding:80px;text-align:center}
+.empty-state h3{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;
+  color:var(--navy);margin-bottom:8px}
+.empty-state p{font-size:0.84rem;color:var(--text2);font-weight:300}
+
+@media(max-width:1100px){
+  nav{padding:0 24px}.page-header{padding:36px 24px 32px}
+  .filter-bar{padding:12px 24px}.type-tabs{padding:0 24px}.content{padding:20px 24px}
+  .sched-card{grid-template-columns:1fr;border:1px solid var(--border)}
+  .sc-divider{display:none}.sc-cell{padding:14px 20px;border-bottom:1px solid var(--border)}
+  .sc-cell:last-child{border-bottom:none}
+}
+@media(max-width:640px){
+  .nav-links{display:none}.ph-stats{gap:20px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">S</div>
+    <div class="logo-word">SC<em>T</em>MS</div>
+  </a>
+  <div class="nav-links">
+    <a href="routes.html" class="nav-link active" data-i18n="nav_routes">Routes</a>
+    <a href="booking.html" class="nav-link" data-i18n="nav_book">Book</a>
+    <a href="marketplace.html" class="nav-link" data-i18n="nav_market">Marketplace</a>
+    <a href="dashboard.html" class="nav-link" data-i18n="nav_dash">Dashboard</a>
+  </div>
+  <div class="nav-right">
+    <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
+    <a href="login.html" class="btn-ghost" id="nav-signin" data-i18n="nav_signin">Sign In</a>
+    <a href="register.html" class="btn-solid" id="nav-register" data-i18n="nav_register">Register</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="ph-tag" data-i18n="ph_tag">Live Schedules</div>
+  <div class="ph-title" data-i18n="ph_title"><strong>All Routes</strong></div>
+  <div class="ph-sub" data-i18n="ph_sub">Search across all bus &amp; train schedules</div>
+  <div class="ph-stats">
+    <div class="phs"><div class="phs-val" id="ph-count">-</div><div class="phs-label" data-i18n="ph_sched">Schedules</div></div>
+    <div class="phs"><div class="phs-val">12</div><div class="phs-label" data-i18n="ph_cities">Cities</div></div>
+    <div class="phs"><div class="phs-val">30+</div><div class="phs-label" data-i18n="ph_routes">Routes</div></div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <div class="filter-alert" id="filter-alert" role="alert"></div>
+  <select class="filter-select" id="f-from">
+    <option value="" data-i18n="opt_from">From City</option>
+    <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
+    <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
+    <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
+    <option>Jessore</option><option>Bogra</option><option>Dinajpur</option>
+  </select>
+  <select class="filter-select" id="f-to">
+    <option value="" data-i18n="opt_to">To City</option>
+    <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
+    <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
+    <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
+    <option>Jessore</option><option>Bogra</option><option>Dinajpur</option>
+  </select>
+  <input type="date" class="filter-input" id="f-date">
+  <button class="btn-search" onclick="search()" data-i18n="btn_search">Search</button>
+  <button class="btn-clear" onclick="clearFilters()" data-i18n="btn_clear">Clear</button>
+</div>
+
+<div class="type-tabs">
+  <div class="tabs">
+    <div class="tab active" onclick="setType('all',this)" data-mode="all" data-i18n="tab_all">All</div>
+    <div class="tab" onclick="setType('train',this)" data-mode="train" data-i18n="tab_train">Train</div>
+    <div class="tab" onclick="setType('bus',this)" data-mode="bus" data-i18n="tab_bus">Bus</div>
+  </div>
+  <div class="result-count" id="result-count"></div>
+</div>
+
+<div class="content">
+  <div id="login-banner" class="login-banner" style="display:none">
+    <p data-i18n="login_banner">Sign in to book tickets instantly. Already have an account?</p>
+    <a href="login.html" data-i18n="login_cta">Sign In -></a>
+  </div>
+  <div id="schedules-list"><div class="spinner"></div></div>
+</div>
+
+<script>
+const API='http://localhost:5000/api';
+const token=localStorage.getItem('sctms_token');
+const user=JSON.parse(localStorage.getItem('sctms_user')||'{}');
+let allData=[], curType='all';
+
+const i18n = {
+  en:{
+    nav_routes:'Routes',nav_book:'Book',nav_market:'Marketplace',nav_dash:'Dashboard',
+    nav_signin:'Sign In',nav_register:'Register',
+    ph_tag:'Live Schedules',ph_title:'<strong>All Routes</strong>',ph_sub:'Search across all bus &amp; train schedules',
+    ph_sched:'Schedules',ph_cities:'Cities',ph_routes:'Routes',
+    opt_from:'From City',opt_to:'To City',btn_search:'Search',btn_clear:'Clear',
+    tab_all:'All',tab_train:'Train',tab_bus:'Bus',
+    login_banner:'Sign in to book tickets instantly. Already have an account?',login_cta:'Sign In ->',
+    err_missing:'Select From, To and Date to search.',
+    err_same:'From and To cannot be the same city.',
+    result_count:'{n} schedule{p} found',
+    empty_title:'No schedules found',empty_msg:'Try a different route or date.',
+    conn_title:'Connection Error',conn_msg:'Is the backend running?',
+    seats_left:'seats left',per_seat:'per seat',direct:'DIRECT',
+    book:'Book ->',sold:'Sold out',signin:'Sign in',
+    type_train:'Train',type_bus:'Bus'
+  },
+  bn:{
+    nav_routes:'রুট',nav_book:'বুকিং',nav_market:'মার্কেটপ্লেস',nav_dash:'ড্যাশবোর্ড',
+    nav_signin:'সাইন ইন',nav_register:'রেজিস্টার',
+    ph_tag:'লাইভ শিডিউল',ph_title:'<strong>সব রুট</strong>',ph_sub:'সব বাস ও ট্রেনের শিডিউল খুঁজুন',
+    ph_sched:'শিডিউল',ph_cities:'শহর',ph_routes:'রুট',
+    opt_from:'যাত্রা শুরু',opt_to:'গন্তব্য',btn_search:'সার্চ',btn_clear:'ক্লিয়ার',
+    tab_all:'সব',tab_train:'ট্রেন',tab_bus:'বাস',
+    login_banner:'টিকিট বুক করতে সাইন ইন করুন। ইতিমধ্যে একাউন্ট আছে?',login_cta:'সাইন ইন ->',
+    err_missing:'সার্চ করতে From, To এবং Date দিন।',
+    err_same:'From এবং To একই হতে পারে না।',
+    result_count:'{n} টি শিডিউল পাওয়া গেছে',
+    empty_title:'কোন শিডিউল পাওয়া যায়নি',empty_msg:'ভিন্ন রুট বা তারিখ চেষ্টা করুন।',
+    conn_title:'সংযোগ সমস্যা',conn_msg:'ব্যাকএন্ড চলছে তো?',
+    seats_left:'সিট বাকি',per_seat:'প্রতি সিট',direct:'ডাইরেক্ট',
+    book:'বুক করুন ->',sold:'সোল্ড আউট',signin:'সাইন ইন',
+    type_train:'ট্রেন',type_bus:'বাস'
+  }
+};
+let curLang = localStorage.getItem('sctms_lang') || 'en';
+function t(k){return (i18n[curLang]&&i18n[curLang][k])||i18n.en[k]||k;}
+function applyLang(){
+  document.documentElement.lang=curLang;
+  const toggle=document.getElementById('lang-toggle');
+  toggle.textContent=curLang==='en'?'EN':'BN';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    const val=t(key);
+    if(val.includes('<')) el.innerHTML=val; else el.textContent=val;
+  });
+}
+document.getElementById('lang-toggle').addEventListener('click',()=>{
+  curLang=curLang==='en'?'bn':'en';
+  localStorage.setItem('sctms_lang',curLang);
+  applyLang();
+  syncAuthNav();
+  renderList();
+  const alert=document.getElementById('filter-alert');
+  if(alert.style.display==='block') alert.textContent=alert.dataset.key?t(alert.dataset.key):alert.textContent;
+});
+function syncAuthNav(){
+  if(token){
+    document.getElementById('nav-signin').style.display='none';
+    document.getElementById('nav-register').textContent=t('nav_dash');
+    document.getElementById('nav-register').href=user.role==='admin'?'dashboard-admin.html':'dashboard.html';
+    document.getElementById('login-banner').style.display='none';
+  } else {
+    document.getElementById('nav-signin').style.display='inline-flex';
+    document.getElementById('nav-register').textContent=t('nav_register');
+    document.getElementById('nav-register').href='register.html';
+    document.getElementById('login-banner').style.display='flex';
+  }
+}
+applyLang();
+syncAuthNav();
+['f-from','f-to','f-date'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('input',clearAlert);
+  el.addEventListener('change',clearAlert);
+});
+
+// auth nav handled by syncAuthNav()
+
+// Pre-fill from URL params
+const params=new URLSearchParams(location.search);
+if(params.get('from'))document.getElementById('f-from').value=params.get('from');
+if(params.get('to'))document.getElementById('f-to').value=params.get('to');
+if(params.get('date'))document.getElementById('f-date').value=params.get('date');
+const modeParam = params.get('mode');
+
+if(!params.get('date')) document.getElementById('f-date').valueAsDate=new Date();
+
+let curType2='all';
+if(modeParam && ['bus','train','all'].includes(modeParam)){
+  const tabEls = Array.from(document.querySelectorAll('.tab'));
+  const tEl = tabEls.find(t=>t.dataset.mode===modeParam);
+  if(tEl){ setType(modeParam,tEl); } else { curType2=modeParam; }
+}
+function setType(t,el){
+  curType2=t;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderList();
+}
+
+function ft(t){if(!t)return "-";const d=new Date(t);return d.getUTCHours().toString().padStart(2,'0')+":"+d.getUTCMinutes().toString().padStart(2,'0');}
+function dur(dep,arr){if(!dep||!arr)return "-";const m=Math.round((new Date(arr)-new Date(dep))/60000);const h=Math.floor(m/60),mn=m%60;return h?`${h}h ${mn}m`:`${mn}m`;}
+function setAlert(key){
+  const a=document.getElementById('filter-alert');
+  a.dataset.key=key;
+  a.textContent=t(key);
+  a.style.display='block';
+}
+function clearAlert(){
+  const a=document.getElementById('filter-alert');
+  a.style.display='none';a.textContent='';a.dataset.key='';
+  document.getElementById('f-from').classList.remove('field-error');
+  document.getElementById('f-to').classList.remove('field-error');
+  document.getElementById('f-date').classList.remove('field-error');
+}
+function validateFilters(){
+  const from=document.getElementById('f-from').value;
+  const to=document.getElementById('f-to').value;
+  const date=document.getElementById('f-date').value;
+  clearAlert();
+  if(!from||!to||!date){
+    if(!from) document.getElementById('f-from').classList.add('field-error');
+    if(!to) document.getElementById('f-to').classList.add('field-error');
+    if(!date) document.getElementById('f-date').classList.add('field-error');
+    setAlert('err_missing');
+    return false;
+  }
+  if(from===to){
+    document.getElementById('f-from').classList.add('field-error');
+    document.getElementById('f-to').classList.add('field-error');
+    setAlert('err_same');
+    return false;
+  }
+  return true;
+}
+
+async function search(){
+  if(!validateFilters()) return;
+  const from=document.getElementById('f-from').value;
+  const to=document.getElementById('f-to').value;
+  const date=document.getElementById('f-date').value;
+  const el=document.getElementById('schedules-list');
+  el.innerHTML='<div class="spinner"></div>';
+  try{
+    let url=`${API}/schedules/search?date=${date||new Date().toISOString().split('T')[0]}`;
+    if(from)url+=`&origin=${encodeURIComponent(from)}`;
+    if(to)url+=`&destination=${encodeURIComponent(to)}`;
+    const res=await fetch(url);
+    const data=await res.json();
+    allData=(data.schedules||data||[]);
+    renderList();
+  }catch{el.innerHTML=`<div class="empty-state"><h3>${t('conn_title')}</h3><p>${t('conn_msg')}</p></div>`;}
+}
+
+function renderList(){
+  const el=document.getElementById('schedules-list');
+  let list=curType2==='all'?allData:allData.filter(s=>s.VehicleType===curType2);
+  const p=list.length!==1?'s':'';
+  document.getElementById('result-count').textContent=t('result_count').replace('{n}',list.length).replace('{p}',p);
+  document.getElementById('ph-count').textContent=list.length;
+  if(!list.length){el.innerHTML=`<div class="empty-state"><h3>${t('empty_title')}</h3><p>${t('empty_msg')}</p></div>`;return;}
+  el.innerHTML=list.map(s=>{
+    const isT=s.VehicleType==='train';
+    const avail=s.AvailableSeats;
+    const total=s.TotalSeats||40;
+    const sold=avail===0;
+    const low=avail>0&&avail<=5;
+    let bookBtn='';
+    if(!token) bookBtn=`<a href="login.html" class="btn-book signin">${t('signin')}</a>`;
+    else if(sold) bookBtn=`<span class="btn-book sold">${t('sold')}</span>`;
+    else bookBtn=`<a href="booking.html?scheduleId=${s.ScheduleID}&from=${encodeURIComponent(s.Origin)}&to=${encodeURIComponent(s.Destination)}&date=${(s.JourneyDate||'').split('T')[0]}" class="btn-book">${t('book')}</a>`;
+    return `<div class="sched-card">
+      <div class="sc-cell sc-route">
+        <div class="sc-vtype ${isT?'vt':'vb'}">${isT?t('type_train'):t('type_bus')} ${s.VehicleType}</div>
+        <div class="sc-cities">${s.Origin}<span class="sc-arrow">-></span>${s.Destination}</div>
+        <div class="sc-vehicle">${s.VehicleName||''}</div>
+      </div>
+      <div class="sc-divider"></div>
+      <div class="sc-cell sc-time-block" style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center">
+        <div><div class="sc-time">${ft(s.DepartureTime)}</div><div class="sc-city-sm">${s.Origin}</div></div>
+        <div style="text-align:center">
+          <div class="sc-dur-line"><div class="dl"></div><div class="sc-dur-val">${dur(s.DepartureTime,s.ArrivalTime)}</div><div class="dl"></div></div>
+          <div style="font-size:0.58rem;color:var(--text3);font-family:'JetBrains Mono',monospace">${t('direct')}</div>
+        </div>
+        <div style="text-align:right"><div class="sc-time">${ft(s.ArrivalTime)}</div><div class="sc-city-sm">${s.Destination}</div></div>
+      </div>
+      <div class="sc-divider"></div>
+      <div class="sc-cell sc-seats" style="text-align:center">
+        <div class="sc-seats-num" style="color:${sold?'var(--red)':low?'#D97706':'var(--green)'}">${avail}</div>
+        <div class="sc-seats-label">${t('seats_left')}</div>
+      </div>
+      <div class="sc-divider"></div>
+      <div class="sc-cell sc-fare" style="text-align:center">
+        <div class="sc-fare-num">BDT ${s.Fare}</div>
+        <div class="sc-fare-label">${t('per_seat')}</div>
+      </div>
+      <div class="sc-action">${bookBtn}</div>
+    </div>`;
+  }).join('');
+}
+
+function clearFilters(){
+  document.getElementById('f-from').value='';
+  document.getElementById('f-to').value='';
+  document.getElementById('f-date').valueAsDate=new Date();
+  clearAlert();
+  initialLoad();
+}
+
+// Initial load  popular routes
+async function initialLoad(){
+  const el=document.getElementById('schedules-list');
+  const today=new Date().toISOString().split('T')[0];
+  const pairs=[['Dhaka','Chittagong'],['Dhaka','Sylhet'],['Dhaka','Rajshahi'],['Dhaka','Khulna'],['Chittagong','Dhaka']];
+  try{
+    const results=await Promise.all(pairs.map(([o,d])=>fetch(`${API}/schedules/search?origin=${o}&destination=${d}&date=${today}`).then(r=>r.json())));
+    allData=results.flatMap(r=>r.schedules||r||[]);
+    renderList();
+  }catch{el.innerHTML=`<div class="empty-state"><h3>${t('conn_title')}</h3><p>${t('conn_msg')}</p></div>`;}
+}
+
+if(params.get('from')||params.get('to')||params.get('date')) search();
+else initialLoad();
+</script>
+</body>
+</html>
+
+
+
+
+
+

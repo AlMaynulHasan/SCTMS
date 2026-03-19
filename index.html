@@ -1,0 +1,915 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SCTMS - Smart City Transport. Book bus and train tickets across Bangladesh with instant search.">
+<title>SCTMS - Smart City Transport</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Figtree:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FDFBF8;--bg2:#F7F4EF;--bg3:#F0EDE6;--surface:#FFFFFF;
+  --navy:#0F1729;--navy2:#1B2340;--navy3:#2C3659;
+  --gold:#A07828;--gold2:#C49A32;--gold-dim:rgba(160,120,40,0.07);
+  --text:#0F1729;--text2:#5C6478;--text3:rgba(15,23,41,0.32);
+  --border:rgba(15,23,41,0.09);--border2:rgba(160,120,40,0.22);
+  --green:#2A7A4B;--red:#C0392B;--blue:#2563EB;
+  --shadow:0 1px 3px rgba(15,23,41,0.05),0 4px 16px rgba(15,23,41,0.06);
+  --shadow2:0 2px 8px rgba(15,23,41,0.07),0 20px 48px rgba(15,23,41,0.09);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Figtree','Noto Sans Bengali',sans-serif;min-height:100vh}
+button{font-family:inherit}
+button:focus-visible,a:focus-visible{
+  outline:2px solid var(--gold2);
+  outline-offset:2px;
+}
+
+/* NAV - transparent over hero image */
+nav{
+  position:absolute;top:0;left:0;right:0;z-index:100;
+  height:68px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 64px;
+  background:transparent;
+}
+nav.scrolled{
+  position:fixed;
+  background:rgba(15,23,41,0.96);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{
+  width:32px;height:32px;border-radius:7px;
+  background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:#fff;
+}
+.logo-word{
+  font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;
+  color:#fff;letter-spacing:2px;text-transform:uppercase;
+}
+.logo-word em{color:var(--gold2);font-style:normal}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-link{
+  padding:6px 14px;border-radius:6px;
+  color:rgba(255,255,255,0.75);text-decoration:none;font-size:0.72rem;font-weight:500;
+  letter-spacing:1.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;
+  transition:all 0.18s;
+}
+.nav-link:hover{background:rgba(255,255,255,0.1);color:#fff}
+.nav-right{display:flex;align-items:center;gap:8px}
+.btn-ghost{
+  padding:8px 18px;border-radius:7px;border:1px solid rgba(255,255,255,0.25);
+  background:transparent;color:rgba(255,255,255,0.85);font-family:'Figtree',sans-serif;
+  font-size:0.82rem;font-weight:500;cursor:pointer;text-decoration:none;transition:all 0.18s;
+}
+.btn-ghost:hover{border-color:#fff;color:#fff;background:rgba(255,255,255,0.08)}
+.btn-solid{
+  padding:8px 20px;border-radius:7px;border:none;
+  background:#fff;color:var(--navy);font-family:'Figtree',sans-serif;
+  font-size:0.82rem;font-weight:700;cursor:pointer;text-decoration:none;transition:all 0.18s;
+}
+.btn-solid:hover{background:var(--gold2);color:#fff}
+.lang-toggle{
+  padding:8px 12px;border-radius:7px;border:1px solid rgba(255,255,255,0.3);
+  background:rgba(255,255,255,0.1);color:#fff;font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;letter-spacing:1px;cursor:pointer;transition:all 0.18s
+}
+.lang-toggle:hover{background:rgba(255,255,255,0.2);border-color:#fff}
+
+/* ===================== HERO ===================== */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:120px 24px 80px;text-align:center;position:relative;overflow:hidden;
+}
+
+/* Background image */
+.hero-img{
+  position:absolute;inset:0;z-index:0;
+  background-image:var(--hero-bg);
+  background-size:cover;background-position:center 40%;
+  transform:scale(1.03);animation:slowzoom 20s ease infinite alternate;
+  transition:background-image 0.5s ease;
+}
+/* CSS fallback when no photo - animated deep navy gradient with subtle texture */
+.hero-img.no-photo{
+  background-image:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(44,80,160,0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 70%, rgba(160,120,40,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 100% 50% at 50% 100%, rgba(10,15,30,0.9) 0%, transparent 70%),
+    linear-gradient(160deg, #0a0f1e 0%, #111827 40%, #0f1e3a 70%, #0a0f1e 100%);
+  animation:bgshift 12s ease infinite alternate, slowzoom 20s ease infinite alternate;
+}
+@keyframes bgshift{
+  0%{filter:hue-rotate(0deg) brightness(1)}
+  50%{filter:hue-rotate(8deg) brightness(1.06)}
+  100%{filter:hue-rotate(-5deg) brightness(0.97)}
+}
+/* Animated dot grid overlay for no-photo state */
+.hero-img.no-photo::after{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px);
+  background-size:36px 36px;
+  animation:dotsway 8s ease infinite alternate;
+}
+@keyframes dotsway{from{transform:translate(0,0)}to{transform:translate(6px,4px)}}
+@keyframes slowzoom{from{transform:scale(1.03)}to{transform:scale(1.08)}}
+
+/* Dark gradient overlay - heavier at top and bottom */
+.hero-overlay{
+  position:absolute;inset:0;z-index:1;
+  background:
+    linear-gradient(to bottom,
+      rgba(10,15,30,0.72) 0%,
+      rgba(10,15,30,0.45) 35%,
+      rgba(10,15,30,0.52) 65%,
+      rgba(10,15,30,0.85) 100%
+    );
+}
+
+/* All hero children above overlay */
+.hero>*:not(.hero-img):not(.hero-overlay){position:relative;z-index:2;}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.2);border-radius:20px;
+  padding:5px 14px 5px 10px;margin-bottom:22px;
+  font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:rgba(255,255,255,0.85);
+  letter-spacing:2px;text-transform:uppercase;
+}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+h1{
+  font-family:'Fraunces',serif;font-size:clamp(2.6rem,5.5vw,5rem);
+  font-weight:300;line-height:1.08;color:#fff;
+  margin-bottom:14px;letter-spacing:-1px;
+  text-shadow:0 2px 24px rgba(0,0,0,0.3);
+}
+h1 em{font-style:italic;color:var(--gold2)}
+h1 strong{font-weight:700}
+.hero-sub{
+  font-size:1rem;color:rgba(255,255,255,0.7);line-height:1.7;
+  max-width:420px;margin:0 auto 40px;font-weight:300;
+}
+
+/* SEARCH CARD */
+.search-card{
+  width:100%;max-width:700px;
+  background:#fff;border-radius:16px;
+  padding:24px 28px 28px;
+  box-shadow:0 24px 80px rgba(0,0,0,0.35);
+  margin-bottom:36px;text-align:left;
+}
+.sf-alert{
+  display:none;margin-bottom:12px;padding:9px 12px;border-radius:8px;
+  background:rgba(192,57,43,0.06);border:1px solid rgba(192,57,43,0.15);
+  color:#b42318;font-size:0.82rem
+}
+.field-error{border-color:var(--red)!important;background:#fff7f6}
+
+/* Tab row: Bus / Train */
+.search-tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0}
+.stab{
+  padding:9px 18px;font-size:0.78rem;font-weight:600;cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  color:var(--text2);transition:all 0.18s;background:none;border-top:none;border-left:none;border-right:none;
+  font-family:'Figtree',sans-serif;
+}
+.stab.active{color:var(--navy);border-bottom-color:var(--navy)}
+.stab:hover{color:var(--navy)}
+
+.sf-swap-row{display:grid;grid-template-columns:1fr 40px 1fr;align-items:end;margin-bottom:12px;gap:0}
+.sf label{
+  display:block;font-family:'JetBrains Mono',monospace;font-size:0.52rem;
+  color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:5px;
+}
+.sf select,.sf input[type=date]{
+  width:100%;background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:8px;padding:12px 14px;color:var(--navy);
+  font-family:'Figtree',sans-serif;font-size:0.9rem;outline:none;
+  transition:all 0.18s;-webkit-appearance:none;cursor:pointer;
+}
+.sf select:focus,.sf input[type=date]:focus{
+  border-color:var(--navy);background:#fff;
+  box-shadow:0 0 0 3px rgba(15,23,41,0.07);
+}
+.sf select option{background:#fff}
+.swap-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:50%;
+  border:1.5px solid var(--border);background:#fff;
+  cursor:pointer;font-size:1rem;transition:all 0.22s;align-self:center;margin:0 auto;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+}
+.swap-btn:hover{border-color:var(--navy);background:var(--navy);color:#fff;transform:rotate(180deg)}
+
+.sf-bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.sf-date{}
+.sf-pass{position:relative}
+.btn-search{
+  width:100%;padding:14px;border-radius:10px;border:none;
+  background:linear-gradient(135deg,var(--navy) 0%,#2C3659 100%);
+  color:#fff;
+  font-family:'Figtree',sans-serif;font-size:1rem;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-search:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(15,23,41,0.3)}
+.btn-search svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.5;flex-shrink:0}
+
+/* Hero stats below search */
+.hero-stats{
+  display:flex;gap:0;background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.15);
+  border-radius:12px;overflow:hidden;
+}
+.hs{
+  padding:14px 28px;border-right:1px solid rgba(255,255,255,0.12);flex:1;
+  transition:background 0.2s;
+}
+.hs:last-child{border-right:none}
+.hs:hover{background:rgba(255,255,255,0.08)}
+.hs-val{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:600;
+  color:#fff;line-height:1;margin-bottom:2px}
+.hs-label{font-size:0.56rem;color:rgba(255,255,255,0.55);font-family:'JetBrains Mono',monospace;
+  text-transform:uppercase;letter-spacing:1.5px}
+
+/* Image upload button - admin only */
+.img-upload-btn{
+  position:absolute;bottom:22px;right:22px;z-index:10;
+  display:flex;align-items:center;gap:8px;
+  padding:9px 16px;border-radius:8px;
+  background:rgba(15,23,41,0.55);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.22);
+  color:#fff;font-size:0.76rem;font-family:'Figtree',sans-serif;font-weight:500;
+  cursor:pointer;transition:all 0.22s;
+}
+.img-upload-btn:hover{background:rgba(15,23,41,0.75);border-color:rgba(255,255,255,0.5);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.3)}
+.img-upload-btn .rm-btn{margin-left:4px;color:rgba(255,100,100,0.85);font-size:.72rem;padding:0 4px;background:none;border:none;cursor:pointer;font-family:'Figtree',sans-serif}
+.img-upload-btn .rm-btn:hover{color:#ff6060}
+#img-file-input{display:none}
+.scroll-hint{
+  position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+  z-index:2;display:flex;flex-direction:column;align-items:center;gap:5px;
+  animation:bounce 2s ease infinite;
+}
+.scroll-hint span{font-size:0.56rem;color:rgba(255,255,255,0.4);letter-spacing:2px;font-family:'JetBrains Mono',monospace}
+.scroll-hint svg{width:18px;height:18px;stroke:rgba(255,255,255,0.4);fill:none;stroke-width:2}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+
+/* MARQUEE */
+.marquee-strip{
+  overflow:hidden;background:var(--navy);padding:10px 0;
+}
+.marquee-inner{display:flex;white-space:nowrap;animation:scroll 32s linear infinite}
+.mi{
+  padding:0 32px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;
+  font-weight:500;color:rgba(255,255,255,0.45);letter-spacing:2px;text-transform:uppercase;
+  border-right:1px solid rgba(255,255,255,0.1);flex-shrink:0;
+}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* STATS BAR */
+.stats-bar{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-bottom:1px solid var(--border);border-top:1px solid var(--border);
+  background:var(--surface);
+}
+.sitem{
+  padding:36px 48px;border-right:1px solid var(--border);
+  transition:background 0.2s;cursor:default;
+}
+.sitem:last-child{border-right:none}
+.sitem:hover{background:var(--bg2)}
+.snum{font-family:'Fraunces',serif;font-size:2.4rem;font-weight:600;
+  color:var(--navy);line-height:1;margin-bottom:6px}
+.slabel{font-size:0.62rem;color:var(--text2);text-transform:uppercase;
+  letter-spacing:2px;font-family:'JetBrains Mono',monospace}
+
+/* SECTIONS */
+section{padding:96px 64px}
+section.alt{background:var(--bg2)}
+.sec-tag{
+  font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--gold);
+  text-transform:uppercase;letter-spacing:3px;display:flex;align-items:center;
+  gap:10px;margin-bottom:12px;
+}
+.sec-tag::after{content:'';width:24px;height:1px;background:var(--gold)}
+.sec-title{
+  font-family:'Fraunces',serif;font-size:clamp(2rem,3.5vw,2.8rem);
+  font-weight:300;color:var(--navy);line-height:1.15;letter-spacing:-0.5px;margin-bottom:48px;
+}
+.sec-title strong{font-weight:700}
+
+/* ROUTES GRID */
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)}
+.rcard{
+  background:var(--surface);padding:28px;cursor:pointer;
+  transition:all 0.2s;position:relative;overflow:hidden;
+}
+.rcard:hover{background:var(--bg2);transform:translateY(-2px);box-shadow:var(--shadow)}
+.rtag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 10px;border-radius:4px;margin-bottom:16px;
+  font-family:'JetBrains Mono',monospace;font-size:0.58rem;font-weight:500;
+  letter-spacing:1px;text-transform:uppercase;
+}
+.rt{background:rgba(37,99,235,0.07);color:var(--blue);border:1px solid rgba(37,99,235,0.12)}
+.rb{background:rgba(42,122,75,0.07);color:var(--green);border:1px solid rgba(42,122,75,0.12)}
+.rcities{
+  font-family:'Fraunces',serif;font-size:1.25rem;font-weight:600;
+  color:var(--navy);display:flex;align-items:center;gap:8px;margin-bottom:6px;
+}
+.ra{color:var(--gold)}
+.rmeta{font-size:0.76rem;color:var(--text2);margin-bottom:20px;line-height:1.6;font-weight:300}
+.rfoot{display:flex;align-items:center;justify-content:space-between}
+.rprice{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--navy)}
+.rprice small{font-family:'Figtree',sans-serif;font-size:0.68rem;color:var(--text2);font-weight:400}
+.avail{font-size:0.6rem;font-family:'JetBrains Mono',monospace;padding:3px 9px;border-radius:4px;letter-spacing:0.5px}
+.ao{background:rgba(42,122,75,0.08);color:var(--green);border:1px solid rgba(42,122,75,0.12)}
+.al{background:rgba(234,179,8,0.08);color:#92701A;border:1px solid rgba(234,179,8,0.15)}
+.af{background:rgba(192,57,43,0.07);color:var(--red);border:1px solid rgba(192,57,43,0.1)}
+.view-all{text-align:center;margin-top:40px}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:11px 28px;border-radius:7px;
+  border:1.5px solid var(--navy);background:transparent;color:var(--navy);
+  font-family:'Figtree',sans-serif;font-size:0.84rem;font-weight:600;
+  cursor:pointer;text-decoration:none;transition:all 0.18s;
+}
+.btn-outline:hover{background:var(--navy);color:#fff}
+
+/* FEATURES */
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)}
+.feat{
+  background:var(--surface);padding:36px 32px;transition:background 0.2s;
+  position:relative;overflow:hidden;
+}
+.feat:hover{background:var(--bg2)}
+.fnum{
+  font-family:'Fraunces',serif;font-size:2.6rem;font-weight:700;
+  color:rgba(15,23,41,0.05);line-height:1;margin-bottom:14px;
+}
+.ficon{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:2px;color:var(--gold);margin-bottom:12px;text-transform:uppercase}
+.feat h3{font-size:0.92rem;font-weight:600;color:var(--navy);margin-bottom:8px}
+.feat p{font-size:0.8rem;color:var(--text2);line-height:1.8;font-weight:300}
+
+/* CTA */
+.cta{
+  background:var(--navy);padding:80px 64px;
+  display:flex;align-items:center;justify-content:space-between;gap:40px;
+  position:relative;overflow:hidden;
+}
+.cta::before{
+  content:'';position:absolute;top:-120px;right:-80px;
+  width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(160,120,40,0.12),transparent 70%);
+}
+.cta-txt h2{
+  font-family:'Fraunces',serif;font-size:2.4rem;font-weight:300;
+  color:#fff;line-height:1.15;margin-bottom:8px;letter-spacing:-0.5px;
+}
+.cta-txt h2 strong{font-weight:700}
+.cta-txt p{font-size:0.88rem;color:rgba(255,255,255,0.5);font-weight:300}
+.btn-cta{
+  flex-shrink:0;padding:14px 36px;border-radius:8px;
+  border:1.5px solid rgba(255,255,255,0.3);background:transparent;
+  color:#fff;font-family:'Figtree',sans-serif;font-size:0.88rem;font-weight:600;
+  cursor:pointer;text-decoration:none;transition:all 0.2s;white-space:nowrap;
+  position:relative;z-index:1;
+}
+.btn-cta:hover{background:#fff;color:var(--navy);border-color:#fff}
+
+/* FOOTER */
+footer{background:var(--navy);padding:56px 64px 32px;color:#fff}
+.ft{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;
+  margin-bottom:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.fb-logo{
+  font-family:'Fraunces',serif;font-size:1.2rem;font-weight:600;
+  color:#fff;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;
+}
+.fb-logo em{color:var(--gold2);font-style:normal}
+.fb p{font-size:0.78rem;color:rgba(255,255,255,0.4);line-height:1.8;max-width:220px;font-weight:300}
+.fc h4{font-family:'JetBrains Mono',monospace;font-size:0.55rem;
+  color:rgba(255,255,255,0.25);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+.fc ul{list-style:none}
+.fc ul li{margin-bottom:8px}
+.fc ul li a{font-size:0.78rem;color:rgba(255,255,255,0.45);text-decoration:none;
+  transition:color 0.2s;font-weight:300}
+.fc ul li a:hover{color:#fff}
+.ft-bot{display:flex;align-items:center;justify-content:space-between}
+.ft-bot p{font-size:0.7rem;color:rgba(255,255,255,0.25)}
+.ft-bot span{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.2)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero>*{animation:fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) both}
+.hero>*:nth-child(1){animation-delay:0.05s}
+.hero>*:nth-child(2){animation-delay:0.1s}
+.hero>*:nth-child(3){animation-delay:0.17s}
+.hero>*:nth-child(4){animation-delay:0.24s}
+.hero>*:nth-child(5){animation-delay:0.31s}
+.hero>*:nth-child(6){animation-delay:0.38s}
+
+/* SCROLL REVEAL */
+.reveal{opacity:1;transform:none}
+.reveal.anim{opacity:0;transform:translateY(18px);transition:opacity 0.6s ease,transform 0.6s ease}
+.reveal.anim.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:1100px){
+  nav{padding:0 28px}
+  .nav-links{display:none}
+  section:not(.hero){padding:72px 28px}
+  .cta{padding:56px 28px;flex-direction:column;gap:24px}
+  footer{padding:44px 28px 28px}
+  .stats-bar,.rgrid,.fgrid{grid-template-columns:1fr 1fr}
+  .ft{grid-template-columns:1fr 1fr;gap:28px}
+}
+@media(max-width:640px){
+  .stats-bar{grid-template-columns:1fr 1fr}
+  .rgrid,.fgrid{grid-template-columns:1fr}
+  .ft{grid-template-columns:1fr}
+  .hero-stats{width:calc(100% - 0px);border-radius:10px}
+  .hs{padding:12px 14px}
+  .sf-swap-row{grid-template-columns:1fr 40px 1fr}
+  .sf-bottom{grid-template-columns:1fr}
+  h1{font-size:2.1rem;letter-spacing:-0.5px}
+  .search-card{padding:18px 18px 22px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">S</div>
+    <div class="logo-word">SC<em>T</em>MS</div>
+  </a>
+  <div class="nav-links">
+    <a href="routes.html" class="nav-link" data-i18n="nav_routes">Routes</a>
+    <a href="booking.html" class="nav-link" data-i18n="nav_book">Book</a>
+    <a href="marketplace.html" class="nav-link" data-i18n="nav_market">Marketplace</a>
+    <a href="dashboard.html" class="nav-link" data-i18n="nav_dash">Dashboard</a>
+  </div>
+  <div class="nav-right">
+    <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
+    <a href="login.html" class="btn-ghost" data-i18n="nav_signin">Sign In</a>
+    <a href="register.html" class="btn-solid" data-i18n="nav_register">Register</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <!-- Background image + overlay -->
+  <div class="hero-img"></div>
+  <div class="hero-overlay"></div>
+
+  <div class="hero-badge" data-i18n="hero_badge"><div class="hero-badge-dot"></div> Bangladesh Smart Transit &middot; 2026</div>
+  <h1 data-i18n-html="hero_title">Travel Across <em>Bangladesh</em><br><strong>Reimagined</strong></h1>
+  <p class="hero-sub" data-i18n="hero_sub">Book bus &amp; train tickets across all major cities &mdash; instantly, seamlessly.</p>
+
+  <!-- SEARCH CARD -->
+  <div class="search-card">
+    <div class="sf-alert" id="search-alert" role="alert"></div>
+    <div class="search-tabs">
+      <button class="stab active" type="button" data-mode="bus" data-i18n="tab_bus">Bus</button>
+      <button class="stab" type="button" data-mode="train" data-i18n="tab_train">Train</button>
+      <button class="stab" type="button" data-mode="all" data-i18n="tab_all">All</button>
+    </div>
+    <div class="sf-swap-row">
+      <div class="sf">
+        <label data-i18n="lbl_from">From</label>
+        <select id="s-from">
+          <option value="" data-i18n="opt_city">&mdash; Select City &mdash;</option>
+          <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
+          <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
+          <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
+          <option>Jessore</option><option>Bogura</option><option>Dinajpur</option>
+          <option>Panchagarh</option><option>Thakurgaon</option><option>Tangail</option>
+          <option>Faridpur</option><option>Pirganj</option><option>Cox's Bazar</option>
+        </select>
+      </div>
+      <button class="swap-btn" type="button" onclick="swapCities()" title="Swap cities" data-i18n-title="swap_title">&harr;</button>
+      <div class="sf">
+        <label data-i18n="lbl_to">To</label>
+        <select id="s-to">
+          <option value="" data-i18n="opt_city">&mdash; Select City &mdash;</option>
+          <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
+          <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
+          <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
+          <option>Jessore</option><option>Bogura</option><option>Dinajpur</option>
+          <option>Panchagarh</option><option>Thakurgaon</option><option>Tangail</option>
+          <option>Faridpur</option><option>Pirganj</option><option>Cox's Bazar</option>
+        </select>
+      </div>
+    </div>
+    <div class="sf-bottom">
+      <div class="sf sf-date">
+        <label data-i18n="lbl_date">Journey Date</label>
+        <input type="date" id="s-date">
+      </div>
+      <div class="sf">
+        <label data-i18n="lbl_pass">Passengers</label>
+        <select>
+          <option data-i18n="pass_1">1 Passenger</option>
+          <option data-i18n="pass_2">2 Passengers</option>
+          <option data-i18n="pass_3">3 Passengers</option>
+          <option data-i18n="pass_4">4 Passengers</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-search" type="button" onclick="goSearch()">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span data-i18n="btn_search">Search Schedules</span>
+    </button>
+  </div>
+
+  <!-- Stats pill -->
+  <div class="hero-stats">
+    <div class="hs"><div class="hs-val">64+</div><div class="hs-label" data-i18n="hs_routes">Routes</div></div>
+    <div class="hs"><div class="hs-val">1.2M</div><div class="hs-label" data-i18n="hs_pass">Passengers</div></div>
+    <div class="hs"><div class="hs-val">340+</div><div class="hs-label" data-i18n="hs_daily">Daily Trips</div></div>
+    <div class="hs"><div class="hs-val">99%</div><div class="hs-label" data-i18n="hs_ontime">On-time</div></div>
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="scroll-hint">
+    <span data-i18n="scroll">Scroll</span>
+    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+
+  <!-- Image upload - admin only (client-side hint only) -->
+  <div class="img-upload-btn" id="upload-btn" style="display:none">
+    <span onclick="document.getElementById('img-file-input').click()" style="display:flex;align-items:center;gap:7px;cursor:pointer" data-i18n="img_change">Change Background Photo</span>
+    <button class="rm-btn" id="rm-btn" style="display:none" onclick="removeHeroImg()" title="Remove photo" type="button" data-i18n="img_remove">Remove</button>
+  </div>
+  <input type="file" id="img-file-input" accept="image/*" onchange="setHeroImage(this)">
+</section>
+
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span class="mi">Dhaka &rarr; Chittagong</span><span class="mi">Dhaka &rarr; Sylhet</span>
+    <span class="mi">Dhaka &rarr; Rajshahi</span><span class="mi">Dhaka &rarr; Khulna</span>
+    <span class="mi">Dhaka &rarr; Barishal</span><span class="mi">Dhaka &rarr; Rangpur</span>
+    <span class="mi">Chittagong &rarr; Dhaka</span><span class="mi">Sylhet &rarr; Dhaka</span>
+    <span class="mi">Rajshahi &rarr; Dhaka</span><span class="mi">Khulna &rarr; Dhaka</span>
+    <span class="mi">Dhaka &rarr; Chittagong</span><span class="mi">Dhaka &rarr; Sylhet</span>
+    <span class="mi">Dhaka &rarr; Rajshahi</span><span class="mi">Dhaka &rarr; Khulna</span>
+    <span class="mi">Dhaka &rarr; Barishal</span><span class="mi">Dhaka &rarr; Rangpur</span>
+    <span class="mi">Chittagong &rarr; Dhaka</span><span class="mi">Sylhet &rarr; Dhaka</span>
+    <span class="mi">Rajshahi &rarr; Dhaka</span><span class="mi">Khulna &rarr; Dhaka</span>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="sitem reveal"><div class="snum">64+</div><div class="slabel" data-i18n="sb_routes">Active Routes</div></div>
+  <div class="sitem reveal"><div class="snum">1.2M</div><div class="slabel" data-i18n="sb_pass">Passengers</div></div>
+  <div class="sitem reveal"><div class="snum">340+</div><div class="slabel" data-i18n="sb_daily">Daily Trips</div></div>
+  <div class="sitem reveal"><div class="snum">99%</div><div class="slabel" data-i18n="sb_ontime">On-time Rate</div></div>
+</div>
+
+<section>
+  <div class="sec-tag" data-i18n="sec_popular">Popular Routes</div>
+  <div class="sec-title" data-i18n-html="sec_popular_title">Most Travelled <strong>Journeys</strong></div>
+  <div class="rgrid reveal">
+    <div class="rcard" onclick="location.href='routes.html'">
+      <div class="rtag rb" data-i18n="tag_bus">Bus</div>
+      <div class="rcities">Dhaka <span class="ra">&rarr;</span> Chittagong</div>
+      <div class="rmeta">5h 30m &middot; Non-stop &middot; Multiple departures daily</div>
+      <div class="rfoot"><div class="rprice">&#2547;500 <small data-i18n="price_onward">onwards</small></div><span class="avail ao" data-i18n="avail_ok">Available</span></div>
+    </div>
+    <div class="rcard" onclick="location.href='routes.html'">
+      <div class="rtag rt" data-i18n="tag_train">Train</div>
+      <div class="rcities">Dhaka <span class="ra">&rarr;</span> Sylhet</div>
+      <div class="rmeta">6h 15m &middot; Intercity &middot; Subarna Express</div>
+      <div class="rfoot"><div class="rprice">&#2547;600 <small data-i18n="price_onward">onwards</small></div><span class="avail al" data-i18n="avail_low">Low seats</span></div>
+    </div>
+    <div class="rcard" onclick="location.href='routes.html'">
+      <div class="rtag rb" data-i18n="tag_bus">Bus</div>
+      <div class="rcities">Dhaka <span class="ra">&rarr;</span> Rajshahi</div>
+      <div class="rmeta">4h 45m &middot; AC &middot; Night coach available</div>
+      <div class="rfoot"><div class="rprice">&#2547;450 <small data-i18n="price_onward">onwards</small></div><span class="avail ao" data-i18n="avail_ok">Available</span></div>
+    </div>
+    <div class="rcard" onclick="location.href='routes.html'">
+      <div class="rtag rt" data-i18n="tag_train">Train</div>
+      <div class="rcities">Dhaka <span class="ra">&rarr;</span> Khulna</div>
+      <div class="rmeta">8h 00m &middot; Sundarban Express</div>
+      <div class="rfoot"><div class="rprice">&#2547;560 <small data-i18n="price_onward">onwards</small></div><span class="avail ao" data-i18n="avail_ok">Available</span></div>
+    </div>
+    <div class="rcard" onclick="location.href='routes.html'">
+      <div class="rtag rb" data-i18n="tag_bus">Bus</div>
+      <div class="rcities">Dhaka <span class="ra">&rarr;</span> Barishal</div>
+      <div class="rmeta">4h 00m &middot; AC &middot; Hourly departures</div>
+      <div class="rfoot"><div class="rprice">&#2547;420 <small data-i18n="price_onward">onwards</small></div><span class="avail af" data-i18n="avail_sold">Sold out</span></div>
+    </div>
+    <div class="rcard" onclick="location.href='routes.html'">
+      <div class="rtag rt" data-i18n="tag_train">Train</div>
+      <div class="rcities">Dhaka <span class="ra">&rarr;</span> Rangpur</div>
+      <div class="rmeta">7h 30m &middot; Tista Express</div>
+      <div class="rfoot"><div class="rprice">&#2547;480 <small data-i18n="price_onward">onwards</small></div><span class="avail ao" data-i18n="avail_ok">Available</span></div>
+    </div>
+  </div>
+  <div class="view-all reveal">
+    <a href="routes.html" class="btn-outline" data-i18n="btn_view_routes">View All Routes &rarr;</a>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="sec-tag" data-i18n="sec_features">Features</div>
+  <div class="sec-title" data-i18n-html="sec_features_title">Everything You Need,<br><strong>In One Place</strong></div>
+  <div class="fgrid reveal">
+    <div class="feat">
+      <div class="fnum">01</div>
+      <div class="ficon">FAST</div>
+      <h3 data-i18n="feat1_title">Instant Booking</h3>
+      <p data-i18n="feat1_desc">Search, select your seat and confirm booking in under 60 seconds. No queues, no hassle.</p>
+    </div>
+    <div class="feat">
+      <div class="fnum">02</div>
+      <div class="ficon">EXCHANGE</div>
+      <h3 data-i18n="feat2_title">Ticket Exchange</h3>
+      <p data-i18n="feat2_desc">Cannot travel? List your ticket on the marketplace and exchange with another passenger.</p>
+    </div>
+    <div class="feat">
+      <div class="fnum">03</div>
+      <div class="ficon">HOLD</div>
+      <h3 data-i18n="feat3_title">Seat Hold</h3>
+      <p data-i18n="feat3_desc">Reserve your preferred seat for up to 15 minutes while you complete payment.</p>
+    </div>
+    <div class="feat">
+      <div class="fnum">04</div>
+      <div class="ficon">WAITLIST</div>
+      <h3 data-i18n="feat4_title">Waitlist</h3>
+      <p data-i18n="feat4_desc">Sold out? Join the waitlist and get automatically notified when a seat opens up.</p>
+    </div>
+    <div class="feat">
+      <div class="fnum">05</div>
+      <div class="ficon">ANALYTICS</div>
+      <h3 data-i18n="feat5_title">Live Analytics</h3>
+      <p data-i18n="feat5_desc">Real-time seat availability, route performance and revenue stats for administrators.</p>
+    </div>
+    <div class="feat">
+      <div class="fnum">06</div>
+      <div class="ficon">SECURE</div>
+      <h3 data-i18n="feat6_title">OTP Verification</h3>
+      <p data-i18n="feat6_desc">Secure your account with email OTP verification during registration and login.</p>
+    </div>
+  </div>
+</section>
+
+<div class="cta reveal">
+  <div class="cta-txt">
+    <h2 data-i18n-html="cta_title">Ready to book your<br><strong>next journey?</strong></h2>
+    <p data-i18n="cta_sub">Join 1.2 million passengers already travelling smarter.</p>
+  </div>
+  <a href="register.html" class="btn-cta" data-i18n="cta_btn">Get Started &rarr;</a>
+</div>
+
+<footer>
+  <div class="ft">
+    <div class="fb">
+      <div class="fb-logo">SC<em>T</em>MS</div>
+      <p data-i18n="ft_desc">Smart City Transport Management System &mdash; Bangladesh's unified platform for bus &amp; train travel.</p>
+    </div>
+    <div class="fc"><h4 data-i18n="ft_travel">Travel</h4><ul>
+      <li><a href="routes.html" data-i18n="ft_all_routes">All Routes</a></li>
+      <li><a href="booking.html" data-i18n="ft_book">Book Ticket</a></li>
+      <li><a href="marketplace.html" data-i18n="ft_market">Marketplace</a></li>
+    </ul></div>
+    <div class="fc"><h4 data-i18n="ft_account">Account</h4><ul>
+      <li><a href="login.html" data-i18n="ft_signin">Sign In</a></li>
+      <li><a href="register.html" data-i18n="ft_register">Register</a></li>
+      <li><a href="dashboard.html" data-i18n="ft_dash">Dashboard</a></li>
+    </ul></div>
+    <div class="fc"><h4 data-i18n="ft_admin">Admin</h4><ul>
+      <li><a href="dashboard-admin.html" data-i18n="ft_admin_panel">Admin Panel</a></li>
+      <li><a href="dashboard-admin.html" data-i18n="ft_revenue">Revenue</a></li>
+      <li><a href="dashboard-admin.html" data-i18n="ft_schedules">Schedules</a></li>
+    </ul></div>
+  </div>
+  <div class="ft-bot">
+    <p data-i18n="ft_copyright">&copy; 2026 SCTMS. All rights reserved.</p>
+    <span data-i18n="ft_stack">Node.js &middot; SQL Server &middot; HTML/CSS/JS</span>
+  </div>
+</footer>
+
+<script>
+// Hero background image - uses object URL (no localStorage size issues)
+let _heroObjUrl = null;
+let _mode = 'bus';
+const i18n={
+  en:{
+    nav_routes:'Routes',nav_book:'Book',nav_market:'Marketplace',nav_dash:'Dashboard',
+    nav_signin:'Sign In',nav_register:'Register',
+    hero_badge:'<div class="hero-badge-dot"></div> Bangladesh Smart Transit &middot; 2026',
+    hero_title:'Travel Across <em>Bangladesh</em><br><strong>Reimagined</strong>',
+    hero_sub:'Book bus &amp; train tickets across all major cities &mdash; instantly, seamlessly.',
+    tab_bus:'Bus',tab_train:'Train',tab_all:'All',
+    lbl_from:'From',lbl_to:'To',opt_city:'&mdash; Select City &mdash;',
+    lbl_date:'Journey Date',lbl_pass:'Passengers',
+    pass_1:'1 Passenger',pass_2:'2 Passengers',pass_3:'3 Passengers',pass_4:'4 Passengers',
+    btn_search:'Search Schedules',swap_title:'Swap cities',
+    hs_routes:'Routes',hs_pass:'Passengers',hs_daily:'Daily Trips',hs_ontime:'On-time',
+    scroll:'Scroll',
+    img_change:'Change Background Photo',img_remove:'Remove',
+    sb_routes:'Active Routes',sb_pass:'Passengers',sb_daily:'Daily Trips',sb_ontime:'On-time Rate',
+    sec_popular:'Popular Routes',sec_popular_title:'Most Travelled <strong>Journeys</strong>',
+    tag_bus:'Bus',tag_train:'Train',price_onward:'onwards',avail_ok:'Available',avail_low:'Low seats',avail_sold:'Sold out',
+    btn_view_routes:'View All Routes &rarr;',
+    sec_features:'Features',sec_features_title:'Everything You Need,<br><strong>In One Place</strong>',
+    feat1_title:'Instant Booking',feat1_desc:'Search, select your seat and confirm booking in under 60 seconds. No queues, no hassle.',
+    feat2_title:'Ticket Exchange',feat2_desc:'Cannot travel? List your ticket on the marketplace and exchange with another passenger.',
+    feat3_title:'Seat Hold',feat3_desc:'Reserve your preferred seat for up to 15 minutes while you complete payment.',
+    feat4_title:'Waitlist',feat4_desc:'Sold out? Join the waitlist and get automatically notified when a seat opens up.',
+    feat5_title:'Live Analytics',feat5_desc:'Real-time seat availability, route performance and revenue stats for administrators.',
+    feat6_title:'OTP Verification',feat6_desc:'Secure your account with email OTP verification during registration and login.',
+    cta_title:'Ready to book your<br><strong>next journey?</strong>',cta_sub:'Join 1.2 million passengers already travelling smarter.',
+    cta_btn:'Get Started &rarr;',
+    ft_desc:'Smart City Transport Management System &mdash; Bangladesh&#39;s unified platform for bus &amp; train travel.',
+    ft_travel:'Travel',ft_all_routes:'All Routes',ft_book:'Book Ticket',ft_market:'Marketplace',
+    ft_account:'Account',ft_signin:'Sign In',ft_register:'Register',ft_dash:'Dashboard',
+    ft_admin:'Admin',ft_admin_panel:'Admin Panel',ft_revenue:'Revenue',ft_schedules:'Schedules',
+    ft_copyright:'&copy; 2026 SCTMS. All rights reserved.',
+    ft_stack:'Node.js &middot; SQL Server &middot; HTML/CSS/JS',
+    err_missing:'Please select From, To and Journey Date.',
+    err_same:'From and To cannot be the same city.'
+  },
+  bn:{
+    nav_routes:'রুট',nav_book:'বুকিং',nav_market:'মার্কেটপ্লেস',nav_dash:'ড্যাশবোর্ড',
+    nav_signin:'সাইন ইন',nav_register:'রেজিস্টার',
+    hero_badge:'<div class="hero-badge-dot"></div> বাংলাদেশ স্মার্ট ট্রানজিট &middot; ২০২৬',
+    hero_title:'বাংলাদেশ জুড়ে <em>ভ্রমণ</em><br><strong>নতুনভাবে</strong>',
+    hero_sub:'সব বড় শহরের বাস ও ট্রেন টিকিট বুক করুন দ্রুত ও সহজভাবে।',
+    tab_bus:'বাস',tab_train:'ট্রেন',tab_all:'সব',
+    lbl_from:'যাত্রা শুরু',lbl_to:'গন্তব্য',opt_city:'&mdash; শহর নির্বাচন করুন &mdash;',
+    lbl_date:'যাত্রার তারিখ',lbl_pass:'যাত্রী',
+    pass_1:'১ জন',pass_2:'২ জন',pass_3:'৩ জন',pass_4:'৪ জন',
+    btn_search:'শিডিউল খুঁজুন',swap_title:'শহর বদলান',
+    hs_routes:'রুট',hs_pass:'যাত্রী',hs_daily:'দৈনিক ট্রিপ',hs_ontime:'সময়সীমায়',
+    scroll:'স্ক্রল',
+    img_change:'ব্যাকগ্রাউন্ড ছবি বদলান',img_remove:'মুছুন',
+    sb_routes:'সক্রিয় রুট',sb_pass:'যাত্রী',sb_daily:'দৈনিক ট্রিপ',sb_ontime:'সময়সীমা',
+    sec_popular:'জনপ্রিয় রুট',sec_popular_title:'সবচেয়ে জনপ্রিয় <strong>যাত্রা</strong>',
+    tag_bus:'বাস',tag_train:'ট্রেন',price_onward:'থেকে',avail_ok:'উপলব্ধ',avail_low:'কম সিট',avail_sold:'সোল্ড আউট',
+    btn_view_routes:'সব রুট দেখুন &rarr;',
+    sec_features:'ফিচার',sec_features_title:'যা দরকার সবকিছু<br><strong>এক জায়গায়</strong>',
+    feat1_title:'তাৎক্ষণিক বুকিং',feat1_desc:'সার্চ করে সিট বেছে ৬০ সেকেন্ডে বুকিং কনফার্ম করুন।',
+    feat2_title:'টিকিট এক্সচেঞ্জ',feat2_desc:'ভ্রমণ সম্ভব নয়? মার্কেটপ্লেসে টিকিট লিস্ট করুন।',
+    feat3_title:'সিট হোল্ড',feat3_desc:'পেমেন্ট শেষ করার সময় ১৫ মিনিট সিট ধরে রাখুন।',
+    feat4_title:'ওয়েটলিস্ট',feat4_desc:'সোল্ড আউট? ওয়েটলিস্টে যোগ দিন এবং সিট খালি হলে জানুন।',
+    feat5_title:'লাইভ অ্যানালিটিক্স',feat5_desc:'রিয়েল-টাইম সিট ও রুট পারফরম্যান্স ড্যাশবোর্ড।',
+    feat6_title:'ওটিপি যাচাই',feat6_desc:'রেজিস্ট্রেশন ও লগইনে ওটিপি যাচাই।',
+    cta_title:'আপনার পরের যাত্রা<br><strong>বুক করতে প্রস্তুত?</strong>',cta_sub:'১.২ মিলিয়ন যাত্রী ইতিমধ্যে স্মার্টভাবে ভ্রমণ করছে।',
+    cta_btn:'শুরু করুন &rarr;',
+    ft_desc:'Smart City Transport Management System &mdash; বাংলাদেশে বাস ও ট্রেনের এক প্ল্যাটফর্ম।',
+    ft_travel:'ভ্রমণ',ft_all_routes:'সব রুট',ft_book:'টিকিট বুক',ft_market:'মার্কেটপ্লেস',
+    ft_account:'একাউন্ট',ft_signin:'সাইন ইন',ft_register:'রেজিস্টার',ft_dash:'ড্যাশবোর্ড',
+    ft_admin:'অ্যাডমিন',ft_admin_panel:'অ্যাডমিন প্যানেল',ft_revenue:'রেভিনিউ',ft_schedules:'শিডিউল',
+    ft_copyright:'&copy; ২০২৬ SCTMS. সর্বস্বত্ব সংরক্ষিত।',
+    ft_stack:'Node.js &middot; SQL Server &middot; HTML/CSS/JS',
+    err_missing:'From, To এবং Journey Date দিন।',
+    err_same:'From এবং To একই শহর হতে পারে না।'
+  }
+};
+let curLang=localStorage.getItem('sctms_lang')||'en';
+function t(k){return (i18n[curLang]&&i18n[curLang][k])||i18n.en[k]||k;}
+function applyLang(){
+  document.documentElement.lang=curLang;
+  document.getElementById('lang-toggle').textContent=curLang==='en'?'EN':'BN';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    const val=t(key);
+    if(val.includes('<')||val.includes('&')) el.innerHTML=val; else el.textContent=val;
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+    el.innerHTML=t(el.getAttribute('data-i18n-html'));
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{
+    el.setAttribute('title',t(el.getAttribute('data-i18n-title')));
+  });
+}
+document.getElementById('lang-toggle').addEventListener('click',()=>{
+  curLang=curLang==='en'?'bn':'en';
+  localStorage.setItem('sctms_lang',curLang);
+  applyLang();
+});
+applyLang();
+function setSearchAlert(msg){
+  const a=document.getElementById('search-alert');
+  a.textContent=msg;
+  a.style.display='block';
+}
+function clearSearchAlert(){
+  const a=document.getElementById('search-alert');
+  a.style.display='none';a.textContent='';
+  document.getElementById('s-from').classList.remove('field-error');
+  document.getElementById('s-to').classList.remove('field-error');
+  document.getElementById('s-date').classList.remove('field-error');
+}
+
+function setHeroImage(input){
+  const file = input.files[0]; if(!file) return;
+  // Revoke previous object URL to free memory
+  if(_heroObjUrl){ URL.revokeObjectURL(_heroObjUrl); _heroObjUrl = null; }
+  _heroObjUrl = URL.createObjectURL(file);
+  applyHeroImg(_heroObjUrl);
+  // Save filename hint to sessionStorage so label persists on refresh (image itself cannot be persisted)
+  try{ sessionStorage.setItem('sctms_hero_name', file.name); }catch{}
+  // Reset file input so same file can be re-selected
+  input.value = '';
+}
+
+function applyHeroImg(url){
+  const el = document.querySelector('.hero-img');
+  el.style.backgroundImage = `url('${url}')`;
+  el.classList.remove('no-photo');
+  document.getElementById('rm-btn').style.display = 'inline';
+}
+
+function removeHeroImg(){
+  if(_heroObjUrl){ URL.revokeObjectURL(_heroObjUrl); _heroObjUrl = null; }
+  const el = document.querySelector('.hero-img');
+  el.style.backgroundImage = '';
+  el.classList.add('no-photo');
+  document.getElementById('rm-btn').style.display = 'none';
+  try{ sessionStorage.removeItem('sctms_hero_name'); }catch{}
+}
+
+// On load - start with CSS background (no online fetch needed)
+document.querySelector('.hero-img').classList.add('no-photo');
+
+// Show upload button only for admin (client-side hint only)
+try{
+  const u = JSON.parse(localStorage.getItem('sctms_user')||'{}');
+  if(u.role === 'admin') document.getElementById('upload-btn').style.display = 'flex';
+}catch{}
+
+// Nav scroll: transparent -> navy on scroll
+window.addEventListener('scroll',()=>{
+  document.querySelector('nav').classList.toggle('scrolled',window.scrollY>60);
+});
+
+// Date default
+const _td=new Date();
+document.getElementById('s-date').value=_td.getFullYear()+'-'+String(_td.getMonth()+1).padStart(2,'0')+'-'+String(_td.getDate()).padStart(2,'0');
+document.getElementById('s-date').min=document.getElementById('s-date').value;
+['s-from','s-to','s-date'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('input',clearSearchAlert);
+  el.addEventListener('change',clearSearchAlert);
+});
+
+// Search tabs
+const tabs = Array.from(document.querySelectorAll('.stab'));
+tabs.forEach(t=>{
+  t.addEventListener('click',()=>{
+    tabs.forEach(b=>b.classList.remove('active'));
+    t.classList.add('active');
+    _mode = t.getAttribute('data-mode') || 'all';
+  });
+});
+
+// Swap cities
+function swapCities(){
+  const a=document.getElementById('s-from'),b=document.getElementById('s-to');
+  const t=a.value; a.value=b.value; b.value=t;
+}
+
+// Search
+function goSearch(){
+  const from=document.getElementById('s-from').value;
+  const to=document.getElementById('s-to').value;
+  const date=document.getElementById('s-date').value;
+  clearSearchAlert();
+  if(!from||!to||!date){
+    if(!from) document.getElementById('s-from').classList.add('field-error');
+    if(!to) document.getElementById('s-to').classList.add('field-error');
+    if(!date) document.getElementById('s-date').classList.add('field-error');
+    setSearchAlert(t('err_missing'));return;
+  }
+  if(from===to){
+    document.getElementById('s-from').classList.add('field-error');
+    document.getElementById('s-to').classList.add('field-error');
+    setSearchAlert(t('err_same'));return;
+  }
+  const modeParam = _mode && _mode !== 'all' ? `&mode=${encodeURIComponent(_mode)}` : '';
+  location.href=`routes.html?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${date}${modeParam}`;
+}
+
+// Scroll reveal (with fallback)
+document.querySelectorAll('.reveal').forEach(el=>el.classList.add('anim'));
+if('IntersectionObserver' in window){
+  const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+} else {
+  document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));
+}
+setTimeout(()=>{document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));},700);
+</script>
+</body>
+</html>
+

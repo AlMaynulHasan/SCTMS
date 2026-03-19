@@ -1,0 +1,1728 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel  SCTMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700&family=Figtree:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FDFBF8;--bg2:#F7F4EF;--bg3:#F0EDE6;--sf:#fff;
+  --nv:#0F1729;--nv2:#1B2340;
+  --gd:#A07828;--gd2:#C49A32;
+  --tx:#0F1729;--tx2:#5C6478;--tx3:rgba(15,23,41,0.3);
+  --br:rgba(15,23,41,0.09);--br2:rgba(160,120,40,0.22);
+  --gn:#2A7A4B;--rd:#C0392B;--bl:#2563EB;--og:#D97706;
+  --sh:0 1px 3px rgba(15,23,41,0.05),0 4px 14px rgba(15,23,41,0.05);
+  --sb:248px;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font-family:'Figtree','Noto Sans Bengali',sans-serif;display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:var(--sb);flex-shrink:0;background:var(--nv);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100;transition:transform .3s;overflow-y:auto}
+.sb-hd{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between}
+.sb-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.logo-mk{width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:.9rem;font-weight:700;color:#fff}
+.logo-wd{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:#fff;letter-spacing:2px;text-transform:uppercase}
+.logo-wd em{color:var(--gd2);font-style:normal}
+.sb-close{display:none;background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:1rem;padding:4px}
+.adm-chip{margin:10px 14px;padding:7px 11px;border-radius:5px;background:rgba(160,120,40,.1);border:1px solid rgba(160,120,40,.18);font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--gd2);letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.adm-chip::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--gd2);animation:pulse 1.8s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sb-nav{padding:8px 12px;flex:1}
+.sb-sec{margin-bottom:18px}
+.sb-sl{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:3px;padding:0 8px;margin-bottom:5px}
+.sb-it{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;color:rgba(255,255,255,.5);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .18s;margin-bottom:1px;border:1px solid transparent;text-decoration:none;user-select:none}
+.sb-it:hover{background:rgba(255,255,255,.06);color:#fff}
+.sb-it.active{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.08)}
+.sb-it .si{font-size:.88rem;width:16px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;padding:1px 7px;border-radius:10px;font-size:.58rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+.bd-r{background:rgba(192,57,43,.15);color:var(--rd);border:1px solid rgba(192,57,43,.18)}
+.bd-g{background:rgba(160,120,40,.18);color:var(--gd2);border:1px solid rgba(160,120,40,.22)}
+.sb-ft{padding:12px 14px;border-top:1px solid rgba(255,255,255,.07)}
+.sb-ur{display:flex;align-items:center;gap:9px;padding:6px 8px 8px}
+.sb-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gd),var(--gd2));display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:.9rem;font-weight:700;color:#000;flex-shrink:0}
+.sb-unm{font-size:.8rem;font-weight:500;color:#fff;line-height:1.2}
+.sb-urol{font-size:.55rem;color:var(--gd2);font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+.sb-lgo{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;color:rgba(255,255,255,.4);font-size:.8rem;cursor:pointer;transition:all .2s;border:none;background:transparent;width:100%;font-family:'Figtree',sans-serif}
+.sb-lgo:hover{color:#ff8080;background:rgba(255,80,80,.06)}
+
+/* MAIN */
+.main{margin-left:var(--sb);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:60px;padding:0 32px;background:rgba(253,251,248,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-shrink:0}
+.tb-l{display:flex;align-items:center;gap:12px}
+.menu-btn{display:none;background:none;border:none;color:var(--tx2);cursor:pointer;font-size:1.1rem;padding:4px}
+.tb-title{font-size:.88rem;font-weight:600;color:var(--nv)}
+.tb-r{display:flex;align-items:center;gap:8px;position:relative}
+.ib{width:34px;height:34px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:.9rem;transition:all .2s;display:flex;align-items:center;justify-content:center;position:relative}
+.ib:hover{border-color:var(--nv);color:var(--nv)}
+.ndot{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--rd);border:1.5px solid var(--bg);display:none}
+.btn-ghost{padding:7px 16px;border-radius:6px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-family:'Figtree',sans-serif;font-size:.78rem;cursor:pointer;text-decoration:none;transition:all .18s;white-space:nowrap}
+.btn-ghost:hover{border-color:var(--nv);color:var(--nv)}
+.lang-toggle{
+  padding:7px 12px;border-radius:6px;border:1px solid var(--br);
+  background:transparent;color:var(--tx2);font-family:'JetBrains Mono',monospace;
+  font-size:.7rem;letter-spacing:1px;cursor:pointer;transition:all .18s
+}
+.lang-toggle:hover{border-color:var(--nv);color:var(--nv)}
+
+/* NOTIF */
+.np{position:absolute;top:48px;right:0;width:310px;background:var(--sf);border:1px solid var(--br);border-radius:10px;box-shadow:0 8px 32px rgba(15,23,41,.12);z-index:200;opacity:0;pointer-events:none;transform:translateY(-6px);transition:all .2s}
+.np.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.np-hd{padding:12px 16px;border-bottom:1px solid var(--br);display:flex;justify-content:space-between;align-items:center}
+.np-hd h4{font-size:.82rem;font-weight:600}
+.np-clr{font-size:.68rem;color:var(--tx2);cursor:pointer;background:none;border:none;font-family:'JetBrains Mono',monospace}
+.np-clr:hover{color:var(--rd)}
+.ni{padding:10px 16px;border-bottom:1px solid rgba(15,23,41,.04);display:flex;gap:10px;transition:background .15s}
+.ni:hover{background:var(--bg2)}
+.ni:last-child{border-bottom:none}
+.ni-ico{font-size:.9rem;flex-shrink:0;margin-top:2px}
+.ni-tx{font-size:.76rem;line-height:1.5}
+.ni-tm{font-size:.6rem;color:var(--tx3);font-family:'JetBrains Mono',monospace;margin-top:2px}
+
+/* CONTENT */
+.content{padding:28px 32px;flex:1}
+.panel{display:none}.panel.active{display:block}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.ph-t{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:600;color:var(--nv)}
+.ph-a{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.metric{background:var(--sf);border:1px solid var(--br);border-radius:10px;padding:20px;transition:all .2s}
+.metric:hover{box-shadow:var(--sh);border-color:rgba(15,23,41,.14)}
+.m-top{display:flex;justify-content:space-between;margin-bottom:12px}
+.m-lbl{font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--tx2);text-transform:uppercase;letter-spacing:2px}
+.m-ico{font-size:1rem;opacity:.6}
+.m-val{font-family:'Fraunces',serif;font-size:2rem;font-weight:600;color:var(--nv);line-height:1;margin-bottom:4px}
+.m-sub{font-size:.7rem;color:var(--tx2);font-weight:300}
+
+/* CARD */
+.card{background:var(--sf);border:1px solid var(--br);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.ch{padding:13px 20px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.ct{font-size:.84rem;font-weight:600;color:var(--nv)}
+.ca{font-size:.7rem;color:var(--tx2);cursor:pointer;background:none;border:none;font-family:'JetBrains Mono',monospace;transition:color .18s;white-space:nowrap}
+.ca:hover{color:var(--nv)}
+
+/* TABLE */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:500px}
+thead th{padding:10px 16px;text-align:left;font-size:.55rem;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);background:var(--bg2);font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--br);font-weight:400;white-space:nowrap}
+tbody tr{border-bottom:1px solid rgba(15,23,41,.05);transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg2)}
+tbody td{padding:11px 16px;font-size:.82rem;vertical-align:middle}
+tr.cr{cursor:pointer}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--gd)}
+.badge{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:.58rem;font-weight:500;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;white-space:nowrap}
+.bg{background:rgba(42,122,75,.08);color:var(--gn);border:1px solid rgba(42,122,75,.12)}
+.by{background:rgba(217,119,6,.08);color:#92701A;border:1px solid rgba(217,119,6,.12)}
+.br2{background:rgba(192,57,43,.07);color:var(--rd);border:1px solid rgba(192,57,43,.1)}
+.bb{background:rgba(37,99,235,.07);color:var(--bl);border:1px solid rgba(37,99,235,.1)}
+.bn{background:rgba(15,23,41,.06);color:var(--tx2);border:1px solid rgba(15,23,41,.08)}
+
+/* PAGINATION */
+.pg{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--br);flex-wrap:wrap;gap:8px}
+.pg-info{font-size:.72rem;color:var(--tx2);font-family:'JetBrains Mono',monospace}
+.pg-btns{display:flex;gap:4px}
+.pg-btn{padding:4px 10px;border-radius:4px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:.72rem;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s}
+.pg-btn:hover:not(:disabled){border-color:var(--nv);color:var(--nv)}
+.pg-btn.act{background:var(--nv);color:#fff;border-color:var(--nv)}
+.pg-btn:disabled{opacity:.3;cursor:not-allowed}
+
+/* CHARTS */
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:120px;padding-bottom:24px;position:relative}
+.bar-chart::after{content:'';position:absolute;bottom:24px;left:0;right:0;height:1px;background:var(--br)}
+.bw{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:3px 3px 0 0;background:var(--nv);opacity:.8;min-height:3px;cursor:pointer;position:relative;transition:opacity .2s}
+.bar:hover{opacity:1}
+.bt{position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:var(--nv);color:#fff;border-radius:4px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:.58rem;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10}
+.bar:hover .bt{opacity:1}
+.bl2{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--tx2);text-align:center}
+.dw{display:flex;flex-direction:column;align-items:center;gap:14px;padding:16px}
+.donut{position:relative;width:110px;height:110px}
+.donut svg{transform:rotate(-90deg)}
+.dv{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.dvn{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;color:var(--nv)}
+.dvl{font-family:'JetBrains Mono',monospace;font-size:.44rem;color:var(--tx2);letter-spacing:1px}
+.dl{display:flex;flex-direction:column;gap:6px;width:100%}
+.dli{display:flex;align-items:center;gap:7px;font-size:.74rem}
+.dld{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dln{color:var(--tx2);flex:1;font-weight:300}
+.dlv{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--nv)}
+.two-col{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+
+/* EXCHANGE */
+.exc-it{padding:14px 20px;border-bottom:1px solid rgba(15,23,41,.05)}
+.exc-it:last-child{border-bottom:none}
+.exc-nm{font-weight:500;font-size:.84rem;color:var(--nv);margin-bottom:2px}
+.exc-mt{font-size:.7rem;color:var(--tx2);margin-bottom:6px}
+.exc-dt{font-size:.72rem;color:var(--tx2);margin-bottom:10px;padding:6px 10px;background:var(--bg2);border-radius:5px;font-family:'JetBrains Mono',monospace}
+.exc-bs{display:flex;gap:7px}
+.btn-ap{padding:6px 13px;border-radius:5px;border:1px solid rgba(42,122,75,.2);background:rgba(42,122,75,.06);color:var(--gn);font-size:.74rem;font-weight:600;cursor:pointer;transition:all .18s;font-family:'Figtree',sans-serif}
+.btn-ap:hover{background:rgba(42,122,75,.12)}
+.btn-rj{padding:6px 13px;border-radius:5px;border:1px solid rgba(192,57,43,.15);background:transparent;color:var(--rd);font-size:.74rem;cursor:pointer;transition:all .18s;font-family:'Figtree',sans-serif}
+.btn-rj:hover{background:rgba(192,57,43,.05)}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(15,23,41,.5);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--sf);border:1px solid var(--br);border-radius:14px;padding:28px;width:560px;max-width:95vw;max-height:88vh;overflow-y:auto;transform:translateY(12px);transition:transform .22s;box-shadow:0 20px 60px rgba(15,23,41,.15)}
+.overlay.open .modal{transform:translateY(0)}
+.mhd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;gap:10px}
+.mtitle{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:600;color:var(--nv);line-height:1.3}
+.mclose{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:1rem;padding:2px;flex-shrink:0;transition:color .15s}
+.mclose:hover{color:var(--nv)}
+.fg{margin-bottom:13px}
+.fg label{display:block;font-family:'JetBrains Mono',monospace;font-size:.53rem;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:5px}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--bg2);border:1.5px solid var(--br);border-radius:7px;padding:10px 13px;color:var(--nv);font-family:'Figtree',sans-serif;font-size:.86rem;outline:none;transition:all .18s;-webkit-appearance:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--nv);background:var(--sf);box-shadow:0 0 0 3px rgba(15,23,41,.05)}
+.fg select option{background:var(--sf)}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fm{padding:10px 12px;border-radius:6px;font-size:.78rem;margin-bottom:12px;display:none;line-height:1.5}
+.fm.ok{background:rgba(42,122,75,.07);color:var(--gn);border:1px solid rgba(42,122,75,.12)}
+.fm.err{background:rgba(192,57,43,.06);color:var(--rd);border:1px solid rgba(192,57,43,.1)}
+.ma{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
+.btn-sub{padding:10px 22px;border-radius:7px;border:none;background:var(--nv);color:#fff;font-family:'Figtree',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .18s}
+.btn-sub:hover{background:var(--nv2)}
+.btn-cm{padding:10px 18px;border-radius:7px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-family:'Figtree',sans-serif;font-size:.86rem;cursor:pointer;transition:all .18s}
+.btn-cm:hover{border-color:var(--nv);color:var(--nv)}
+.btn-dgr{padding:10px 20px;border-radius:7px;border:none;background:var(--rd);color:#fff;font-family:'Figtree',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .18s}
+.btn-dgr:hover{background:#a93226}
+
+/* Detail view */
+.dv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.dvr{padding:10px 12px;background:var(--bg2);border-radius:7px}
+.dvl2{font-family:'JetBrains Mono',monospace;font-size:.5rem;text-transform:uppercase;letter-spacing:2px;color:var(--tx3);margin-bottom:3px}
+.dvv{font-size:.82rem;color:var(--nv);font-weight:500}
+.dvf{grid-column:1/-1}
+
+/* BUTTONS */
+.btn-add{padding:8px 18px;border-radius:6px;border:none;background:var(--nv);color:#fff;font-family:'Figtree',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn-add:hover{background:var(--nv2)}
+.btn-ed{padding:4px 11px;border-radius:4px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:.72rem;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .15s}
+.btn-ed:hover{border-color:var(--nv);color:var(--nv)}
+.btn-dl{padding:4px 10px;border-radius:4px;border:1px solid rgba(192,57,43,.18);background:transparent;color:var(--rd);font-size:.72rem;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .15s;margin-left:4px}
+.btn-dl:hover{background:rgba(192,57,43,.06)}
+.btn-vw{padding:4px 10px;border-radius:4px;border:1px solid rgba(37,99,235,.2);background:transparent;color:var(--bl);font-size:.72rem;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .15s;margin-left:4px}
+.btn-vw:hover{background:rgba(37,99,235,.05)}
+.btn-sec{padding:7px 14px;border-radius:6px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-family:'Figtree',sans-serif;font-size:.78rem;cursor:pointer;transition:all .18s}
+.btn-sec:hover{border-color:var(--nv);color:var(--nv)}
+.btn-exp{padding:7px 14px;border-radius:6px;border:1px solid rgba(42,122,75,.2);background:rgba(42,122,75,.04);color:var(--gn);font-family:'JetBrains Mono',monospace;font-size:.68rem;cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn-exp:hover{background:rgba(42,122,75,.08)}
+.bk-tab{padding:6px 12px;border-radius:5px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:.72rem;font-weight:500;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .15s;white-space:nowrap}
+.bk-tab.active{background:var(--nv);color:#fff;border-color:var(--nv)}
+.bk-tab:hover:not(.active){border-color:var(--nv);color:var(--nv)}
+
+/* MISC */
+.spinner{width:24px;height:24px;border:2px solid var(--br);border-top-color:var(--nv);border-radius:50%;animation:spin .8s linear infinite;margin:44px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.es{padding:48px 20px;text-align:center}
+.es .ei{font-size:2rem;margin-bottom:10px}
+.es p{font-size:.82rem;color:var(--tx2);margin-bottom:12px}
+.ers{padding:32px 20px;text-align:center}
+.ers p{font-size:.82rem;color:var(--rd);margin-bottom:10px}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--nv);color:#fff;border-radius:8px;padding:11px 18px;font-size:.82rem;transform:translateY(60px);opacity:0;transition:all .3s;z-index:9999;border-left:3px solid var(--gd);max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-left-color:var(--gn)}.toast.err{border-left-color:var(--rd)}
+.sb-ov{display:none;position:fixed;inset:0;background:rgba(15,23,41,.45);z-index:99}
+.sb-ov.open{display:block}
+.prog-row{margin-bottom:12px}
+.prog-lb{display:flex;justify-content:space-between;margin-bottom:4px}
+.prog-nm{font-size:.78rem}
+.prog-pc{font-family:'JetBrains Mono',monospace;font-size:.7rem}
+.prog-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.prog-fl{height:100%;border-radius:3px;transition:width .6s ease}
+.sys-r{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg2);border-radius:6px;margin-bottom:6px}
+.sys-r:last-child{margin-bottom:0}
+
+input[type=search]{-webkit-appearance:none}
+.inf-row{display:flex;justify-content:space-between;padding:9px 12px;background:var(--bg2);border-radius:6px}
+.inf-lbl{font-size:.78rem;color:var(--tx2)}
+.inf-val{font-family:'JetBrains Mono',monospace;font-size:.76rem}
+
+@media(max-width:1100px){.metrics{grid-template-columns:1fr 1fr}.charts-row,.two-col{grid-template-columns:1fr}.three-col{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.sb-close{display:block}.main{margin-left:0}.menu-btn{display:flex}.topbar{padding:0 16px}.content{padding:16px}.metrics{grid-template-columns:1fr 1fr;gap:10px}.fg-row{grid-template-columns:1fr}.three-col{grid-template-columns:1fr}.dv-grid{grid-template-columns:1fr}}
+@media(max-width:480px){.metrics{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="sb-ov" id="sb-ov" onclick="closeSb()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sb-hd">
+    <a href="index.html" class="sb-logo"><div class="logo-mk">S</div><div class="logo-wd">SC<em>T</em>MS</div></a>
+    <button class="sb-close" onclick="closeSb()"></button>
+  </div>
+  <div class="adm-chip" data-i18n="adm_chip">Administrator</div>
+  <div class="sb-nav">
+    <div class="sb-sec">
+      <div class="sb-sl" data-i18n="sb_overview">Overview</div>
+      <div class="sb-it active" onclick="showPanel('dashboard',this)"><span class="si"></span> <span data-i18n="sb_dashboard">Dashboard</span></div>
+      <div class="sb-it" onclick="showPanel('revenue',this)"><span class="si"></span> <span data-i18n="sb_revenue">Revenue</span></div>
+      <div class="sb-it" onclick="showPanel('stats',this)"><span class="si"></span> <span data-i18n="sb_stats">Statistics</span></div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-sl" data-i18n="sb_manage">Management</div>
+      <div class="sb-it" onclick="showPanel('vehicles',this)"><span class="si"></span> <span data-i18n="sb_vehicles">Vehicles</span></div>
+      <div class="sb-it" onclick="showPanel('routes',this)"><span class="si"></span> <span data-i18n="sb_routes">Routes</span></div>
+      <div class="sb-it" onclick="showPanel('schedules',this)"><span class="si"></span> <span data-i18n="sb_schedules">Schedules</span></div>
+      <div class="sb-it" onclick="showPanel('users',this)"><span class="si"></span> <span data-i18n="sb_users">Users</span> <span class="sb-badge bd-g" id="sb-users"></span></div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-sl" data-i18n="sb_ops">Operations</div>
+      <div class="sb-it" onclick="showPanel('bookings',this)"><span class="si"></span> <span data-i18n="sb_bookings">All Bookings</span></div>
+      <div class="sb-it" onclick="showPanel('marketplace',this)"><span class="si"></span> <span data-i18n="sb_market">Marketplace</span></div>
+      <div class="sb-it" onclick="showPanel('promo',this)"><span class="si"></span> <span data-i18n="sb_promo">Promo Codes</span></div>
+    </div>
+  </div>
+  <div class="sb-ft">
+    <div class="sb-ur">
+      <div class="sb-av" id="sb-av">A</div>
+      <div><div class="sb-unm" id="sb-name">Admin</div><div class="sb-urol" data-i18n="sb_role">Administrator</div></div>
+    </div>
+    <button class="sb-lgo" onclick="logout()" data-i18n="sb_signout">Sign Out</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="tb-l">
+      <button class="menu-btn" onclick="openSb()"></button>
+      <div class="tb-title" id="tb-title" data-i18n="tb_title">Dashboard</div>
+    </div>
+    <div class="tb-r">
+      <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
+      <button class="ib" onclick="refreshCur()" title="Refresh"></button>
+      <button class="ib" onclick="toggleNotif()" id="notif-btn"><div class="ndot" id="ndot"></div></button>
+      <div class="np" id="np">
+        <div class="np-hd"><h4 data-i18n="notif_title">Notifications</h4><button class="np-clr" onclick="clearNotifs()" data-i18n="notif_clear">Clear all</button></div>
+        <div id="np-list"><div style="padding:20px;text-align:center;font-size:.78rem;color:var(--tx2)" data-i18n="notif_empty">No notifications</div></div>
+      </div>
+      <a href="index.html" class="btn-ghost" data-i18n="btn_home">Home</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="metrics">
+        <div class="metric"><div class="m-top"><div class="m-lbl" data-i18n="m_passengers">Passengers</div><div class="m-ico"></div></div><div class="m-val" id="m-pass"></div><div class="m-sub" data-i18n="m_registered">Registered users</div></div>
+        <div class="metric"><div class="m-top"><div class="m-lbl" data-i18n="m_today_book">Today Bookings</div><div class="m-ico"></div></div><div class="m-val" id="m-book"></div><div class="m-sub" data-i18n="m_all_routes">All routes</div></div>
+        <div class="metric"><div class="m-top"><div class="m-lbl" data-i18n="m_today_rev">Today Revenue</div><div class="m-ico"></div></div><div class="m-val" id="m-rev"></div><div class="m-sub" data-i18n="m_net">Net collected</div></div>
+        <div class="metric"><div class="m-top"><div class="m-lbl" data-i18n="m_active_routes">Active Routes</div><div class="m-ico"></div></div><div class="m-val" id="m-routes"></div><div class="m-sub" data-i18n="m_bus_train">Bus + Train</div></div>
+      </div>
+      <div class="two-col">
+        <div>
+          <div class="card">
+            <div class="ch"><div class="ct" data-i18n="card_recent">Recent Bookings</div><button class="ca" onclick="showPanel('bookings',document.querySelector('[onclick*=bookings]'))" data-i18n="btn_view_all">View all </button></div>
+            <div class="tw" id="dash-bk"><div class="spinner"></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="ch"><div class="ct" data-i18n="card_market">Marketplace Activity</div><a href="marketplace.html" target="_blank" style="font-size:.68rem;color:var(--tx2);font-family:'JetBrains Mono',monospace;text-decoration:none">P2P </a></div>
+            <div style="padding:14px;display:flex;flex-direction:column;gap:7px" id="dash-mp">
+              <div class="sys-r"><span style="font-size:.78rem" data-i18n="mp_active">Active Listings</span><span class="mono" id="mp-dash-active"></span></div>
+              <div class="sys-r"><span style="font-size:.78rem" data-i18n="mp_done">Completed Swaps</span><span class="mono" id="mp-dash-done"></span></div>
+              <div class="sys-r"><span style="font-size:.78rem" data-i18n="mp_pending">Pending Requests</span><span class="mono" id="mp-dash-pend"></span></div>
+              <div style="padding:8px 10px;background:rgba(37,99,235,0.04);border:1px solid rgba(37,99,235,0.1);border-radius:6px;font-size:.7rem;color:var(--tx2);line-height:1.5" data-i18n="mp_note">Admin has <strong>read-only</strong> access. Passengers manage their own swaps.</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct" data-i18n="card_summary">Today's Summary</div></div>
+            <div style="padding:14px;display:flex;flex-direction:column;gap:7px" id="dash-sum"><div class="spinner"></div></div>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct" data-i18n="card_system">System Status</div></div>
+            <div style="padding:14px" id="dash-sys">
+              <div class="sys-r"><span style="font-size:.78rem" data-i18n="sys_api">API Server</span><span class="badge bn" id="sys-api">Checking</span></div>
+              <div class="sys-r"><span style="font-size:.78rem" data-i18n="sys_veh">Total Vehicles</span><span class="mono" id="sys-veh"></span></div>
+              <div class="sys-r"><span style="font-size:.78rem" data-i18n="sys_routes">Total Routes</span><span class="mono" id="sys-rte"></span></div>
+              <div class="sys-r"><span style="font-size:.78rem" data-i18n="sys_cancel">Today Cancellations</span><span class="mono" id="sys-canc"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVENUE -->
+    <div class="panel" id="panel-revenue">
+      <div class="ph">
+        <div class="ph-t" data-i18n="rev_title">Revenue Overview</div>
+        <div class="ph-a">
+          <button class="bk-tab active" id="rv-wb" onclick="setRevP('weekly',this)" data-i18n="rev_weekly">Weekly</button>
+          <button class="bk-tab" id="rv-mb" onclick="setRevP('monthly',this)" data-i18n="rev_monthly">Monthly</button>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><div class="m-top"><div class="m-lbl">Today</div><div class="m-ico"></div></div><div class="m-val" id="rev-today"></div><div class="m-sub">Net revenue</div></div>
+        <div class="metric"><div class="m-top"><div class="m-lbl">This Week</div><div class="m-ico"></div></div><div class="m-val" id="rev-week"></div><div class="m-sub">7-day total</div></div>
+        <div class="metric"><div class="m-top"><div class="m-lbl">This Month</div><div class="m-ico"></div></div><div class="m-val" id="rev-month"></div><div class="m-sub">Monthly total</div></div>
+        <div class="metric"><div class="m-top"><div class="m-lbl">Avg / Booking</div><div class="m-ico"></div></div><div class="m-val" id="rev-avg"></div><div class="m-sub">Average fare</div></div>
+      </div>
+      <div class="charts-row">
+        <div class="card">
+          <div class="ch"><div class="ct">Revenue Chart</div><span style="font-size:.66rem;color:var(--tx3);font-family:'JetBrains Mono',monospace">from confirmed bookings</span></div>
+          <div style="padding:20px"><div class="bar-chart" id="rev-chart"></div></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct">By Vehicle Type</div></div>
+          <div class="dw">
+            <div class="donut">
+              <svg width="110" height="110" viewBox="0 0 110 110">
+                <circle cx="55" cy="55" r="46" fill="none" stroke="var(--bg3)" stroke-width="14"/>
+                <circle id="d-bus" cx="55" cy="55" r="46" fill="none" stroke="var(--gn)" stroke-width="14" stroke-dasharray="289" stroke-dashoffset="0" stroke-linecap="round"/>
+                <circle id="d-train" cx="55" cy="55" r="46" fill="none" stroke="var(--bl)" stroke-width="14" stroke-dasharray="289" stroke-dashoffset="289" stroke-linecap="round"/>
+              </svg>
+              <div class="dv"><div class="dvn" id="d-tot"></div><div class="dvl">TRIPS</div></div>
+            </div>
+            <div class="dl">
+              <div class="dli"><div class="dld" style="background:var(--gn)"></div><div class="dln">Bus</div><div class="dlv" id="d-bv"></div></div>
+              <div class="dli"><div class="dld" style="background:var(--bl)"></div><div class="dln">Train</div><div class="dlv" id="d-tv"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">Top Revenue Routes</div></div>
+        <div class="tw" id="rev-routes"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="panel" id="panel-stats">
+      <div class="ph"><div class="ph-t" data-i18n="stats_title">Statistics</div><button class="btn-sec" onclick="loadStats()" data-i18n="btn_refresh">Refresh</button></div>
+      <div class="three-col">
+        <div class="card"><div style="padding:18px"><div style="font-size:.72rem;color:var(--tx2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Today Bookings</div><div class="m-val" id="st-today" style="font-size:2rem"></div><div style="font-size:.7rem;color:var(--tx2);margin-top:4px" id="st-today-s">Loading</div></div></div>
+        <div class="card"><div style="padding:18px"><div style="font-size:.72rem;color:var(--tx2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Total Bookings</div><div style="font-family:'Fraunces',serif;font-size:2rem;font-weight:600;color:var(--bl)" id="st-total"></div><div style="font-size:.7rem;color:var(--tx2);margin-top:4px" id="st-total-s">All time</div></div></div>
+        <div class="card"><div style="padding:18px"><div style="font-size:.72rem;color:var(--tx2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Total Revenue</div><div style="font-family:'Fraunces',serif;font-size:2rem;font-weight:600;color:var(--gn)" id="st-rev"></div><div style="font-size:.7rem;color:var(--tx2);margin-top:4px">Confirmed bookings</div></div></div>
+      </div>
+      <div class="two-col">
+        <div class="card"><div class="ch"><div class="ct">Status Breakdown</div></div><div style="padding:18px" id="st-status"><div class="spinner"></div></div></div>
+        <div class="card"><div class="ch"><div class="ct">Top Routes</div></div><div style="padding:14px;display:flex;flex-direction:column;gap:10px" id="st-routes"><div class="spinner"></div></div></div>
+      </div>
+      <div class="card"><div class="ch"><div class="ct">Payment Methods</div></div><div style="padding:18px" id="st-pay"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- VEHICLES -->
+    <div class="panel" id="panel-vehicles">
+      <div class="ph">
+        <div class="ph-t" data-i18n="veh_title">Vehicles</div>
+        <div class="ph-a">
+          <input type="search" id="veh-s" placeholder="Search" oninput="filterVeh()" style="padding:7px 12px;border-radius:6px;border:1px solid var(--br);background:var(--sf);font-family:'Figtree',sans-serif;font-size:.82rem;outline:none;color:var(--nv);width:200px" data-i18n-placeholder="ph_search">
+          <button class="btn-add" onclick="addVehicle()" data-i18n="btn_add_vehicle">+ Add Vehicle</button>
+        </div>
+      </div>
+      <div class="card"><div class="tw" id="veh-tbl"><div class="spinner"></div></div><div id="veh-pg"></div></div>
+    </div>
+
+    <!-- ROUTES -->
+    <div class="panel" id="panel-routes">
+      <div class="ph">
+        <div class="ph-t" data-i18n="routes_title">Routes</div>
+        <div class="ph-a">
+          <input type="search" id="rte-s" placeholder="Search" oninput="filterRte()" style="padding:7px 12px;border-radius:6px;border:1px solid var(--br);background:var(--sf);font-family:'Figtree',sans-serif;font-size:.82rem;outline:none;color:var(--nv);width:200px" data-i18n-placeholder="ph_search">
+          <button class="btn-add" onclick="addRoute()" data-i18n="btn_add_route">+ Add Route</button>
+        </div>
+      </div>
+      <div class="card"><div class="tw" id="rte-tbl"><div class="spinner"></div></div><div id="rte-pg"></div></div>
+    </div>
+
+    <!-- SCHEDULES -->
+    <div class="panel" id="panel-schedules">
+      <div class="ph">
+        <div class="ph-t" data-i18n="sched_title">Schedules</div>
+        <div class="ph-a"><button class="btn-add" onclick="addSchedule()" data-i18n="btn_add_sched">+ Add Schedule</button></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+        <select id="sc-ff" class="btn-sec" style="padding:7px 12px;font-size:.82rem;outline:none;-webkit-appearance:none" onchange="applyScF()">
+          <option value="">All Origins</option><option>Dhaka</option><option>Chittagong</option><option>Sylhet</option><option>Rajshahi</option><option>Khulna</option><option>Barishal</option><option>Rangpur</option><option>Mymensingh</option>
+        </select>
+        <select id="sc-ft" class="btn-sec" style="padding:7px 12px;font-size:.82rem;outline:none;-webkit-appearance:none" onchange="applyScF()">
+          <option value="">All Destinations</option><option>Dhaka</option><option>Chittagong</option><option>Sylhet</option><option>Rajshahi</option><option>Khulna</option><option>Barishal</option><option>Rangpur</option><option>Mymensingh</option>
+        </select>
+        <input type="date" id="sc-fd" class="btn-sec" style="padding:7px 12px;font-size:.82rem;outline:none" onchange="applyScF()">
+        <select id="sc-fv" class="btn-sec" style="padding:7px 12px;font-size:.82rem;outline:none;-webkit-appearance:none" onchange="applyScF()">
+          <option value="">All Types</option><option value="bus">Bus</option><option value="train">Train</option>
+        </select>
+        <button class="btn-sec" onclick="clearScF()"> Clear</button>
+        <span id="sc-cnt" style="font-size:.72rem;color:var(--tx3);font-family:'JetBrains Mono',monospace"></span>
+      </div>
+      <div class="card"><div class="tw" id="sched-tbl"><div class="spinner"></div></div><div id="sc-pg"></div></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="panel" id="panel-users">
+      <div class="ph">
+        <div class="ph-t" data-i18n="users_title">Users</div>
+        <div class="ph-a">
+          <input type="search" id="usr-s" placeholder="Search name / email / phone" oninput="filterUsers()" style="padding:7px 12px;border-radius:6px;border:1px solid var(--br);background:var(--sf);font-family:'Figtree',sans-serif;font-size:.82rem;outline:none;color:var(--nv);width:250px" data-i18n-placeholder="ph_search_user">
+          <select id="usr-rf" onchange="filterUsers()" style="padding:7px 12px;border-radius:6px;border:1px solid var(--br);background:var(--sf);font-family:'Figtree',sans-serif;font-size:.82rem;outline:none;-webkit-appearance:none;color:var(--nv)">
+            <option value="" data-i18n="opt_all_roles">All Roles</option><option value="passenger" data-i18n="opt_passengers">Passengers</option><option value="staff" data-i18n="opt_staff">Staff</option><option value="admin" data-i18n="opt_admins">Admins</option>
+          </select>
+          <button class="btn-add" onclick="openUserAdd()" data-i18n="btn_add_operator">+ Add Operator</button>
+          <button class="btn-exp" onclick="exportUsers()"> Export CSV</button>
+        </div>
+      </div>
+      <div class="card"><div class="tw" id="users-tbl"><div class="spinner"></div></div><div id="usr-pg"></div></div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div class="panel" id="panel-bookings">
+      <div class="ph">
+        <div class="ph-t" data-i18n="bookings_title">All Bookings</div>
+        <button class="btn-exp" onclick="exportBk()" data-i18n="btn_export">Export CSV</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+        <input type="search" id="bk-s" placeholder="Search ID / passenger / route" oninput="renderBk()" style="padding:7px 12px;border-radius:6px;border:1px solid var(--br);background:var(--sf);font-family:'Figtree',sans-serif;font-size:.82rem;outline:none;color:var(--nv);width:260px" data-i18n-placeholder="ph_search_bk">
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="bk-tab active" onclick="setBkTab('all',this)">All</button>
+          <button class="bk-tab" onclick="setBkTab('confirmed',this)">Confirmed</button>
+          <button class="bk-tab" onclick="setBkTab('pending',this)">Pending</button>
+          <button class="bk-tab" onclick="setBkTab('cancelled',this)">Cancelled</button>
+          <button class="bk-tab" onclick="setBkTab('exchanged',this)">Exchanged</button>
+        </div>
+        <span id="bk-cnt" style="font-size:.72rem;color:var(--tx3);font-family:'JetBrains Mono',monospace"></span>
+      </div>
+      <div class="card"><div class="tw" id="bk-tbl"><div class="spinner"></div></div><div id="bk-pg"></div></div>
+    </div>
+
+    <!-- MARKETPLACE -->
+    <div class="panel" id="panel-marketplace">
+      <div class="ph">
+        <div class="ph-t" data-i18n="mp_title">Marketplace Overview</div>
+        <button class="btn-sec" onclick="loadMarket()" data-i18n="btn_refresh">Refresh</button>
+      </div>
+      <!-- Read-only notice -->
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 16px;background:rgba(37,99,235,0.05);border:1px solid rgba(37,99,235,0.1);border-radius:8px;margin-bottom:18px">
+        <span style="font-size:.9rem;flex-shrink:0"></span>
+        <div style="font-size:.76rem;color:var(--tx2);line-height:1.6">This is a <strong style="color:var(--nv)">passenger-to-passenger</strong> exchange platform. Admins have <strong>read-only access</strong>  exchanges are approved directly by the passengers involved, not by the company.</div>
+      </div>
+      <div class="three-col" style="margin-bottom:14px">
+        <div class="card"><div style="padding:18px"><div style="font-size:.62rem;color:var(--tx2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Active Listings</div><div class="m-val" id="mp-active" style="font-size:1.8rem"></div></div></div>
+        <div class="card"><div style="padding:18px"><div style="font-size:.62rem;color:var(--tx2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Completed Swaps</div><div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:600;color:var(--gn)" id="mp-done"></div></div></div>
+        <div class="card"><div style="padding:18px"><div style="font-size:.62rem;color:var(--tx2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Pending Requests</div><div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:600;color:var(--og)" id="mp-pend-cnt"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">Exchange History</div><span style="font-size:.68rem;color:var(--tx3);font-family:'JetBrains Mono',monospace">View only  passengers manage their own swaps</span></div>
+        <div id="mp-hist"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-promo">
+      <div id="sec-promo"></div>
+    </div>
+
+  </div>
+</main>
+
+<!-- VEHICLE MODAL -->
+<div class="overlay" id="modal-vehicle" onclick="if(event.target===this)closeM('vehicle')">
+  <div class="modal">
+    <div class="mhd"><div class="mtitle" id="mv-t">Add Vehicle</div><button class="mclose" onclick="closeM('vehicle')"></button></div>
+    <div class="fm" id="mv-msg"></div>
+    <div class="fg-row">
+      <div class="fg"><label>Vehicle Name *</label><input type="text" id="v-name" placeholder="Shyamoli Express"></div>
+      <div class="fg"><label>Type *</label><select id="v-type"><option value="bus"> Bus</option><option value="train"> Train</option></select></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Total Seats *</label><input type="number" id="v-seats" placeholder="40" min="1"></div>
+      <div class="fg"><label>Class</label><select id="v-class"><option value=""> Select </option><option value="AC">AC</option><option value="Non-AC">Non-AC</option><option value="Sleeper">Sleeper</option><option value="Business">Business</option><option value="Economy">Economy</option></select></div>
+    </div>
+    <div class="fg"><label>Amenities</label><input type="text" id="v-amen" placeholder="AC, WiFi, Charging Port, Snacks"></div>
+    <div class="fg-row">
+      <div class="fg"><label>Reg. Number</label><input type="text" id="v-reg" placeholder="Dhaka Metro BA-1234"></div>
+      <div class="fg"><label>Status</label><select id="v-status"><option value="active"> Active</option><option value="maintenance"> Maintenance</option><option value="inactive"> Inactive</option></select></div>
+    </div>
+    <div class="ma"><button class="btn-cm" onclick="closeM('vehicle')">Cancel</button><button class="btn-sub" onclick="submitV()">Save Vehicle</button></div>
+  </div>
+</div>
+
+<!-- ROUTE MODAL -->
+<div class="overlay" id="modal-route" onclick="if(event.target===this)closeM('route')">
+  <div class="modal">
+    <div class="mhd"><div class="mtitle" id="mr-t">Add Route</div><button class="mclose" onclick="closeM('route')"></button></div>
+    <div class="fm" id="mr-msg"></div>
+    <div class="fg-row">
+      <div class="fg"><label>Origin *</label><select id="r-origin"><option value="">Select</option><option>Dhaka</option><option>Chittagong</option><option>Sylhet</option><option>Rajshahi</option><option>Khulna</option><option>Barishal</option><option>Rangpur</option><option>Mymensingh</option><option>Comilla</option><option>Jessore</option><option>Bogra</option><option>Cox's Bazar</option></select></div>
+      <div class="fg"><label>Destination *</label><select id="r-dest"><option value="">Select</option><option>Dhaka</option><option>Chittagong</option><option>Sylhet</option><option>Rajshahi</option><option>Khulna</option><option>Barishal</option><option>Rangpur</option><option>Mymensingh</option><option>Comilla</option><option>Jessore</option><option>Bogra</option><option>Cox's Bazar</option></select></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Distance (km)</label><input type="number" id="r-dist" placeholder="250" min="1"></div>
+      <div class="fg"><label>Base Fare () *</label><input type="number" id="r-fare" placeholder="450" min="1"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Duration (hrs)</label><input type="number" id="r-dur" placeholder="5.5" step="0.5" min="0.5"></div>
+      <div class="fg"><label>Status</label><select id="r-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+    </div>
+    <div class="ma"><button class="btn-cm" onclick="closeM('route')">Cancel</button><button class="btn-sub" onclick="submitR()">Save Route</button></div>
+  </div>
+</div>
+
+<!-- SCHEDULE MODAL -->
+<div class="overlay" id="modal-schedule" onclick="if(event.target===this)closeM('schedule')">
+  <div class="modal">
+    <div class="mhd"><div class="mtitle" id="ms-t">Add Schedule</div><button class="mclose" onclick="closeM('schedule')"></button></div>
+    <div class="fm" id="ms-msg"></div>
+    <div class="fg-row">
+      <div class="fg"><label>Origin *</label><select id="sc-origin"><option value="">Select</option><option>Dhaka</option><option>Chittagong</option><option>Sylhet</option><option>Rajshahi</option><option>Khulna</option><option>Barishal</option><option>Rangpur</option><option>Mymensingh</option></select></div>
+      <div class="fg"><label>Destination *</label><select id="sc-dest"><option value="">Select</option><option>Dhaka</option><option>Chittagong</option><option>Sylhet</option><option>Rajshahi</option><option>Khulna</option><option>Barishal</option><option>Rangpur</option><option>Mymensingh</option></select></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Vehicle *</label><select id="sc-vsel" onchange="onVehSel()"><option value="">Select Vehicle</option></select></div>
+      <div class="fg"><label>Vehicle Type *</label><select id="sc-vtype"><option value="bus"> Bus</option><option value="train"> Train</option></select></div>
+    </div>
+    <div class="fg" id="sc-mw" style="display:none"><label>Vehicle Name (manual) *</label><input type="text" id="sc-vname" placeholder="Enter vehicle name"></div>
+    <div class="fg-row">
+      <div class="fg"><label>Date *</label><input type="date" id="sc-date"></div>
+      <div class="fg"><label>Total Seats *</label><input type="number" id="sc-seats" placeholder="40" min="1"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Departure *</label><input type="time" id="sc-dep"></div>
+      <div class="fg"><label>Arrival *</label><input type="time" id="sc-arr"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Fare () *</label><input type="number" id="sc-fare" placeholder="450" min="1"></div>
+      <div class="fg"><label>Amenities</label><input type="text" id="sc-amen" placeholder="AC, WiFi"></div>
+    </div>
+    <div class="ma"><button class="btn-cm" onclick="closeM('schedule')">Cancel</button><button class="btn-sub" onclick="submitSc()">Save Schedule</button></div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="overlay" id="modal-del" onclick="if(event.target===this)closeM('del')">
+  <div class="modal" style="max-width:380px;text-align:center">
+    <div style="font-size:2.4rem;margin-bottom:10px"></div>
+    <div class="mtitle" id="del-t" style="display:block;margin-bottom:8px">Delete?</div>
+    <div style="font-size:.82rem;color:var(--tx2);margin-bottom:24px;line-height:1.6" id="del-msg"> permanently delete </div>
+    <div class="ma" style="justify-content:center"><button class="btn-cm" onclick="closeM('del')">Cancel</button><button class="btn-dgr" id="del-btn">Delete</button></div>
+  </div>
+</div>
+
+<!-- BOOKING DETAIL MODAL -->
+<div class="overlay" id="modal-bkd" onclick="if(event.target===this)closeM('bkd')">
+  <div class="modal" style="max-width:580px">
+    <div class="mhd"><div class="mtitle" id="bkd-t">Booking Details</div><button class="mclose" onclick="closeM('bkd')"></button></div>
+    <div id="bkd-body"></div>
+    <div class="ma" id="bkd-act"></div>
+  </div>
+</div>
+
+<!-- USER DETAIL MODAL -->
+<div class="overlay" id="modal-usr" onclick="if(event.target===this)closeM('usr')">
+  <div class="modal" style="max-width:500px">
+    <div class="mhd"><div class="mtitle" id="usd-t">User Details</div><button class="mclose" onclick="closeM('usr')"></button></div>
+    <div id="usd-body"></div>
+    <div class="ma" id="usd-act"></div>
+  </div>
+</div>
+
+<div class="overlay" id="modal-uadd" onclick="if(event.target===this)closeM('uadd')">
+  <div class="modal" style="max-width:520px">
+    <div class="mhd">
+      <div class="mtitle" id="uadd-t" data-i18n="uadd_title">Create Operator/Staff</div>
+      <button class="mclose" onclick="closeM('uadd')"></button>
+    </div>
+    <div class="fm" id="uadd-msg"></div>
+    <div class="fg-row">
+      <div class="fg"><label id="uadd-fn-l" data-i18n="uadd_fn">First Name *</label><input type="text" id="uadd-fn"></div>
+      <div class="fg"><label id="uadd-ln-l" data-i18n="uadd_ln">Last Name *</label><input type="text" id="uadd-ln"></div>
+    </div>
+    <div class="fg"><label id="uadd-em-l" data-i18n="uadd_email">Email *</label><input type="email" id="uadd-em" placeholder="operator@sctms.com"></div>
+    <div class="fg-row">
+      <div class="fg"><label id="uadd-ph-l" data-i18n="uadd_phone">Phone</label><input type="tel" id="uadd-ph" placeholder="01XXXXXXXXX"></div>
+      <div class="fg"><label id="uadd-role-l" data-i18n="uadd_role">Role *</label>
+        <select id="uadd-role">
+          <option value="staff" id="uadd-role-st" data-i18n="opt_staff">Staff</option>
+          <option value="admin" id="uadd-role-ad" data-i18n="opt_admins">Admin</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label id="uadd-pw-l" data-i18n="uadd_pw">Temporary Password</label><input type="text" id="uadd-pw" placeholder="Auto-generated if empty"></div>
+    <div class="ma">
+      <button class="btn-cm" onclick="closeM('uadd')" data-i18n="btn_cancel">Cancel</button>
+      <button class="btn-sub" onclick="submitUserAdd()" data-i18n="btn_create">Create User</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API='http://localhost:5000/api';
+const token=localStorage.getItem('sctms_token');
+const user=JSON.parse(localStorage.getItem('sctms_user')||'{}');
+function denyAccess(){
+  document.body.innerHTML = `
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FDFBF8;padding:32px">
+      <div style="max-width:520px;background:#fff;border:1px solid rgba(15,23,41,0.09);border-radius:16px;padding:28px;box-shadow:0 8px 24px rgba(15,23,41,0.08)">
+        <div style="font-family:'Fraunces',serif;font-size:1.6rem;color:#0F1729;margin-bottom:8px">Access denied</div>
+        <p style="color:#5C6478;font-size:.9rem;line-height:1.6;margin-bottom:16px">
+          This area is restricted to admin/operators only. Please sign in with the correct account.
+        </p>
+        <a href="login.html" style="display:inline-block;padding:10px 18px;border-radius:8px;background:#0F1729;color:#fff;text-decoration:none;font-weight:600">Go to Sign In</a>
+      </div>
+    </div>
+  `;
+}
+if(!token)window.location.href='login.html';
+const role=(user.role||'').toLowerCase();
+if(!role || !['admin','staff'].includes(role)){denyAccess();throw new Error('access_denied');}
+if(user.firstName){
+  document.getElementById('sb-av').textContent=user.firstName[0].toUpperCase();
+  document.getElementById('sb-name').textContent=user.firstName+' '+(user.lastName||'');
+}
+const i18n={
+  en:{
+    adm_chip:'Administrator',sb_overview:'Overview',sb_dashboard:'Dashboard',sb_revenue:'Revenue',sb_stats:'Statistics',
+    sb_manage:'Management',sb_vehicles:'Vehicles',sb_routes:'Routes',sb_schedules:'Schedules',sb_users:'Users',
+    sb_ops:'Operations',sb_bookings:'All Bookings',sb_market:'Marketplace',sb_promo:'Promo Codes',
+    sb_role:'Administrator',sb_signout:'Sign Out',tb_title:'Dashboard',
+    notif_title:'Notifications',notif_clear:'Clear all',notif_empty:'No notifications',
+    btn_home:'Home',
+    m_passengers:'Passengers',m_registered:'Registered users',m_today_book:'Today Bookings',m_all_routes:'All routes',
+    m_today_rev:'Today Revenue',m_net:'Net collected',m_active_routes:'Active Routes',m_bus_train:'Bus + Train',
+    card_recent:'Recent Bookings',btn_view_all:'View all',card_market:'Marketplace Activity',
+    mp_active:'Active Listings',mp_done:'Completed Swaps',mp_pending:'Pending Requests',
+    mp_note:'Admin has <strong>read-only</strong> access. Passengers manage their own swaps.',
+    card_summary:"Today's Summary",card_system:'System Status',
+    sys_api:'API Server',sys_veh:'Total Vehicles',sys_routes:'Total Routes',sys_cancel:'Today Cancellations',
+    rev_title:'Revenue Overview',rev_weekly:'Weekly',rev_monthly:'Monthly',
+    stats_title:'Statistics',btn_refresh:'Refresh',
+    veh_title:'Vehicles',btn_add_vehicle:'+ Add Vehicle',routes_title:'Routes',btn_add_route:'+ Add Route',
+    sched_title:'Schedules',btn_add_sched:'+ Add Schedule',
+    users_title:'Users',ph_search:'Search',ph_search_user:'Search name / email / phone',
+    opt_all_roles:'All Roles',opt_passengers:'Passengers',opt_staff:'Staff',opt_admins:'Admins',
+    btn_add_operator:'+ Add Operator',
+    uadd_title:'Create Operator/Staff',uadd_fn:'First Name *',uadd_ln:'Last Name *',uadd_email:'Email *',
+    uadd_phone:'Phone',uadd_role:'Role *',uadd_pw:'Temporary Password',
+    btn_create:'Create User',btn_cancel:'Cancel',
+    bookings_title:'All Bookings',btn_export:'Export CSV',ph_search_bk:'Search ID / passenger / route',
+    mp_title:'Marketplace Overview',
+    pn_dashboard:'Dashboard',pn_revenue:'Revenue',pn_stats:'Statistics',pn_vehicles:'Vehicles',pn_routes:'Routes',
+    pn_schedules:'Schedules',pn_users:'Users',pn_bookings:'All Bookings',pn_market:'Marketplace',pn_promo:'Promo Codes',
+    toast_refreshed:'Refreshed'
+  },
+  bn:{
+    adm_chip:'অ্যাডমিন',sb_overview:'ওভারভিউ',sb_dashboard:'ড্যাশবোর্ড',sb_revenue:'রেভিনিউ',sb_stats:'স্ট্যাটস',
+    sb_manage:'ম্যানেজমেন্ট',sb_vehicles:'ভেহিকল',sb_routes:'রুট',sb_schedules:'শিডিউল',sb_users:'ইউজার',
+    sb_ops:'অপারেশনস',sb_bookings:'সব বুকিং',sb_market:'মার্কেটপ্লেস',sb_promo:'প্রোমো কোড',
+    sb_role:'অ্যাডমিন',sb_signout:'সাইন আউট',tb_title:'ড্যাশবোর্ড',
+    notif_title:'নোটিফিকেশন',notif_clear:'সব মুছুন',notif_empty:'কোন নোটিফিকেশন নেই',
+    btn_home:'হোম',
+    m_passengers:'যাত্রী',m_registered:'রেজিস্টার্ড ইউজার',m_today_book:'আজকের বুকিং',m_all_routes:'সব রুট',
+    m_today_rev:'আজকের রেভিনিউ',m_net:'নেট কালেকশন',m_active_routes:'সক্রিয় রুট',m_bus_train:'বাস + ট্রেন',
+    card_recent:'সাম্প্রতিক বুকিং',btn_view_all:'সব দেখুন',card_market:'মার্কেটপ্লেস অ্যাক্টিভিটি',
+    mp_active:'অ্যাকটিভ লিস্টিং',mp_done:'কমপ্লিটেড সুয়াপ',mp_pending:'পেন্ডিং রিকোয়েস্ট',
+    mp_note:'অ্যাডমিনের জন্য <strong>রিড-অনলি</strong> এক্সেস। যাত্রীরা নিজেরা সুয়াপ ম্যানেজ করে।',
+    card_summary:'আজকের সারাংশ',card_system:'সিস্টেম স্ট্যাটাস',
+    sys_api:'এপিআই সার্ভার',sys_veh:'মোট ভেহিকল',sys_routes:'মোট রুট',sys_cancel:'আজকের বাতিল',
+    rev_title:'রেভিনিউ ওভারভিউ',rev_weekly:'সাপ্তাহিক',rev_monthly:'মাসিক',
+    stats_title:'স্ট্যাটিসটিকস',btn_refresh:'রিফ্রেশ',
+    veh_title:'ভেহিকল',btn_add_vehicle:'+ ভেহিকল যোগ',routes_title:'রুট',btn_add_route:'+ রুট যোগ',
+    sched_title:'শিডিউল',btn_add_sched:'+ শিডিউল যোগ',
+    users_title:'ইউজার',ph_search:'সার্চ',ph_search_user:'নাম / ইমেইল / ফোন সার্চ',
+    opt_all_roles:'সব রোল',opt_passengers:'প্যাসেঞ্জার',opt_staff:'স্টাফ',opt_admins:'অ্যাডমিন',
+    btn_add_operator:'+ অপারেটর যোগ',
+    uadd_title:'অপারেটর/স্টাফ তৈরি',uadd_fn:'নাম *',uadd_ln:'পদবি *',uadd_email:'ইমেইল *',
+    uadd_phone:'ফোন',uadd_role:'রোল *',uadd_pw:'টেম্পোরারি পাসওয়ার্ড',
+    btn_create:'ইউজার তৈরি',btn_cancel:'বাতিল',
+    bookings_title:'সব বুকিং',btn_export:'CSV এক্সপোর্ট',ph_search_bk:'আইডি / যাত্রী / রুট সার্চ',
+    mp_title:'মার্কেটপ্লেস ওভারভিউ',
+    pn_dashboard:'ড্যাশবোর্ড',pn_revenue:'রেভিনিউ',pn_stats:'স্ট্যাটস',pn_vehicles:'ভেহিকল',pn_routes:'রুট',
+    pn_schedules:'শিডিউল',pn_users:'ইউজার',pn_bookings:'সব বুকিং',pn_market:'মার্কেটপ্লেস',pn_promo:'প্রোমো কোড',
+    toast_refreshed:'রিফ্রেশ হয়েছে'
+  }
+};
+let curLang=localStorage.getItem('sctms_lang')||'en';
+function t(k){return (i18n[curLang]&&i18n[curLang][k])||i18n.en[k]||k;}
+function applyLang(){
+  document.documentElement.lang=curLang;
+  const toggle=document.getElementById('lang-toggle');
+  if(toggle) toggle.textContent=curLang==='en'?'EN':'BN';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    const val=t(key);
+    if(val.includes('<')) el.innerHTML=val; else el.textContent=val;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    el.setAttribute('placeholder',t(el.getAttribute('data-i18n-placeholder')));
+  });
+}
+document.getElementById('lang-toggle').addEventListener('click',()=>{
+  curLang=curLang==='en'?'bn':'en';
+  localStorage.setItem('sctms_lang',curLang);
+  applyLang();
+});
+applyLang();
+
+//  CORE HELPERS 
+function H(){return{'Authorization':'Bearer '+token,'Content-Type':'application/json'};}
+function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+type;clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',3200);}
+function showMsg(id,msg,type){const e=document.getElementById(id);e.textContent=msg;e.className='fm '+type;e.style.display='block';}
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fdate(t){if(!t)return'';const d=new Date(t);return`${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}`;}
+function ft(t){if(!t)return'';const d=new Date(t);return d.getUTCHours().toString().padStart(2,'0')+':'+d.getUTCMinutes().toString().padStart(2,'0');}
+function fmt(n){return Number(n||0).toLocaleString();}
+function fmtT(n){const v=Number(n||0);return v>=1000?''+(v/1000).toFixed(1)+'K':''+v;}
+function sbc(s){return{confirmed:'bg',cancelled:'br2',pending:'by',exchanged:'bb'}[s]||'bn';}
+function ES(msg,fn){return`<div class="es"><div class="ei"></div><p>${msg}</p>${fn?`<button class="btn-sec" onclick="${fn}()">Retry</button>`:''}</div>`;}
+function ER(msg,fn){return`<div class="ers"><p> ${msg}</p><button class="btn-sec" onclick="${fn}()">Retry</button></div>`;}
+function irow(l,v,c){return`<div class="inf-row"><span class="inf-lbl">${l}</span><span class="inf-val" style="color:${c||'var(--nv)'};">${v}</span></div>`;}
+
+//  SIDEBAR 
+function logout(){localStorage.clear();window.location.href='login.html';}
+function openSb(){document.getElementById('sidebar').classList.add('open');document.getElementById('sb-ov').classList.add('open');}
+function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-ov').classList.remove('open');}
+
+//  NOTIFS 
+// ─── NOTIFICATIONS (real API) ───────────────
+let _nots = [];
+
+async function loadNotifications(){
+  if(!token) return;
+  try{
+    const res = await fetch(`${API}/notifications/my`, {headers:H()});
+    if(!res.ok) return;
+    const d = await res.json();
+    _nots = d.notifications || [];
+    const unread = d.unreadCount || 0;
+    const ndot = document.getElementById('ndot');
+    if(unread > 0){
+      ndot.style.display = 'block';
+      ndot.textContent = unread > 9 ? '9+' : (unread > 1 ? unread : '');
+    } else {
+      ndot.style.display = 'none';
+    }
+    renderNotifList();
+  } catch{}
+}
+
+const TYPE_ICON = {
+  booking_confirmed:  '🎫',
+  booking_cancelled:  '❌',
+  transfer_completed: '🔄',
+  waitlist_notified:  '📢',
+  trip_status_changed:'🚌',
+};
+
+function renderNotifList(){
+  const list = document.getElementById('np-list');
+  if(!_nots.length){
+    list.innerHTML = `<div style="padding:20px;text-align:center;font-size:.78rem;color:var(--tx2)">${t('notif_empty')}</div>`;
+    return;
+  }
+  list.innerHTML = _nots.slice(0,12).map(n=>`
+    <div class="ni" style="${!n.IsRead?'background:rgba(160,120,40,.03)':''}" onclick="markRead(${n.NotificationID})">
+      <div class="ni-ico">${TYPE_ICON[n.Type]||'🔔'}</div>
+      <div>
+        <div class="ni-tx" style="${!n.IsRead?'font-weight:500':''}">${n.Message}</div>
+        <div class="ni-tm">${relTime(n.CreatedAt)}</div>
+      </div>
+      ${!n.IsRead?'<div style="width:6px;height:6px;border-radius:50%;background:var(--gd);flex-shrink:0;margin-top:5px"></div>':''}
+    </div>`).join('');
+}
+
+function relTime(ts){
+  if(!ts) return '';
+  const diff = (Date.now() - new Date(ts)) / 1000;
+  if(diff < 60)  return 'Just now';
+  if(diff < 3600) return Math.floor(diff/60)+'m ago';
+  if(diff < 86400) return Math.floor(diff/3600)+'h ago';
+  return fdate(ts);
+}
+
+async function markRead(id){
+  try{
+    await fetch(`${API}/notifications/${id}/read`, {method:'PUT', headers:H()});
+    const n = _nots.find(x=>x.NotificationID===id);
+    if(n) n.IsRead = true;
+    renderNotifList();
+    const unread = _nots.filter(x=>!x.IsRead).length;
+    document.getElementById('ndot').style.display = unread > 0 ? 'block' : 'none';
+  }catch{}
+}
+
+function addNotif(ico, txt){
+  // Local only (for admin actions like delete/cancel done in this session)
+  _nots.unshift({NotificationID: Date.now(), Type:'admin_action', Message: txt, IsRead:false, CreatedAt: new Date().toISOString()});
+  if(_nots.length > 20) _nots.pop();
+  document.getElementById('ndot').style.display = 'block';
+  renderNotifList();
+}
+
+function toggleNotif(){
+  document.getElementById('np').classList.toggle('open');
+  // Mark all read when panel is opened
+  if(document.getElementById('np').classList.contains('open') && _nots.some(n=>!n.IsRead)){
+    fetch(`${API}/notifications/read-all`, {method:'PUT', headers:H()}).catch(()=>{});
+    _nots.forEach(n => n.IsRead = true);
+    document.getElementById('ndot').style.display = 'none';
+    renderNotifList();
+  }
+}
+
+async function clearNotifs(){
+  try{
+    await fetch(`${API}/notifications/clear`, {method:'DELETE', headers:H()});
+  }catch{}
+  _nots = [];
+  renderNotifList();
+  document.getElementById('ndot').style.display = 'none';
+  document.getElementById('np').classList.remove('open');
+}
+
+document.addEventListener('click', e=>{
+  if(!e.target.closest('#notif-btn') && !e.target.closest('#np'))
+    document.getElementById('np').classList.remove('open');
+});
+
+//  PANEL NAV 
+let _cur='dashboard';
+const PNM={dashboard:'pn_dashboard',revenue:'pn_revenue',stats:'pn_stats',vehicles:'pn_vehicles',routes:'pn_routes',schedules:'pn_schedules',users:'pn_users',bookings:'pn_bookings',marketplace:'pn_market',promo:'pn_promo'};
+function showPanel(n,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');
+  document.querySelectorAll('.sb-it').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('tb-title').textContent=t(PNM[n]||'tb_title');
+  closeSb();_cur=n;
+  ({revenue:loadRevenue,stats:loadStats,vehicles:loadVehicles,routes:loadRoutes,schedules:loadSchedules,users:loadUsers,bookings:loadAllBk,marketplace:loadMarket,promo:loadPromo}[n]||function(){})();
+}
+function refreshCur(){
+  const m={dashboard:()=>{loadDash();loadDashBk();loadDashMp();},revenue:loadRevenue,stats:loadStats,vehicles:loadVehicles,routes:loadRoutes,schedules:loadSchedules,users:loadUsers,bookings:loadAllBk,marketplace:loadMarket};
+  if(m[_cur]){m[_cur]();toast(' '+t('toast_refreshed'));}
+}
+
+//  MODALS 
+let _delCb=null,eid_v=null,eid_r=null,eid_sc=null;
+function openM(t){document.getElementById('modal-'+t).classList.add('open');}
+function closeM(t){document.getElementById('modal-'+t).classList.remove('open');}
+function showDel(title,msg,cb){document.getElementById('del-t').textContent=title;document.getElementById('del-msg').textContent=msg;_delCb=cb;openM('del');}
+document.getElementById('del-btn').onclick=()=>{if(_delCb)_delCb();};
+
+//  PAGINATION 
+const PG=20;
+function paginate(data,page,renderFn,pgId,chFn){
+  const tot=data.length,pages=Math.ceil(tot/PG);
+  renderFn(data.slice((page-1)*PG,page*PG));
+  const c=document.getElementById(pgId);if(!c)return;
+  if(tot<=PG){c.innerHTML='';return;}
+  const s=Math.max(1,page-2),e=Math.min(pages,page+2);
+  let b=`<button class="pg-btn" onclick="${chFn}(${page-1})" ${page===1?'disabled':''}></button>`;
+  for(let i=s;i<=e;i++)b+=`<button class="pg-btn${i===page?' act':''}" onclick="${chFn}(${i})">${i}</button>`;
+  b+=`<button class="pg-btn" onclick="${chFn}(${page+1})" ${page===pages?'disabled':''}></button>`;
+  c.innerHTML=`<div class="pg"><span class="pg-info">${(page-1)*PG+1}${Math.min(page*PG,tot)} of ${tot}</span><div class="pg-btns">${b}</div></div>`;
+}
+
+// 
+// DASHBOARD
+// 
+async function loadDash(){
+  try{
+    const res=await fetch(`${API}/admin/stats`,{headers:H()});
+    if(res.status===401){logout();return;}
+    const d=await res.json();
+    document.getElementById('m-pass').textContent=fmt(d.TotalPassengers);
+    document.getElementById('m-book').textContent=fmt(d.TodayBookings);
+    document.getElementById('m-rev').textContent=''+fmt(d.TodayRevenue);
+    document.getElementById('m-routes').textContent=fmt(d.ActiveRoutes);
+    document.getElementById('sb-users').textContent=d.TotalPassengers||0;
+    document.getElementById('sys-api').textContent='Online';document.getElementById('sys-api').className='badge bg';
+    document.getElementById('sys-canc').textContent=d.TodayCancellations||0;
+    document.getElementById('dash-sum').innerHTML=
+      irow('Today Bookings',d.TodayBookings||0,'var(--bl)')+
+      irow('Cancellations',d.TodayCancellations||0,'var(--rd)')+
+      irow('Pending Transfers',d.PendingExchanges||0,'var(--gd)')+
+      `<div style="display:flex;justify-content:space-between;padding:9px 12px;background:rgba(160,120,40,.06);border:1px solid var(--br2);border-radius:6px"><span style="font-size:.78rem;font-weight:600">Today Revenue</span><span style="font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--gd);font-weight:600">${fmt(d.TodayRevenue)}</span></div>`;
+    if((d.TodayBookings||0)>0)addNotif('',`${d.TodayBookings} booking(s) today`);
+  }catch{
+    document.getElementById('sys-api').textContent='Offline';document.getElementById('sys-api').className='badge br2';
+    document.getElementById('dash-sum').innerHTML=ER('Server unreachable','loadDash');
+  }
+}
+
+async function loadDashBk(){
+  try{
+    const [bkRes,vRes,rRes]=await Promise.all([
+      fetch(`${API}/bookings`,{headers:H()}),
+      fetch(`${API}/vehicles`,{headers:H()}),
+      fetch(`${API}/routes`,{headers:H()})
+    ]);
+    const bk=await bkRes.json();
+    const vehs=vRes.ok?await vRes.json():[];
+    const rtes=rRes.ok?await rRes.json():[];
+    if(Array.isArray(vehs)){_allVeh=vehs;document.getElementById('sys-veh').textContent=vehs.length;}
+    if(Array.isArray(rtes)){document.getElementById('sys-rte').textContent=rtes.length;}
+    if(!Array.isArray(bk)||!bk.length){document.getElementById('dash-bk').innerHTML=ES('No bookings yet.');return;}
+    const rows=bk.slice(0,8).map(b=>`<tr class="cr" onclick='viewBkd(${JSON.stringify(b).replace(/"/g,"&quot;")})'>
+      <td class="mono">BK-${b.BookingID}</td>
+      <td style="font-size:.82rem">${b.PassengerName||b.Email||''}</td>
+      <td style="font-size:.76rem">${b.Origin||''}  ${b.Destination||''}</td>
+      <td class="mono">${fdate(b.JourneyDate||b.BookedAt)}</td>
+      <td style="color:var(--gn);font-family:'JetBrains Mono',monospace;font-size:.76rem">${fmt(b.TotalFare)}</td>
+      <td><span class="badge ${sbc(b.BookingStatus)}">${b.BookingStatus}</span></td>
+    </tr>`).join('');
+    document.getElementById('dash-bk').innerHTML=`<table><thead><tr><th>ID</th><th>Passenger</th><th>Route</th><th>Date</th><th>Fare</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }catch(e){document.getElementById('dash-bk').innerHTML=ER('Failed to load bookings','loadDashBk');}
+}
+
+async function loadDashMp(){
+  try{
+    const res=await fetch(`${API}/transfer/history`,{headers:H()});
+    if(!res.ok)return;
+    const data=await res.json();
+    const all=Array.isArray(data)?data:[];
+    document.getElementById('mp-dash-active').textContent=all.filter(e=>e.TransferStatus==='pending').length;
+    document.getElementById('mp-dash-done').textContent=all.filter(e=>e.TransferStatus==='completed').length;
+    document.getElementById('mp-dash-pend').textContent=all.filter(e=>e.TransferStatus==='pending').length;
+  }catch{}
+}
+
+// 
+// REVENUE  (real data from bookings)
+// 
+let _rBk=[],_rP='weekly';
+async function loadRevenue(){
+  if(!_rBk.length){
+    try{const r=await fetch(`${API}/bookings`,{headers:H()});const d=await r.json();_rBk=Array.isArray(d)?d:[];}catch{_rBk=[];}
+  }
+  const conf=_rBk.filter(b=>b.BookingStatus==='confirmed');
+  const now=new Date();now.setUTCHours(0,0,0,0);
+  const wk=new Date(now);wk.setDate(now.getDate()-7);
+  const mo=new Date(now.getFullYear(),now.getMonth(),1);
+  const rev=(arr,from)=>arr.filter(b=>new Date(b.JourneyDate||b.BookedAt)>=from).reduce((s,b)=>s+Number(b.TotalFare||0),0);
+  document.getElementById('rev-today').textContent=''+fmt(rev(conf,now));
+  document.getElementById('rev-week').textContent=fmtT(rev(conf,wk));
+  document.getElementById('rev-month').textContent=fmtT(rev(conf,mo));
+  const avg=conf.length?Math.round(conf.reduce((s,b)=>s+Number(b.TotalFare||0),0)/conf.length):0;
+  document.getElementById('rev-avg').textContent=''+fmt(avg);
+  buildRevChart(_rP,conf);
+  // donut
+  const bus=conf.filter(b=>(b.VehicleType||'').toLowerCase()==='bus').length;
+  const train=conf.filter(b=>(b.VehicleType||'').toLowerCase()==='train').length;
+  const tot=bus+train||1;const C=289;
+  const bL=(bus/tot)*C;
+  document.getElementById('d-bus').setAttribute('stroke-dasharray',`${bL} ${C}`);
+  document.getElementById('d-bus').setAttribute('stroke-dashoffset','0');
+  document.getElementById('d-train').setAttribute('stroke-dasharray',`${(train/tot)*C} ${C}`);
+  document.getElementById('d-train').setAttribute('stroke-dashoffset',`${-bL}`);
+  document.getElementById('d-tot').textContent=bus+train;
+  document.getElementById('d-bv').textContent=bus+(bus+train?` (${Math.round(bus/tot*100)}%)`:'');
+  document.getElementById('d-tv').textContent=train+(bus+train?` (${Math.round(train/tot*100)}%)`:'');
+  // top routes
+  const rm={};
+  conf.forEach(b=>{const k=`${b.Origin}  ${b.Destination}`;if(!rm[k])rm[k]={n:0,rev:0};rm[k].n++;rm[k].rev+=Number(b.TotalFare||0);});
+  const sorted=Object.entries(rm).sort((a,b)=>b[1].rev-a[1].rev).slice(0,5);
+  document.getElementById('rev-routes').innerHTML=sorted.length
+    ?`<table><thead><tr><th>Route</th><th>Bookings</th><th>Revenue</th><th>Avg Fare</th></tr></thead><tbody>${sorted.map(([r,v])=>`<tr><td style="font-weight:500">${r}</td><td class="mono">${v.n}</td><td style="color:var(--gn);font-family:'JetBrains Mono',monospace;font-size:.76rem">${fmt(v.rev)}</td><td class="mono">${fmt(Math.round(v.rev/v.n))}</td></tr>`).join('')}</tbody></table>`
+    :ES('No booking data available yet.');
+}
+function setRevP(p,btn){
+  _rP=p;
+  ['rv-wb','rv-mb'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  btn.classList.add('active');
+  buildRevChart(p,_rBk.filter(b=>b.BookingStatus==='confirmed'));
+}
+function buildRevChart(p,conf){
+  const now=new Date();now.setUTCHours(0,0,0,0);
+  let labels=[],vals=[];
+  if(p==='weekly'){
+    for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);const n2=new Date(d);n2.setDate(d.getDate()+1);labels.push(['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]);vals.push(conf.filter(b=>{const bd=new Date(b.JourneyDate||b.BookedAt);return bd>=d&&bd<n2;}).reduce((s,b)=>s+Number(b.TotalFare||0),0));}
+  }else{
+    for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);const n2=new Date(now.getFullYear(),now.getMonth()-i+1,1);labels.push(MON[d.getMonth()]);vals.push(conf.filter(b=>{const bd=new Date(b.JourneyDate||b.BookedAt);return bd>=d&&bd<n2;}).reduce((s,b)=>s+Number(b.TotalFare||0),0));}
+  }
+  const max=Math.max(...vals)||1;
+  document.getElementById('rev-chart').innerHTML=labels.map((l,i)=>`<div class="bw"><div class="bar" style="height:${Math.max(4,(vals[i]/max)*100)}px"><div class="bt">${fmt(vals[i])}</div></div><div class="bl2">${l}</div></div>`).join('');
+}
+
+// 
+// STATISTICS  (real data)
+// 
+async function loadStats(){
+  let bk=[];
+  try{const r=await fetch(`${API}/bookings`,{headers:H()});bk=await r.json();if(!Array.isArray(bk))bk=[];}
+  catch{document.getElementById('st-status').innerHTML=ER('Failed to load','loadStats');return;}
+  const now=new Date();now.setUTCHours(0,0,0,0);
+  const todayBk=bk.filter(b=>new Date(b.JourneyDate||b.BookedAt)>=now);
+  const conf=bk.filter(b=>b.BookingStatus==='confirmed');
+  const totRev=conf.reduce((s,b)=>s+Number(b.TotalFare||0),0);
+  document.getElementById('st-today').textContent=todayBk.length;
+  document.getElementById('st-today-s').textContent=`${todayBk.filter(b=>b.BookingStatus==='confirmed').length} confirmed, ${todayBk.filter(b=>b.BookingStatus==='cancelled').length} cancelled`;
+  document.getElementById('st-total').textContent=bk.length;
+  document.getElementById('st-total-s').textContent=`${conf.length} confirmed (${bk.length?Math.round(conf.length/bk.length*100):0}%)`;
+  document.getElementById('st-rev').textContent=fmtT(totRev);
+  // status breakdown
+  const statuses=[['confirmed','var(--gn)'],['pending','var(--og)'],['cancelled','var(--rd)'],['exchanged','var(--bl)']];
+  const counts=statuses.map(([s])=>bk.filter(b=>b.BookingStatus===s).length);
+  const mx=Math.max(...counts)||1;
+  document.getElementById('st-status').innerHTML=statuses.map(([s,c],i)=>`<div class="prog-row"><div class="prog-lb"><span class="prog-nm" style="text-transform:capitalize">${s}</span><span class="prog-pc" style="color:${c}">${counts[i]}</span></div><div class="prog-bar"><div class="prog-fl" style="width:${counts[i]/mx*100}%;background:${c}"></div></div></div>`).join('');
+  // top routes
+  const rm={};bk.forEach(b=>{const k=`${b.Origin}  ${b.Destination}`;rm[k]=(rm[k]||0)+1;});
+  const routes=Object.entries(rm).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const mxR=routes[0]?routes[0][1]:1;
+  document.getElementById('st-routes').innerHTML=routes.map(([r,n],i)=>`<div style="display:flex;align-items:center;gap:10px"><div style="font-family:'Fraunces',serif;font-size:1.1rem;color:var(--tx3);width:18px;text-align:center">${i+1}</div><div style="flex:1"><div style="font-size:.78rem;margin-bottom:3px">${r}</div><div style="height:3px;background:var(--br);border-radius:2px;overflow:hidden"><div style="height:100%;width:${n/mxR*100}%;background:var(--nv);border-radius:2px"></div></div></div><div class="mono">${n}</div></div>`).join('');
+  // payment methods
+  const pm={};bk.forEach(b=>{const k=b.PaymentMethod||'Unknown';pm[k]=(pm[k]||0)+1;});
+  const pms=Object.entries(pm).sort((a,b)=>b[1]-a[1]);
+  const mxP=pms[0]?pms[0][1]:1;
+  document.getElementById('st-pay').innerHTML=pms.map(([m,n])=>`<div class="prog-row"><div class="prog-lb"><span class="prog-nm">${m}</span><span class="prog-pc" style="color:var(--nv)">${n} (${bk.length?Math.round(n/bk.length*100):0}%)</span></div><div class="prog-bar"><div class="prog-fl" style="width:${n/mxP*100}%;background:var(--gd)"></div></div></div>`).join('');
+}
+
+// 
+// VEHICLES
+// 
+let _allVeh=[],_vPg=1;
+async function loadVehicles(){
+  document.getElementById('veh-tbl').innerHTML='<div class="spinner"></div>';
+  try{
+    const res=await fetch(`${API}/vehicles`,{headers:H()});
+    const data=await res.json();
+    if(!Array.isArray(data)||!data.length){document.getElementById('veh-tbl').innerHTML=ES('No vehicles found.','loadVehicles');return;}
+    _allVeh=data;_vPg=1;renderVeh(_allVeh);
+  }catch{document.getElementById('veh-tbl').innerHTML=ER('Failed to load vehicles.','loadVehicles');}
+}
+function renderVeh(data){
+  window._pgVeh=(p)=>{_vPg=p;paginate(data,_vPg,renderVehTbl,'veh-pg','_pgVeh');};
+  paginate(data,_vPg,renderVehTbl,'veh-pg','_pgVeh');
+}
+function renderVehTbl(slice){
+  document.getElementById('veh-tbl').innerHTML=`<table><thead><tr><th>Name</th><th>Type</th><th>Seats</th><th>Class</th><th>Amenities</th><th>Status</th><th>Action</th></tr></thead><tbody>${slice.map(v=>`<tr>
+    <td style="font-weight:500">${v.VehicleName}</td>
+    <td><span class="badge ${v.VehicleType==='train'?'bb':'bg'}">${v.VehicleType==='train'?'':''} ${v.VehicleType}</span></td>
+    <td class="mono">${v.TotalSeats}</td>
+    <td style="font-size:.76rem;color:var(--tx2)">${v.Class||v.VehicleClass||''}</td>
+    <td style="font-size:.74rem;color:var(--tx2);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${v.Amenities||''}">${(v.Amenities||'').split(',').slice(0,2).join(', ')||''}</td>
+    <td><span class="badge ${v.Status==='active'?'bg':v.Status==='maintenance'?'by':'br2'}">${v.Status||'active'}</span></td>
+    <td style="white-space:nowrap"><button class="btn-ed" onclick='editV(${JSON.stringify(v).replace(/'/g,"&#39;")})'>Edit</button><button class="btn-dl" onclick='deleteV(${v.VehicleID},"${v.VehicleName}")'>Del</button></td>
+  </tr>`).join('')}</tbody></table>`;
+}
+function filterVeh(){
+  const q=(document.getElementById('veh-s').value||'').toLowerCase();
+  const f=_allVeh.filter(v=>(v.VehicleName+' '+v.VehicleType+(v.Amenities||'')).toLowerCase().includes(q));
+  _vPg=1;renderVeh(f);
+}
+function addVehicle(){
+  eid_v=null;document.getElementById('mv-t').textContent='Add Vehicle';
+  ['v-name','v-amen','v-reg'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('v-type').value='bus';document.getElementById('v-seats').value='';
+  document.getElementById('v-class').value='';document.getElementById('v-status').value='active';
+  document.getElementById('mv-msg').style.display='none';openM('vehicle');
+}
+function editV(v){
+  eid_v=v.VehicleID;document.getElementById('mv-t').textContent='Edit Vehicle';
+  document.getElementById('v-name').value=v.VehicleName||'';
+  document.getElementById('v-type').value=v.VehicleType||'bus';
+  document.getElementById('v-seats').value=v.TotalSeats||'';
+  document.getElementById('v-class').value=v.Class||v.VehicleClass||'';
+  document.getElementById('v-amen').value=v.Amenities||'';
+  document.getElementById('v-reg').value=v.RegistrationNumber||v.RegNumber||'';
+  document.getElementById('v-status').value=v.Status||'active';
+  document.getElementById('mv-msg').style.display='none';openM('vehicle');
+}
+async function submitV(){
+  const name=document.getElementById('v-name').value.trim(),seats=document.getElementById('v-seats').value;
+  if(!name||!seats){showMsg('mv-msg','Vehicle Name  Seats  ','err');return;}
+  const body={VehicleName:name,VehicleType:document.getElementById('v-type').value,TotalSeats:+seats,Class:document.getElementById('v-class').value,Amenities:document.getElementById('v-amen').value.trim(),RegistrationNumber:document.getElementById('v-reg').value.trim(),Status:document.getElementById('v-status').value};
+  try{
+    const m=eid_v?'PUT':'POST',u=eid_v?`${API}/vehicles/${eid_v}`:`${API}/vehicles`;
+    const res=await fetch(u,{method:m,headers:H(),body:JSON.stringify(body)});
+    if(!res.ok){const e=await res.json();showMsg('mv-msg',e.message||'Error','err');return;}
+    closeM('vehicle');toast(' Vehicle saved');eid_v=null;_allVeh=[];loadVehicles();
+    addNotif('',`Vehicle "${name}" ${m==='PUT'?'updated':'added'}`);
+  }catch{showMsg('mv-msg','Server error. Try again.','err');}
+}
+function deleteV(id,name){
+  showDel('Delete Vehicle',`"${name}" permanently delete   vehicle- schedules affect  `,async()=>{
+    try{const res=await fetch(`${API}/vehicles/${id}`,{method:'DELETE',headers:H()});
+    if(!res.ok)throw new Error((await res.json()).message||'Delete failed');
+    closeM('del');toast(' Vehicle deleted');_allVeh=[];loadVehicles();}
+    catch(e){closeM('del');toast(' '+e.message,'err');}
+  });
+}
+
+// 
+// ROUTES
+// 
+let _allRte=[],_rPg=1;
+async function loadRoutes(){
+  document.getElementById('rte-tbl').innerHTML='<div class="spinner"></div>';
+  try{
+    const res=await fetch(`${API}/routes`,{headers:H()});
+    const data=await res.json();
+    if(!Array.isArray(data)||!data.length){document.getElementById('rte-tbl').innerHTML=ES('No routes found.','loadRoutes');return;}
+    _allRte=data;_rPg=1;renderRte(_allRte);
+  }catch{document.getElementById('rte-tbl').innerHTML=ER('Failed to load routes.','loadRoutes');}
+}
+function renderRte(data){
+  window._pgRte=(p)=>{_rPg=p;paginate(data,_rPg,renderRteTbl,'rte-pg','_pgRte');};
+  paginate(data,_rPg,renderRteTbl,'rte-pg','_pgRte');
+}
+function renderRteTbl(slice){
+  document.getElementById('rte-tbl').innerHTML=`<table><thead><tr><th>Origin</th><th>Destination</th><th>Distance</th><th>Base Fare</th><th>Duration</th><th>Status</th><th>Action</th></tr></thead><tbody>${slice.map(r=>`<tr>
+    <td style="font-weight:500">${r.Origin}</td>
+    <td style="font-weight:500">${r.Destination}</td>
+    <td class="mono">${r.Distance||''} km</td>
+    <td style="color:var(--gn);font-family:'JetBrains Mono',monospace;font-size:.76rem">${fmt(r.BaseFare||r.Fare)}</td>
+    <td class="mono">${r.EstimatedDuration||''} hrs</td>
+    <td><span class="badge ${r.Status==='inactive'?'br2':'bg'}">${r.Status||'active'}</span></td>
+    <td style="white-space:nowrap"><button class="btn-ed" onclick='editR(${JSON.stringify(r).replace(/'/g,"&#39;")})'>Edit</button><button class="btn-dl" onclick='deleteR(${r.RouteID},"${r.Origin}  ${r.Destination}")'>Del</button></td>
+  </tr>`).join('')}</tbody></table>`;
+}
+function filterRte(){
+  const q=(document.getElementById('rte-s').value||'').toLowerCase();
+  const f=_allRte.filter(r=>(r.Origin+r.Destination).toLowerCase().includes(q));
+  _rPg=1;renderRte(f);
+}
+function addRoute(){
+  eid_r=null;document.getElementById('mr-t').textContent='Add Route';
+  ['r-origin','r-dest','r-dist','r-fare','r-dur'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('r-status').value='active';document.getElementById('mr-msg').style.display='none';openM('route');
+}
+function editR(r){
+  eid_r=r.RouteID;document.getElementById('mr-t').textContent='Edit Route';
+  document.getElementById('r-origin').value=r.Origin||'';
+  document.getElementById('r-dest').value=r.Destination||'';
+  document.getElementById('r-dist').value=r.Distance||'';
+  document.getElementById('r-fare').value=r.BaseFare||r.Fare||'';
+  document.getElementById('r-dur').value=r.EstimatedDuration||'';
+  document.getElementById('r-status').value=r.Status||'active';
+  document.getElementById('mr-msg').style.display='none';openM('route');
+}
+async function submitR(){
+  const o=document.getElementById('r-origin').value,d=document.getElementById('r-dest').value,f=document.getElementById('r-fare').value;
+  if(!o||!d||!f){showMsg('mr-msg','Origin, Destination  Fare required','err');return;}
+  if(o===d){showMsg('mr-msg','Origin  Destination    ','err');return;}
+  const body={Origin:o,Destination:d,Distance:+document.getElementById('r-dist').value||0,BaseFare:+f,EstimatedDuration:+document.getElementById('r-dur').value||0,Status:document.getElementById('r-status').value};
+  try{
+    const m=eid_r?'PUT':'POST',u=eid_r?`${API}/routes/${eid_r}`:`${API}/routes`;
+    const res=await fetch(u,{method:m,headers:H(),body:JSON.stringify(body)});
+    if(!res.ok){const e=await res.json();showMsg('mr-msg',e.message||'Error','err');return;}
+    closeM('route');toast(' Route saved');eid_r=null;_allRte=[];loadRoutes();
+  }catch{showMsg('mr-msg','Server error.','err');}
+}
+function deleteR(id,name){
+  showDel('Delete Route',`"${name}" route permanently delete `,async()=>{
+    try{const res=await fetch(`${API}/routes/${id}`,{method:'DELETE',headers:H()});
+    if(!res.ok)throw new Error((await res.json()).message||'Delete failed');
+    closeM('del');toast(' Route deleted');_allRte=[];loadRoutes();}
+    catch(e){closeM('del');toast(' '+e.message,'err');}
+  });
+}
+
+// 
+// SCHEDULES
+// 
+let _allSc=[],_filtSc=[],_scPg=1;
+async function loadSchedules(){
+  document.getElementById('sched-tbl').innerHTML='<div class="spinner"></div>';
+  document.getElementById('sc-cnt').textContent='';
+  let data=[];
+  try{
+    // Try generic endpoint first
+    let res=await fetch(`${API}/schedules`,{headers:H()});
+    if(res.ok){const raw=await res.json();data=raw.schedules||raw||[];}
+    else{
+      // Fallback: try admin endpoint
+      res=await fetch(`${API}/admin/schedules`,{headers:H()});
+      if(res.ok){const raw=await res.json();data=raw.schedules||raw||[];}
+      else{
+        // Fallback: fetch all major route pairs
+        const pairs=[['Dhaka','Chittagong'],['Dhaka','Sylhet'],['Dhaka','Rajshahi'],['Dhaka','Khulna'],['Dhaka','Barishal'],['Dhaka','Rangpur'],['Chittagong','Dhaka'],['Sylhet','Dhaka'],['Rajshahi','Dhaka'],['Khulna','Dhaka']];
+        const date=document.getElementById('sc-fd').value||new Date().toISOString().split('T')[0];
+        const results=await Promise.allSettled(pairs.map(([o,d])=>fetch(`${API}/schedules/search?origin=${o}&destination=${d}&date=${date}`,{headers:H()}).then(r=>r.json()).then(d=>d.schedules||d||[])));
+        const all=results.filter(r=>r.status==='fulfilled').flatMap(r=>Array.isArray(r.value)?r.value:[]);
+        data=all.filter((s,i,arr)=>arr.findIndex(x=>x.ScheduleID===s.ScheduleID)===i);
+      }
+    }
+  }catch{document.getElementById('sched-tbl').innerHTML=ER('Failed to load schedules.','loadSchedules');return;}
+  _allSc=Array.isArray(data)?data:[];
+  applyScF();
+}
+function applyScF(){
+  const from=document.getElementById('sc-ff').value;
+  const to=document.getElementById('sc-ft').value;
+  const date=document.getElementById('sc-fd').value;
+  const type=document.getElementById('sc-fv').value;
+  _filtSc=_allSc.filter(s=>
+    (!from||(s.Origin||'').toLowerCase()===from.toLowerCase())&&
+    (!to||(s.Destination||'').toLowerCase()===to.toLowerCase())&&
+    (!date||(s.JourneyDate||s.DepartureTime||'').startsWith(date))&&
+    (!type||(s.VehicleType||'').toLowerCase()===type.toLowerCase())
+  );
+  _scPg=1;
+  document.getElementById('sc-cnt').textContent=_filtSc.length+' results';
+  if(!_filtSc.length){document.getElementById('sched-tbl').innerHTML=ES('No schedules match the filter.');document.getElementById('sc-pg').innerHTML='';return;}
+  window._pgSc=(p)=>{_scPg=p;paginate(_filtSc,_scPg,renderScTbl,'sc-pg','_pgSc');};
+  paginate(_filtSc,_scPg,renderScTbl,'sc-pg','_pgSc');
+}
+function renderScTbl(slice){
+  document.getElementById('sched-tbl').innerHTML=`<table><thead><tr><th>Route</th><th>Vehicle</th><th>Type</th><th>Date</th><th>Dep.</th><th>Arr.</th><th>Fare</th><th>Seats</th><th>Status</th><th>Action</th></tr></thead><tbody>${slice.map(s=>{
+    const st=s.Status||'scheduled';
+    const stColor={scheduled:'bn',boarding:'by',departed:'bb',completed:'bg',cancelled:'br2'}[st]||'bn';
+    const nextMap={scheduled:'boarding',boarding:'departed',departed:'completed'};
+    const nextSt=nextMap[st];
+    const nextLabel={boarding:'▶ Board',departed:'🚌 Depart',completed:'✅ Done'}[nextSt]||'';
+    return `<tr>
+    <td style="font-size:.82rem;font-weight:500">${s.Origin} → ${s.Destination}</td>
+    <td style="font-size:.78rem">${s.VehicleName||''}</td>
+    <td><span class="badge ${s.VehicleType==='train'?'bb':'bg'}">${s.VehicleType||''}</span></td>
+    <td class="mono">${fdate(s.JourneyDate||s.DepartureTime)}</td>
+    <td class="mono">${ft(s.DepartureTime)}</td>
+    <td class="mono">${ft(s.ArrivalTime)}</td>
+    <td style="color:var(--gn);font-family:'JetBrains Mono',monospace;font-size:.76rem">৳${fmt(s.Fare)}</td>
+    <td class="mono">${s.AvailableSeats??''}/${s.TotalSeats||''}</td>
+    <td><span class="badge ${stColor}">${st}</span></td>
+    <td style="white-space:nowrap;display:flex;gap:4px;align-items:center">
+      ${nextSt&&st!=='cancelled'?`<button class="btn-ed" style="background:rgba(37,99,235,.07);border-color:rgba(37,99,235,.2);color:var(--bl)" onclick="advanceScStatus(${s.ScheduleID},'${nextSt}','${st}')" title="Advance to ${nextSt}">${nextLabel}</button>`:''}
+      ${st!=='cancelled'&&st!=='completed'?`<button class="btn-dl" onclick="cancelSc(${s.ScheduleID},'${st}')" title="Cancel trip">✕</button>`:''}
+      <button class="btn-ed" onclick='editSc(${JSON.stringify(s).replace(/'/g,"&#39;")})'>Edit</button>
+      <button class="btn-dl" onclick='deleteSc(${s.ScheduleID})'>Del</button>
+    </td>
+  </tr>`;}).join('')}</tbody></table>`;
+}
+function clearScF(){
+  ['sc-ff','sc-ft','sc-fv'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sc-fd').value='';
+  applyScF();
+}
+function onVehSel(){
+  const val=document.getElementById('sc-vsel').value;
+  const v=_allVeh.find(x=>String(x.VehicleID)===val);
+  if(v){
+    document.getElementById('sc-vname').value=v.VehicleName;
+    document.getElementById('sc-vtype').value=v.VehicleType||'bus';
+    document.getElementById('sc-seats').value=v.TotalSeats||'';
+    document.getElementById('sc-mw').style.display='none';
+  }else if(val==='__manual'){
+    document.getElementById('sc-mw').style.display='block';
+    document.getElementById('sc-vname').value='';
+  }
+}
+function addSchedule(){
+  eid_sc=null;document.getElementById('ms-t').textContent='Add Schedule';
+  ['sc-origin','sc-dest','sc-vname','sc-seats','sc-dep','sc-arr','sc-fare','sc-amen'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sc-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('sc-vtype').value='bus';document.getElementById('sc-mw').style.display='none';
+  const sel=document.getElementById('sc-vsel');
+  sel.innerHTML='<option value="">Select Vehicle</option>'+_allVeh.map(v=>`<option value="${v.VehicleID}">${v.VehicleName} (${v.VehicleType}, ${v.TotalSeats} seats)</option>`).join('')+'<option value="__manual"> Enter manually</option>';
+  document.getElementById('ms-msg').style.display='none';openM('schedule');
+}
+function editSc(s){
+  eid_sc=s.ScheduleID;document.getElementById('ms-t').textContent='Edit Schedule';
+  document.getElementById('sc-origin').value=s.Origin||'';
+  document.getElementById('sc-dest').value=s.Destination||'';
+  document.getElementById('sc-vtype').value=s.VehicleType||'bus';
+  document.getElementById('sc-date').value=(s.JourneyDate||s.DepartureTime||'').split('T')[0]||'';
+  document.getElementById('sc-seats').value=s.TotalSeats||'';
+  document.getElementById('sc-dep').value=ft(s.DepartureTime).replace('','');
+  document.getElementById('sc-arr').value=ft(s.ArrivalTime).replace('','');
+  document.getElementById('sc-fare').value=s.Fare||'';
+  document.getElementById('sc-amen').value=s.Amenities||'';
+  document.getElementById('sc-mw').style.display='block';
+  document.getElementById('sc-vname').value=s.VehicleName||'';
+  const sel=document.getElementById('sc-vsel');
+  sel.innerHTML='<option value="">Select Vehicle</option>'+_allVeh.map(v=>`<option value="${v.VehicleID}" ${v.VehicleName===s.VehicleName?'selected':''}>${v.VehicleName} (${v.VehicleType})</option>`).join('')+'<option value="__manual"> Enter manually</option>';
+  document.getElementById('ms-msg').style.display='none';openM('schedule');
+}
+async function submitSc(){
+  const o=document.getElementById('sc-origin').value,d=document.getElementById('sc-dest').value;
+  const date=document.getElementById('sc-date').value,seats=document.getElementById('sc-seats').value;
+  const dep=document.getElementById('sc-dep').value,arr=document.getElementById('sc-arr').value,fare=document.getElementById('sc-fare').value;
+  const selVal=document.getElementById('sc-vsel').value;
+  const selVeh=_allVeh.find(v=>String(v.VehicleID)===selVal);
+  const vname=selVeh?selVeh.VehicleName:document.getElementById('sc-vname').value.trim();
+  if(!o||!d||!vname||!date||!seats||!dep||!arr||!fare){showMsg('ms-msg',' required field  ','err');return;}
+  const body={Origin:o,Destination:d,VehicleName:vname,VehicleType:document.getElementById('sc-vtype').value,JourneyDate:date,DepartureTime:`${date}T${dep}:00.000Z`,ArrivalTime:`${date}T${arr}:00.000Z`,TotalSeats:+seats,AvailableSeats:+seats,Fare:+fare,Amenities:document.getElementById('sc-amen').value.trim()};
+  if(selVeh)body.VehicleID=selVeh.VehicleID;
+  try{
+    const m=eid_sc?'PUT':'POST',u=eid_sc?`${API}/schedules/${eid_sc}`:`${API}/schedules`;
+    const res=await fetch(u,{method:m,headers:H(),body:JSON.stringify(body)});
+    if(!res.ok){const e=await res.json();showMsg('ms-msg',e.message||'Error','err');return;}
+    closeM('schedule');toast(' Schedule saved');eid_sc=null;loadSchedules();
+  }catch{showMsg('ms-msg','Server error.','err');}
+}
+function deleteSc(id){
+  showDel('Delete Schedule',`Schedule #${id} permanently delete করবেন?`,async()=>{
+    try{const res=await fetch(`${API}/schedules/${id}`,{method:'DELETE',headers:H()});
+    if(!res.ok)throw new Error((await res.json()).message||'Delete failed');
+    closeM('del');toast('✅ Schedule deleted');loadSchedules();}
+    catch(e){closeM('del');toast('❌ '+e.message,'err');}
+  });
+}
+
+async function advanceScStatus(id, nextStatus, currentStatus){
+  const labels={boarding:'Boarding শুরু করবেন?',departed:'Trip depart করবেন?',completed:'Trip complete mark করবেন?'};
+  if(!confirm(`Schedule #${id} — ${labels[nextStatus]||nextStatus}`))return;
+  try{
+    const res=await fetch(`${API}/schedules/${id}/status`,{method:'PUT',headers:H(),body:JSON.stringify({status:nextStatus})});
+    const d=await res.json();
+    if(!res.ok){toast('❌ '+(d.message||'Error'),'err');return;}
+    toast(`✅ Status → ${nextStatus}`);
+    addNotif('🚌',`Schedule #${id} is now "${nextStatus}"`);
+    loadSchedules();
+  }catch{toast('❌ Server error','err');}
+}
+
+async function cancelSc(id, currentStatus){
+  if(!confirm(`Schedule #${id} cancel করবেন? সব confirmed booking cancel ও refund হবে।`))return;
+  try{
+    const res=await fetch(`${API}/schedules/${id}/status`,{method:'PUT',headers:H(),body:JSON.stringify({status:'cancelled'})});
+    const d=await res.json();
+    if(!res.ok){toast('❌ '+(d.message||'Error'),'err');return;}
+    toast(`✅ Schedule cancelled. ${d.note||''}`);
+    addNotif('⚠️',`Schedule #${id} cancelled — bookings refunded`);
+    loadSchedules();loadDash();
+  }catch{toast('❌ Server error','err');}
+}
+
+// 
+// USERS
+// 
+let _allUsers=[],_uPg=1;
+async function loadUsers(){
+  document.getElementById('users-tbl').innerHTML='<div class="spinner"></div>';
+  // Try multiple common endpoint patterns
+  const endpoints=['/admin/users','/users','/auth/users','/passengers','/admin/passengers'];
+  try{
+    let data=[], foundEp='';
+    for(const ep of endpoints){
+      try{
+        const r=await fetch(`${API}${ep}`,{headers:H()});
+        if(r.ok){
+          const raw=await r.json();
+          const arr=Array.isArray(raw)?raw:(raw.users||raw.data||raw.rows||raw.result||raw.passengers||[]);
+          if(arr.length>0||r.status===200){data=arr;foundEp=ep;break;}
+        }
+      }catch{}
+    }
+    if(!foundEp){
+      document.getElementById('users-tbl').innerHTML=ER('No working user endpoint found.<br><small style="font-family:JetBrains Mono;font-size:.7rem">Tried: '+endpoints.join(', ')+'</small>','loadUsers');
+      return;
+    }
+    if(!data.length){document.getElementById('users-tbl').innerHTML=ES('No users found. (endpoint: '+foundEp+')');return;}
+    _allUsers=data;_uPg=1;renderUsers(_allUsers);
+  }catch(e){document.getElementById('users-tbl').innerHTML=ER('Failed to load users: '+(e.message||'unknown'),'loadUsers');}
+}
+function renderUsers(data){
+  window._pgUsr=(p)=>{_uPg=p;paginate(data,_uPg,renderUsrTbl,'usr-pg','_pgUsr');};
+  paginate(data,_uPg,renderUsrTbl,'usr-pg','_pgUsr');
+}
+function renderUsrTbl(slice){
+  document.getElementById('users-tbl').innerHTML=`<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Joined</th><th>Action</th></tr></thead><tbody>${slice.map(u=>`<tr class="cr" onclick='viewUsr(${JSON.stringify(u).replace(/"/g,"&quot;")})'>
+    <td style="font-weight:500">${u.FirstName||''} ${u.LastName||''}</td>
+    <td style="font-size:.78rem;color:var(--tx2)">${u.Email}</td>
+    <td class="mono">${u.Phone||''}</td>
+    <td><span class="badge ${u.Role==='admin'?'by':u.Role==='staff'?'bb':'bn'}">${u.Role}</span></td>
+    <td><span class="badge ${u.IsActive===0||u.IsActive===false?'br2':'bg'}">${u.IsActive===0||u.IsActive===false?'Inactive':'Active'}</span></td>
+    <td class="mono">${u.CreatedAt?fdate(u.CreatedAt):''}</td>
+    <td onclick="event.stopPropagation()" style="white-space:nowrap">
+      <button class="btn-ed" onclick='toggleRole(${u.UserID},"${u.Role}","${u.FirstName}")'>${u.Role==='admin'?' Demote':u.Role==='staff'?' Promote':' Staff'}</button>
+      <button class="btn-${u.IsActive===0||u.IsActive===false?'vw':'dl'}" onclick='toggleBlock(${u.UserID},${u.IsActive===0||u.IsActive===false?0:1},"${u.FirstName}")'>${u.IsActive===0||u.IsActive===false?'Activate':'Deactivate'}</button>
+    </td>
+  </tr>`).join('')}</tbody></table>`;
+}
+function filterUsers(){
+  const q=(document.getElementById('usr-s').value||'').toLowerCase();
+  const role=document.getElementById('usr-rf').value;
+  const f=_allUsers.filter(u=>
+    (!role||u.Role===role)&&
+    (!q||(u.FirstName+' '+u.LastName+' '+u.Email+' '+(u.Phone||'')).toLowerCase().includes(q))
+  );
+  _uPg=1;renderUsers(f);
+}
+function nextRole(cur){
+  const r=(cur||'passenger').toLowerCase();
+  if(r==='passenger') return 'staff';
+  if(r==='staff') return 'admin';
+  return 'passenger';
+}
+async function toggleRole(id,curRole,name){
+  const nr=nextRole(curRole);
+  if(!confirm(`${name}  role "${nr}"  change ?`))return;
+  try{
+    const res=await fetch(`${API}/admin/users/${id}/toggle`,{method:'PUT',headers:H(),body:JSON.stringify({field:'role',value:nr})});
+    if(!res.ok){const e=await res.json();toast(e.message||'Error','err');return;}
+    toast(` ${name} is now ${nr}`);addNotif('',`${name}'s role changed to ${nr}`);loadUsers();
+  }catch{toast('Server error','err');}
+}
+function openUserAdd(){
+  document.getElementById('uadd-msg').style.display='none';
+  ['uadd-fn','uadd-ln','uadd-em','uadd-ph','uadd-pw'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('uadd-role').value='staff';
+  openM('uadd');
+}
+async function submitUserAdd(){
+  const fn=document.getElementById('uadd-fn').value.trim();
+  const ln=document.getElementById('uadd-ln').value.trim();
+  const em=document.getElementById('uadd-em').value.trim();
+  const ph=document.getElementById('uadd-ph').value.trim();
+  const role=document.getElementById('uadd-role').value;
+  const pw=document.getElementById('uadd-pw').value.trim();
+  if(!fn||!ln||!em){showMsg('uadd-msg','First name, last name, and email are required.','err');return;}
+  try{
+    const res=await fetch(`${API}/admin/users`,{method:'POST',headers:H(),body:JSON.stringify({firstName:fn,lastName:ln,email:em,phone:ph,role,password:pw||undefined})});
+    const data=await res.json();
+    if(!res.ok){showMsg('uadd-msg',data.message||'Failed to create user.','err');return;}
+    closeM('uadd');
+    if(data.tempPassword){toast(`User created. Temp password: ${data.tempPassword}`);}
+    else{toast('User created.');}
+    loadUsers();
+  }catch{showMsg('uadd-msg','Server error.','err');}
+}
+async function toggleBlock(id,curActive,name){
+  // curActive: 1 = active, 0 = inactive
+  const activate = (curActive===0||curActive===false);
+  if(!confirm(`${name} কে ${activate?'activate':'deactivate'} করবেন?`))return;
+  try{
+    const res=await fetch(`${API}/admin/users/${id}/toggle`,{method:'PUT',headers:H(),body:JSON.stringify({field:'status',value:activate?'active':'inactive'})});
+    if(!res.ok){const e=await res.json();toast(e.message||'Error','err');return;}
+    toast(` User ${activate?'activated':'deactivated'}`);
+    addNotif(activate?'':'',`${name} ${activate?'activated':'deactivated'}`);
+    loadUsers();
+  }catch{toast('Server error','err');}
+}
+function viewUsr(u){
+  document.getElementById('usd-t').textContent=(u.FirstName||'')+' '+(u.LastName||'');
+  document.getElementById('usd-body').innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:14px;background:var(--bg2);border-radius:8px">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--nv);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:1.2rem;color:#fff;flex-shrink:0">${(u.FirstName||'?')[0].toUpperCase()}</div>
+      <div><div style="font-weight:600;font-size:.94rem">${u.FirstName||''} ${u.LastName||''}</div><div style="font-size:.72rem;color:var(--tx2);margin-top:2px">${u.Email}</div></div>
+      <span class="badge ${u.Role==='admin'?'by':'bb'}" style="margin-left:auto">${u.Role}</span>
+    </div>
+    <div class="dv-grid">
+      <div class="dvr"><div class="dvl2">Phone</div><div class="dvv">${u.Phone||''}</div></div>
+      <div class="dvr"><div class="dvl2">Joined</div><div class="dvv">${u.CreatedAt?fdate(u.CreatedAt):''}</div></div>
+      <div class="dvr"><div class="dvl2">Status</div><div class="dvv"><span class="badge ${u.IsActive===0||u.IsActive===false?'br2':'bg'}">${u.IsActive===0||u.IsActive===false?'Inactive':'Active'}</span></div></div>
+      <div class="dvr"><div class="dvl2">User ID</div><div class="dvv" style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--gd)">UID-${u.UserID}</div></div>
+      ${u.Address?`<div class="dvr dvf"><div class="dvl2">Address</div><div class="dvv">${u.Address}</div></div>`:''}
+    </div>`;
+  document.getElementById('usd-act').innerHTML=`
+    <button class="btn-cm" onclick="closeM('usr')">Close</button>
+    <button class="${u.Role==='admin'?'btn-sec btn-sub':'btn-sub'}" style="${u.Role==='admin'?'background:var(--og)':''}" onclick="closeM('usr');toggleRole(${u.UserID},'${u.Role}','${u.FirstName}')">${u.Role==='admin'?' Remove Admin':' Make Admin'}</button>
+    <button class="btn-${u.IsActive===0||u.IsActive===false?'sec':'dgr'}" onclick="closeM('usr');toggleBlock(${u.UserID},${u.IsActive===0||u.IsActive===false?0:1},'${u.FirstName}')">${u.IsActive===0||u.IsActive===false?'Activate User':'Deactivate User'}</button>`;
+  openM('usr');
+}
+function exportUsers(){
+  if(!_allUsers.length){toast('No users to export','err');return;}
+  const csv=['Name,Email,Phone,Role,IsActive,Joined',..._allUsers.map(u=>`"${u.FirstName||''} ${u.LastName||''}",${u.Email},${u.Phone||''},${u.Role},${u.IsActive===0||u.IsActive===false?'Inactive':'Active'},${u.CreatedAt?fdate(u.CreatedAt):''}`)].join('\n');
+  dlCSV(csv,'sctms_users.csv');
+}
+
+// 
+// BOOKINGS
+// 
+let _allBk=[],_bkTab='all',_bkPg=1;
+async function loadAllBk(){
+  document.getElementById('bk-tbl').innerHTML='<div class="spinner"></div>';
+  try{
+    const res=await fetch(`${API}/bookings`,{headers:H()});
+    const data=await res.json();
+    if(!Array.isArray(data)||!data.length){document.getElementById('bk-tbl').innerHTML=ES('No bookings found.');return;}
+    _allBk=data;_bkPg=1;renderBk();
+  }catch{document.getElementById('bk-tbl').innerHTML=ER('Failed to load bookings.','loadAllBk');}
+}
+function renderBk(){
+  const q=(document.getElementById('bk-s')||{}).value||'';
+  let list=_allBk;
+  if(_bkTab!=='all')list=list.filter(b=>b.BookingStatus===_bkTab);
+  if(q)list=list.filter(b=>(`BK-${b.BookingID} ${b.PassengerName||''} ${b.Email||''} ${b.Origin||''} ${b.Destination||''}`).toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('bk-cnt').textContent=list.length+' bookings';
+  if(!list.length){document.getElementById('bk-tbl').innerHTML=ES('No bookings match this filter.');document.getElementById('bk-pg').innerHTML='';return;}
+  window._pgBk=(p)=>{_bkPg=p;paginate(list,_bkPg,renderBkTbl,'bk-pg','_pgBk');};
+  paginate(list,_bkPg,renderBkTbl,'bk-pg','_pgBk');
+}
+function renderBkTbl(slice){
+  document.getElementById('bk-tbl').innerHTML=`<table><thead><tr><th>ID</th><th>Passenger</th><th>Route</th><th>Date</th><th>Seat</th><th>Fare</th><th>Method</th><th>Status</th><th>Action</th></tr></thead><tbody>${slice.map(b=>{
+    const can=b.BookingStatus==='confirmed'||b.BookingStatus==='pending';
+    return `<tr class="cr" onclick='viewBkd(${JSON.stringify(b).replace(/"/g,"&quot;")})'>
+      <td class="mono">BK-${b.BookingID}</td>
+      <td style="font-size:.82rem">${b.PassengerName||b.Email||''}</td>
+      <td style="font-size:.76rem">${b.Origin||''}  ${b.Destination||''}</td>
+      <td class="mono">${fdate(b.JourneyDate||b.BookedAt)}</td>
+      <td class="mono">${b.SeatNumber||''}</td>
+      <td style="color:var(--gn);font-family:'JetBrains Mono',monospace;font-size:.76rem">${fmt(b.TotalFare)}</td>
+      <td style="font-size:.74rem;color:var(--tx2)">${b.PaymentMethod||''}</td>
+      <td><span class="badge ${sbc(b.BookingStatus)}">${b.BookingStatus}</span></td>
+      <td onclick="event.stopPropagation()" style="white-space:nowrap">${can?`<button class="btn-dl" onclick="cancelBk(${b.BookingID})">Cancel</button>`:''}</td>
+    </tr>`;}).join('')}</tbody></table>`;
+}
+function setBkTab(tab,btn){_bkTab=tab;_bkPg=1;document.querySelectorAll('.bk-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBk();}
+async function cancelBk(id){
+  if(!confirm(`Booking BK-${id} cancel ? Passenger  notify  `))return;
+  try{
+    const res=await fetch(`${API}/bookings/${id}/cancel`,{method:'PUT',headers:H()});
+    if(!res.ok){const e=await res.json();toast(e.message||'Error','err');return;}
+    toast(' Booking cancelled');addNotif('',`Booking BK-${id} cancelled by admin`);
+    loadAllBk();loadDash();
+  }catch{toast('Server error','err');}
+}
+function viewBkd(b){
+  document.getElementById('bkd-t').innerHTML=`Booking <span style="font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--gd)">BK-${b.BookingID}</span>`;
+  document.getElementById('bkd-body').innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 14px;background:var(--bg2);border-radius:8px;justify-content:space-between">
+      <div style="font-size:1rem;font-weight:600">${b.Origin||''}  ${b.Destination||''}</div>
+      <span class="badge ${sbc(b.BookingStatus)}">${b.BookingStatus}</span>
+    </div>
+    <div class="dv-grid">
+      <div class="dvr"><div class="dvl2">Passenger</div><div class="dvv">${b.PassengerName||b.Email||''}</div></div>
+      <div class="dvr"><div class="dvl2">Email</div><div class="dvv" style="font-size:.78rem">${b.Email||''}</div></div>
+      <div class="dvr"><div class="dvl2">Seat Number</div><div class="dvv" style="font-family:'JetBrains Mono',monospace;color:var(--gd)">${b.SeatNumber||''}</div></div>
+      <div class="dvr"><div class="dvl2">Journey Date</div><div class="dvv">${fdate(b.JourneyDate||b.BookedAt)}</div></div>
+      <div class="dvr"><div class="dvl2">Departure</div><div class="dvv" style="font-family:'JetBrains Mono',monospace">${ft(b.DepartureTime)}</div></div>
+      <div class="dvr"><div class="dvl2">Arrival</div><div class="dvv" style="font-family:'JetBrains Mono',monospace">${ft(b.ArrivalTime)}</div></div>
+      <div class="dvr"><div class="dvl2">Vehicle</div><div class="dvv">${b.VehicleName||''}</div></div>
+      <div class="dvr"><div class="dvl2">Vehicle Type</div><div class="dvv">${b.VehicleType||''}</div></div>
+      <div class="dvr"><div class="dvl2">Total Fare</div><div class="dvv" style="color:var(--gn);font-family:'JetBrains Mono',monospace">${fmt(b.TotalFare)}</div></div>
+      <div class="dvr"><div class="dvl2">Payment</div><div class="dvv">${b.PaymentMethod||''}</div></div>
+      <div class="dvr"><div class="dvl2">Booking ID</div><div class="dvv" style="font-family:'JetBrains Mono',monospace;color:var(--gd)">BK-${b.BookingID}</div></div>
+      <div class="dvr"><div class="dvl2">Booked At</div><div class="dvv">${b.BookedAt?fdate(b.BookedAt):''}</div></div>
+      ${b.Notes?`<div class="dvr dvf"><div class="dvl2">Notes</div><div class="dvv">${b.Notes}</div></div>`:''}
+    </div>`;
+  const can=b.BookingStatus==='confirmed'||b.BookingStatus==='pending';
+  document.getElementById('bkd-act').innerHTML=`<button class="btn-cm" onclick="closeM('bkd')">Close</button>${can?`<button class="btn-dgr" onclick="closeM('bkd');cancelBk(${b.BookingID})">Cancel Booking</button>`:''}`;
+  openM('bkd');
+}
+function exportBk(){
+  const data=_bkTab==='all'?_allBk:_allBk.filter(b=>b.BookingStatus===_bkTab);
+  if(!data.length){toast('No bookings to export','err');return;}
+  const csv=['BookingID,Passenger,Email,Route,Seat,JourneyDate,Fare,Payment,Status',...data.map(b=>`BK-${b.BookingID},"${b.PassengerName||''}","${b.Email||''}","${b.Origin}  ${b.Destination}",${b.SeatNumber||''},${fdate(b.JourneyDate||b.BookedAt)},${b.TotalFare},${b.PaymentMethod||''},${b.BookingStatus}`)].join('\n');
+  dlCSV(csv,'sctms_bookings.csv');
+}
+
+// 
+// PROMO CODES
+// 
+async function loadPromo(){
+  document.getElementById('sec-promo').innerHTML=`
+    <div class="ph"><div class="ph-t">🎟️ Promo Codes</div><button class="btn-add" onclick="openPromoModal()">+ New Code</button></div>
+    <div id="promo-tbl"><div class="spinner"></div></div>`;
+  try{
+    const res=await fetch(`${API}/promo`,{headers:H()});
+    if(!res.ok){document.getElementById('promo-tbl').innerHTML='<div class="es"><div class="ei">⚙️</div><p>Promo endpoint not configured.<br><small style="font-family:JetBrains Mono;font-size:.7rem">Run: promoRoutes.js ও server.js এ register করুন।</small></p></div>';return;}
+    const data=await res.json();
+    const arr=Array.isArray(data)?data:[];
+    if(!arr.length){document.getElementById('promo-tbl').innerHTML='<div class="es"><div class="ei">🎟️</div><p>No promo codes yet. Create one!</p></div>';return;}
+    document.getElementById('promo-tbl').innerHTML=`<div class="tw"><table><thead><tr><th>Code</th><th>Description</th><th>Type</th><th>Discount</th><th>Used</th><th>Limit</th><th>Expires</th><th>Status</th></tr></thead><tbody>${arr.map(p=>`<tr>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gd);letter-spacing:1px">${p.Code}</td>
+      <td style="font-size:.78rem;color:var(--tx2)">${p.Description||'—'}</td>
+      <td><span class="badge bn">${p.DiscountType==='percent'?'%':'Flat'}</span></td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--gn)">${p.DiscountType==='percent'?p.DiscountValue+'%':'৳'+p.DiscountValue}</td>
+      <td class="mono">${p.UsedCount||0}</td>
+      <td class="mono">${p.UsageLimit||'∞'}</td>
+      <td class="mono">${p.ExpiresAt?fdate(p.ExpiresAt):'No expiry'}</td>
+      <td><span class="badge ${p.IsActive?'bg':'br2'}">${p.IsActive?'Active':'Inactive'}</span></td>
+    </tr>`).join('')}</tbody></table></div>`;
+  }catch{document.getElementById('promo-tbl').innerHTML='<div class="es"><div class="ei">⚠️</div><p>Backend route missing — promoRoutes.js যোগ করুন।</p></div>';}
+}
+
+// Dynamic modal helper — creates overlay on the fly
+function showModal(id, innerHtml){
+  let ov=document.getElementById('modal-'+id);
+  if(!ov){
+    ov=document.createElement('div');
+    ov.className='overlay';ov.id='modal-'+id;
+    ov.innerHTML='<div class="modal" style="max-width:500px"></div>';
+    ov.addEventListener('click',e=>{if(e.target===ov)closeM(id);});
+    document.body.appendChild(ov);
+  }
+  ov.querySelector('.modal').innerHTML=innerHtml;
+  openM(id);
+}
+
+function openPromoModal(){
+  showModal('pm',`
+    <div class="mhd"><div class="mtitle">🎟️ New Promo Code</div><button class="mclose" onclick="closeM('pm')">✕</button></div>
+    <div class="fm" id="pm-msg"></div>
+    <div class="fg"><label>Code *</label><input id="pm-code" placeholder="e.g. SCTMS20" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div>
+    <div class="fg"><label>Description</label><input id="pm-desc" placeholder="e.g. 20% off for new users"></div>
+    <div class="fg-row">
+      <div class="fg"><label>Type *</label><select id="pm-type"><option value="percent">Percent (%)</option><option value="flat">Flat (৳)</option></select></div>
+      <div class="fg"><label>Value *</label><input id="pm-val" type="number" placeholder="e.g. 20" min="1"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Expires At</label><input id="pm-exp" type="date"></div>
+      <div class="fg"><label>Usage Limit</label><input id="pm-lim" type="number" placeholder="Blank = unlimited"></div>
+    </div>
+    <div class="ma">
+      <button class="btn-cm" onclick="closeM('pm')">Cancel</button>
+      <button class="btn-sub" onclick="submitPromo()">Create Code</button>
+    </div>`);
+}
+
+async function submitPromo(){
+  const code=document.getElementById('pm-code').value.trim();
+  const val=parseFloat(document.getElementById('pm-val').value);
+  if(!code||!val){showMsg('pm-msg','Code ও value দিন।','err');return;}
+  const body={
+    code,
+    description:document.getElementById('pm-desc').value,
+    discountType:document.getElementById('pm-type').value,
+    discountValue:val,
+    expiresAt:document.getElementById('pm-exp').value||null,
+    usageLimit:parseInt(document.getElementById('pm-lim').value)||null
+  };
+  try{
+    const res=await fetch(`${API}/promo`,{method:'POST',headers:H(),body:JSON.stringify(body)});
+    const d=await res.json();
+    if(!res.ok){showMsg('pm-msg','⚠️ '+(d.message||'Error'),'err');return;}
+    closeM('pm');toast('✅ Promo code created!');loadPromo();
+  }catch{showMsg('pm-msg','⚠️ Server error','err');}
+}
+
+// 
+// MARKETPLACE (read-only for admin)
+// 
+async function loadMarket(){
+  document.getElementById('mp-hist').innerHTML='<div class="spinner"></div>';
+  try{
+    const res=await fetch(`${API}/transfer/history`,{headers:H()});
+    const data=await res.json();
+    const all=Array.isArray(data)?data:[];
+    const active=all.filter(e=>e.TransferStatus==='pending').length;
+    const done=all.filter(e=>e.TransferStatus==='completed').length;
+    const pend=all.filter(e=>e.TransferStatus==='pending').length;
+    document.getElementById('mp-active').textContent=active;
+    document.getElementById('mp-done').textContent=done;
+    document.getElementById('mp-pend-cnt').textContent=pend;
+    if(!all.length){document.getElementById('mp-hist').innerHTML='<div class="es"><div class="ei">🔄</div><p>No transfer history yet.</p></div>';return;}
+    const rows=all.slice(0,50).map(e=>{
+      const isSwap=(e.PaymentRef||'').startsWith('SWAP:');
+      const sc={completed:'bg',cancelled:'br2',pending:'by'}[e.TransferStatus]||'bn';
+      const route=e.Origin&&e.Destination?`${e.Origin} → ${e.Destination}`:'—';
+      const buyer=e.BuyerName||e.BuyerEmail||`UID-${e.BuyerID||''}`;
+      return `<tr>
+        <td style="font-size:.78rem;font-weight:500">${buyer}</td>
+        <td style="font-size:.76rem">${route}</td>
+        <td style="font-size:.76rem">${fdate(e.JourneyDate)||'—'}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:.72rem">${e.SeatNumber||'—'}</td>
+        <td><span class="badge ${isSwap?'bb':'by'}">${isSwap?'🔄 Swap':'💰 Sell'}</span></td>
+        <td class="mono">${isSwap?'—':'৳'+fmt(e.AskingPrice||0)}</td>
+        <td><span class="badge ${sc}">${e.TransferStatus}</span></td>
+        <td class="mono">${fdate(e.RequestedAt)||'—'}</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('mp-hist').innerHTML=`<div class="tw"><table>
+      <thead><tr><th>Buyer</th><th>Route</th><th>Journey</th><th>Seat</th><th>Type</th><th>Price</th><th>Status</th><th>Requested</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;
+  }catch{document.getElementById('mp-hist').innerHTML=ER('Failed to load','loadMarket');}
+}
+
+//  CSV EXPORT 
+function dlCSV(csv,name){
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=name;a.click();URL.revokeObjectURL(a.href);toast(` ${name} downloaded`);
+}
+
+//  INIT 
+loadDash();loadDashBk();loadDashMp();
+loadNotifications();
+setInterval(loadNotifications, 60000); // poll every 60s
+</script>
+</body>
+</html>
+
