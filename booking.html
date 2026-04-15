@@ -1,0 +1,892 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Ticket - SCTMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Figtree:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FDFBF8;--bg2:#F7F4EF;--bg3:#F0EDE6;--sf:#fff;
+  --nv:#0F1729;--nv2:#1B2340;
+  --gd:#A07828;--gd2:#C49A32;--gd-dim:rgba(160,120,40,0.07);
+  --tx:#0F1729;--tx2:#5C6478;--tx3:rgba(15,23,41,0.28);
+  --br:rgba(15,23,41,0.09);--br2:rgba(160,120,40,0.22);
+  --gn:#2A7A4B;--rd:#C0392B;--bl:#2563EB;--og:#D97706;
+  --bkash:#E2136E;--nagad:#F05A28;
+  --sh:0 1px 3px rgba(15,23,41,0.05),0 6px 20px rgba(15,23,41,0.06);
+}
+body{background:var(--bg);color:var(--tx);font-family:'Figtree','Noto Sans Bengali',sans-serif;min-height:100vh}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(253,251,248,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--br);padding:0 40px;height:62px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.nav-left{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.nav-back-wrapper{display:flex;align-items:center;justify-content:center}
+#nav-back{padding:6px 12px;font-size:.72rem}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.logo-mark{width:26px;height:26px;border-radius:5px;background:var(--nv);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:.85rem;font-weight:700;color:#fff}
+.logo-word{font-family:'Fraunces',serif;font-size:.95rem;font-weight:600;color:var(--nv);letter-spacing:2px;text-transform:uppercase}
+.logo-word em{color:var(--gd2);font-style:normal}
+.nav-r{display:flex;gap:8px;align-items:center}
+.nav-link{padding:6px 12px;border-radius:6px;font-size:.82rem;color:var(--tx2);text-decoration:none;font-weight:500;transition:all .18s}
+.nav-link:hover{background:var(--bg2);color:var(--nv)}
+.btn-g{padding:7px 16px;border-radius:6px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-family:'Figtree',sans-serif;font-size:.8rem;text-decoration:none;cursor:pointer;transition:all .18s}
+.btn-g:hover{border-color:var(--nv);color:var(--nv)}
+.lang-toggle{
+  padding:7px 12px;border-radius:6px;border:1px solid var(--br);
+  background:var(--sf);color:var(--nv);font-family:'JetBrains Mono',monospace;
+  font-size:.7rem;letter-spacing:1px;cursor:pointer;transition:all .18s
+}
+.lang-toggle:hover{border-color:var(--nv);background:var(--bg2)}
+
+/* CONTAINER */
+.container{max-width:960px;margin:0 auto;padding:36px 40px 80px}
+.etag{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
+.page-title{font-family:'Fraunces',serif;font-size:2rem;font-weight:600;color:var(--nv);margin-bottom:28px;letter-spacing:-.3px}
+
+/* SEARCH BOX */
+.search-box{background:var(--sf);border:1px solid var(--br);border-radius:12px;padding:22px;margin-bottom:28px;box-shadow:var(--sh)}
+.form-alert{
+  display:none;margin-bottom:12px;padding:9px 12px;border-radius:8px;
+  background:rgba(192,57,43,0.06);border:1px solid rgba(192,57,43,0.15);
+  color:var(--rd);font-size:.82rem
+}
+.field-error{border-color:var(--rd)!important;background:#fff7f6}
+.sf-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-family:'JetBrains Mono',monospace;font-size:.55rem;font-weight:500;color:var(--tx2);text-transform:uppercase;letter-spacing:2px}
+.fg select,.fg input{background:var(--bg2);border:1.5px solid var(--br);border-radius:7px;padding:10px 12px;color:var(--nv);font-family:'Figtree',sans-serif;font-size:.88rem;outline:none;transition:all .18s;-webkit-appearance:none;cursor:pointer}
+.fg select:focus,.fg input:focus{border-color:var(--nv);background:var(--sf);box-shadow:0 0 0 3px rgba(15,23,41,0.06)}
+.btn-search{padding:10px 24px;border-radius:7px;border:none;background:var(--nv);color:#fff;font-family:'Figtree',sans-serif;font-weight:600;font-size:.88rem;cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn-search:hover{background:var(--nv2)}
+
+/* RESULTS */
+.rcount{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--tx2);letter-spacing:.5px;margin-bottom:12px}
+.rcount strong{color:var(--nv)}
+
+/* RESULT CARD */
+.rc{background:var(--sf);border:1px solid var(--br);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:all .2s}
+.rc:hover{border-color:rgba(15,23,41,0.16);box-shadow:var(--sh)}
+.rc-main{display:grid;grid-template-columns:44px 1fr auto auto auto auto auto;align-items:center;gap:12px;padding:18px 22px}
+.rc-ico{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.rc-ico.train{background:rgba(37,99,235,0.07)}.rc-ico.bus{background:rgba(42,122,75,0.07)}
+.rc-vname{font-family:'JetBrains Mono',monospace;font-size:.55rem;text-transform:uppercase;letter-spacing:1px;color:var(--tx2);margin-bottom:3px}
+.rc-route{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--nv)}
+.rc-t .t{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;line-height:1;color:var(--nv)}
+.rc-t .l{font-size:.6rem;color:var(--tx2);text-transform:uppercase;margin-top:2px;font-family:'JetBrains Mono',monospace}
+.rc-dur{text-align:center;min-width:70px}
+.rc-dur .d{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--gd);font-weight:500}
+.rc-dur .line{display:flex;align-items:center;gap:4px;margin-bottom:2px}
+.rc-dur .line::before,.rc-dur .line::after{content:'';flex:1;height:1px;background:var(--br)}
+.rc-p .pl{font-family:'JetBrains Mono',monospace;font-size:.55rem;text-transform:uppercase;letter-spacing:1px;color:var(--tx2)}
+.rc-p .pv{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--nv)}
+.btn-sel{padding:9px 18px;border-radius:7px;border:none;background:var(--nv);color:#fff;font-family:'Figtree',sans-serif;font-weight:600;font-size:.8rem;cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn-sel:hover{background:var(--nv2)}
+.btn-sold{padding:9px 18px;border-radius:7px;border:1px solid var(--br);background:var(--bg2);color:var(--tx3);font-size:.8rem;cursor:not-allowed;font-family:'Figtree',sans-serif}
+.rc-foot{padding:10px 22px;background:var(--bg2);border-top:1px solid var(--br);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.amen{font-size:.7rem;color:var(--tx2)}
+.seats-badge{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:3px 10px;border-radius:20px}
+.sb-ok{background:rgba(42,122,75,.08);color:var(--gn);border:1px solid rgba(42,122,75,.12)}
+.sb-low{background:rgba(217,119,6,.08);color:var(--og);border:1px solid rgba(217,119,6,.12)}
+.sb-full{background:rgba(192,57,43,.07);color:var(--rd);border:1px solid rgba(192,57,43,.1)}
+
+/* SPINNER / EMPTY */
+.spinner{width:26px;height:26px;border:2px solid var(--br);border-top-color:var(--nv);border-radius:50%;animation:spin .8s linear infinite;margin:52px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{background:var(--sf);border:1px solid var(--br);border-radius:12px;padding:52px;text-align:center}
+.empty-ico{font-size:2.6rem;margin-bottom:12px}
+.empty h3{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600;color:var(--nv);margin-bottom:6px}
+.empty p{font-size:.84rem;color:var(--tx2);font-weight:300}
+
+/* OVERLAY */
+.overlay{position:fixed;inset:0;background:rgba(15,23,41,0.55);backdrop-filter:blur(12px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--sf);border:1px solid var(--br);border-radius:14px;padding:28px;width:560px;max-width:95vw;max-height:92vh;overflow-y:auto;transform:translateY(12px);transition:transform .22s;box-shadow:0 24px 64px rgba(15,23,41,0.18)}
+.overlay.open .modal{transform:translateY(0)}
+.mhd{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.mhd h3{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600;color:var(--nv)}
+.mclose{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:1rem;transition:color .15s;padding:4px}
+.mclose:hover{color:var(--nv)}
+
+/* ROUTE SUMMARY (in modal) */
+.rsummary{background:var(--bg2);border:1px solid var(--br);border-radius:9px;padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.rs-name{font-weight:600;font-size:.88rem;color:var(--nv);margin-bottom:2px}
+.rs-meta{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--tx2)}
+.rs-price{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--gd)}
+
+/* LEGEND */
+.legend{display:flex;gap:14px;margin-bottom:10px}
+.leg{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--tx2)}
+.ld{width:13px;height:13px;border-radius:3px}
+.ld.av{background:var(--sf);border:1.5px solid var(--br)}
+.ld.tk{background:#e0ddd6;border:1.5px solid #d4d0c8}
+.ld.sl{background:var(--nv);border:1.5px solid var(--nv)}
+
+/* SEAT MAP */
+.bus-body{background:var(--bg2);border:1.5px solid var(--br);border-radius:12px;padding:16px;margin-bottom:16px}
+.bus-front{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:2px dashed var(--br)}
+.bf-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--tx2);text-transform:uppercase;letter-spacing:2px}
+.seat-rows{display:flex;flex-direction:column;gap:5px}
+.seat-row-wrap{display:flex;align-items:center;gap:6px}
+.row-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--tx3);width:14px;text-align:center;flex-shrink:0}
+.seat-row{display:grid;align-items:center;gap:5px;flex:1}
+.seat-row.bus-row{grid-template-columns:1fr 1fr 22px 1fr 1fr}
+.seat-row.train-row{grid-template-columns:1fr 1fr 1fr 22px 1fr 1fr 1fr}
+.aisle{display:flex;align-items:center;justify-content:center;font-size:.5rem;color:var(--br)}
+.seat{border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.58rem;font-weight:700;cursor:pointer;transition:all .15s;background:var(--sf);border:1.5px solid var(--br);color:var(--tx);height:30px}
+.seat.taken{background:#e8e4dd;color:#bbb8b0;cursor:not-allowed;border-color:#dedad2}
+.seat.selected{background:var(--nv);border-color:var(--nv);color:#fff}
+.seat:not(.taken):not(.selected):hover{border-color:var(--nv);box-shadow:0 2px 8px rgba(15,23,41,0.12)}
+
+/* SELECTED INFO */
+.sel-info{background:var(--gd-dim);border:1px solid var(--br2);border-radius:9px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.si-lbl{font-size:.76rem;color:var(--tx2)}
+.si-val{font-family:'JetBrains Mono',monospace;font-size:.88rem;color:var(--gd);font-weight:600}
+.btn-confirm{width:100%;padding:13px;border-radius:8px;border:none;background:var(--nv);color:#fff;font-family:'Figtree',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-confirm:hover:not(:disabled){background:var(--nv2)}
+.btn-confirm:disabled{background:var(--bg3);color:var(--tx3);border:1px solid var(--br);cursor:not-allowed}
+
+/* PAYMENT MODAL */
+.pay-modal{width:420px}
+.pay-amount{background:var(--bg2);border:1px solid var(--br);border-radius:10px;padding:18px;text-align:center;margin-bottom:20px}
+.pa-label{font-family:'JetBrains Mono',monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--tx2);margin-bottom:5px}
+.pa-val{font-family:'Fraunces',serif;font-size:2.2rem;font-weight:700;color:var(--nv)}
+.pa-detail{font-size:.74rem;color:var(--tx2);margin-top:5px}
+.pay-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.pay-method{border:2px solid var(--br);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;text-align:center;background:var(--sf)}
+.pay-method:hover{border-color:var(--nv)}
+.pay-method.bkash.active{border-color:var(--bkash);background:#fdf0f6}
+.pay-method.nagad.active{border-color:var(--nagad);background:#fff8f5}
+.pm-logo{font-size:1.4rem;margin-bottom:5px}
+.pm-name{font-weight:700;font-size:.88rem}
+.pm-sub{font-size:.68rem;color:var(--tx2);margin-top:2px}
+.pay-input-section{display:none}.pay-input-section.show{display:block}
+.pay-alert{
+  display:none;margin:-4px 0 12px;padding:9px 12px;border-radius:8px;
+  background:rgba(192,57,43,0.06);border:1px solid rgba(192,57,43,0.15);
+  color:var(--rd);font-size:.8rem
+}
+.piw{margin-bottom:14px}
+.piw label{display:block;font-family:'JetBrains Mono',monospace;font-size:.55rem;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:6px}
+.piw input{width:100%;background:var(--bg2);border:1.5px solid var(--br);border-radius:8px;padding:11px 14px;color:var(--nv);font-family:'JetBrains Mono',monospace;font-size:1rem;outline:none;transition:all .2s;letter-spacing:2px}
+.piw input:focus{border-color:var(--nv);background:var(--sf);box-shadow:0 0 0 3px rgba(15,23,41,0.06)}
+.pay-hint{font-size:.72rem;color:var(--tx2);margin-top:6px}
+.pay-hint b{color:var(--gd)}
+.btn-pay{width:100%;padding:13px;border-radius:8px;border:none;font-family:'Figtree',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px}
+.btn-pay.bkash-btn{background:var(--bkash);color:#fff}.btn-pay.bkash-btn:hover{background:#c0105c}
+.btn-pay.nagad-btn{background:var(--nagad);color:#fff}.btn-pay.nagad-btn:hover{background:#d44e20}
+.btn-pay:disabled{background:var(--bg3);color:var(--tx3);border:1px solid var(--br);cursor:not-allowed}
+
+/* OTP section */
+.otp-section{display:none;text-align:center;padding:6px 0}
+.otp-section.show{display:block}
+.otp-ico{font-size:2.2rem;margin-bottom:8px}
+.otp-text{font-size:.82rem;color:var(--tx2);margin-bottom:14px;line-height:1.6}
+.otp-text small{color:var(--gd)}
+.otp-inputs{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
+.otp-inputs input{width:42px;height:48px;text-align:center;border:2px solid var(--br);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;outline:none;transition:all .2s;color:var(--nv);background:var(--bg2)}
+.otp-inputs input:focus{border-color:var(--nv);background:var(--sf)}
+
+/* PROCESSING */
+.processing-anim{text-align:center;padding:28px 0;display:none}
+.processing-anim.show{display:block}
+.proc-spinner{width:46px;height:46px;border:3px solid var(--br);border-top-color:var(--nv);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+.proc-text{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--nv);margin-bottom:4px}
+.proc-sub{font-size:.8rem;color:var(--tx2)}
+
+/* SUCCESS MODAL */
+.success-modal{width:500px}
+.success-ico{font-size:3.2rem;display:inline-block;animation:pop .5s cubic-bezier(.175,.885,.32,1.275);margin-bottom:8px}
+@keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.s-title{font-family:'Fraunces',serif;font-size:1.7rem;font-weight:700;color:var(--nv);margin-bottom:4px}
+.s-sub{font-size:.84rem;color:var(--tx2);margin-bottom:20px;font-weight:300}
+.ticket-card{background:var(--bg2);border:1px solid var(--br);border-radius:12px;padding:18px;margin-bottom:18px;text-align:left;position:relative;overflow:hidden}
+.ticket-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--gd)}
+.ticket-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.ticket-id{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--gd);font-weight:600}
+.ticket-status{background:rgba(42,122,75,.08);color:var(--gn);border:1px solid rgba(42,122,75,.15);font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:3px 10px;border-radius:4px;font-weight:600}
+.ticket-route{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--nv);margin-bottom:12px}
+.ticket-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.ti-label{font-family:'JetBrains Mono',monospace;font-size:.54rem;text-transform:uppercase;letter-spacing:1px;color:var(--tx3);margin-bottom:2px}
+.ti-val{font-weight:600;font-size:.84rem;color:var(--nv)}
+.ticket-div{border:none;border-top:2px dashed var(--br);margin:12px 0}
+.t-barcode{display:flex;justify-content:center;gap:1.5px;margin-top:4px}
+.bc-bar{background:var(--nv);width:2px;border-radius:1px}
+.s-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-pdf{padding:11px;border-radius:8px;border:none;background:var(--nv);color:#fff;font-family:'Figtree',sans-serif;font-weight:600;font-size:.84rem;cursor:pointer;transition:all .2s}
+.btn-pdf:hover{background:var(--nv2)}
+.btn-dash{padding:11px;border-radius:8px;border:1.5px solid var(--br);background:transparent;color:var(--tx);font-family:'Figtree',sans-serif;font-weight:600;font-size:.84rem;cursor:pointer;transition:all .2s}
+.btn-dash:hover{border-color:var(--nv);color:var(--nv)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--nv);color:#fff;border-radius:8px;padding:11px 18px;font-size:.82rem;transform:translateY(60px);opacity:0;transition:all .3s;z-index:9999;border-left:3px solid var(--gd);max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:860px){.sf-row{grid-template-columns:1fr 1fr}.rc-main{grid-template-columns:36px 1fr auto auto}}
+@media(max-width:600px){nav{padding:0 20px}.container{padding:20px 20px 60px}.sf-row{grid-template-columns:1fr}}
+
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-mid{display:none}
+  .hamburger{display:flex;flex-direction:column;gap:4px;cursor:pointer;padding:6px;background:none;border:none;margin-left:auto}
+  .hamburger span{display:block;width:20px;height:2px;background:var(--nv,#0F1729);border-radius:1px;transition:all .25s}
+  .nav-mob-menu{display:none;position:fixed;top:62px;left:0;right:0;background:var(--bg,#FDFBF8);border-bottom:1px solid var(--br,rgba(15,23,41,0.09));padding:12px 20px;flex-direction:column;gap:4px;z-index:500;box-shadow:0 8px 24px rgba(15,23,41,0.08)}
+  .nav-mob-menu.open{display:flex}
+  .nav-mob-menu a,.nav-mob-menu button{padding:11px 14px;border-radius:8px;font-size:.88rem;color:var(--nv,#0F1729);text-decoration:none;font-family:'Figtree',sans-serif;background:none;border:none;cursor:pointer;text-align:left;transition:background .15s}
+  .nav-mob-menu a:hover,.nav-mob-menu button:hover{background:var(--bg2,#F7F4EF)}
+}
+@media(min-width:769px){
+  .hamburger{display:none}
+  .nav-mob-menu{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <div class="nav-back-wrapper">
+      <a href="index.html" class="nav-link" id="nav-back">← SCTMS</a>
+    </div>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-mark">S</div>
+      <div class="logo-word">SC<em>T</em>MS</div>
+    </a>
+  </div>
+  <div class="nav-r">
+    <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
+    <a href="dashboard.html" class="nav-link" id="nav-dash" data-i18n="nav_dash">Dashboard</a>
+    <button class="btn-g" onclick="logout()" data-i18n="nav_signout">Sign Out</button>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="etag" data-i18n="tag_book">// Ticket Booking</div>
+  <div class="page-title" data-i18n="title_search">Search & Book</div>
+
+  <div class="search-box">
+    <div class="form-alert" id="search-alert" role="alert"></div>
+    <div class="sf-row">
+      <div class="fg"><label data-i18n="lbl_from">From</label>
+        <select id="origin">
+          <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
+          <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
+          <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
+          <option>Cox's Bazar</option><option>Jessore</option><option>Bogura</option>
+          <option>Dinajpur</option><option>Panchagarh</option><option>Thakurgaon</option>
+          <option>Tangail</option><option>Faridpur</option><option>Narayanganj</option>
+          <option>Narsingdi</option><option>Brahmanbaria</option><option>Feni</option>
+          <option>Habiganj</option><option>Sirajganj</option><option>Natore</option>
+          <option>Gobindaganj</option><option>Palashbari</option><option>Pirganj</option>
+          <option>Tetulia</option><option>Chakaria</option><option>Jessore</option>
+        </select>
+      </div>
+      <div class="fg"><label data-i18n="lbl_to">To</label>
+        <select id="destination">
+          <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
+          <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
+          <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
+          <option>Cox's Bazar</option><option>Jessore</option><option>Bogura</option>
+          <option>Dinajpur</option><option>Panchagarh</option><option>Thakurgaon</option>
+          <option>Tangail</option><option>Faridpur</option><option>Narayanganj</option>
+          <option>Narsingdi</option><option>Brahmanbaria</option><option>Feni</option>
+          <option>Habiganj</option><option>Sirajganj</option><option>Natore</option>
+          <option>Gobindaganj</option><option>Palashbari</option><option>Pirganj</option>
+          <option>Tetulia</option><option>Chakaria</option>
+        </select>
+      </div>
+      <div class="fg"><label data-i18n="lbl_date">Journey Date</label><input type="date" id="jdate"></div>
+      <div class="fg"><label data-i18n="lbl_pass">Passengers</label>
+        <select id="passengers">
+          <option value="1" id="pass_1">1 Passenger</option>
+          <option value="2" id="pass_2">2 Passengers</option>
+          <option value="3" id="pass_3">3 Passengers</option>
+          <option value="4" id="pass_4">4 Passengers</option>
+        </select>
+      </div>
+      <button class="btn-search" onclick="search()" data-i18n="btn_search">Search -></button>
+    </div>
+  </div>
+
+  <div id="results"></div>
+</div>
+
+<!-- SEAT MODAL -->
+<div class="overlay" id="overlay" onclick="if(event.target.id==='overlay')closeModal()">
+  <div class="modal">
+    <div class="mhd"><h3 data-i18n="seat_title">Select Seat</h3><button class="mclose" onclick="closeModal()" data-i18n="btn_close">Close</button></div>
+    <div class="rsummary">
+      <div><div class="rs-name" id="m-route"></div><div class="rs-meta" id="m-time"></div></div>
+      <div class="rs-price" id="m-price"></div>
+    </div>
+    <div class="legend">
+      <div class="leg"><div class="ld av"></div><span data-i18n="seat_avail">Available</span></div>
+      <div class="leg"><div class="ld tk"></div><span data-i18n="seat_taken">Taken</span></div>
+      <div class="leg"><div class="ld sl"></div><span data-i18n="seat_selected">Selected</span></div>
+    </div>
+    <div class="bus-body" id="seat-container"></div>
+    <div class="sel-info">
+      <div class="si-lbl" data-i18n="seat_label">Selected Seat</div>
+      <div class="si-val" id="sel-lbl" data-i18n="seat_none">None selected</div>
+    </div>
+    <button class="btn-confirm" id="confirm-btn" disabled onclick="goToPayment()" data-i18n="btn_continue_pay">Continue to Payment -></button>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="overlay" id="pay-overlay" onclick="if(event.target.id==='pay-overlay')closePayModal()">
+  <div class="modal pay-modal">
+    <div class="mhd"><h3 data-i18n="pay_title">Payment</h3><button class="mclose" onclick="closePayModal()" data-i18n="btn_close">Close</button></div>
+    <div class="pay-amount">
+      <div class="pa-label" data-i18n="pay_total">Total Amount</div>
+      <div class="pa-val" id="pay-amount-val"></div>
+      <div class="pa-detail" id="pay-details"></div>
+    </div>
+    <div id="pay-step-1">
+      <!-- Promo Code -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;align-items:flex-end">
+        <div style="flex:1">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.55rem;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:6px" data-i18n="promo_label">Promo Code</div>
+          <input type="text" id="promo-input" placeholder="SCTMS20" style="width:100%;background:var(--bg2);border:1.5px solid var(--br);border-radius:8px;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:.9rem;text-transform:uppercase;outline:none;color:var(--nv)" oninput="this.value=this.value.toUpperCase()">
+        </div>
+        <button onclick="applyPromo()" style="padding:10px 16px;border-radius:8px;border:1.5px solid var(--br);background:var(--bg2);color:var(--tx);font-family:'Figtree',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .18s" onmouseover="this.style.borderColor='var(--nv)'" onmouseout="this.style.borderColor='var(--br)'" data-i18n="promo_apply">Apply</button>
+      </div>
+      <div id="promo-result" style="display:none;margin-bottom:12px;padding:9px 13px;border-radius:8px;font-size:.78rem"></div>
+      <div class="pay-alert" id="pay-alert" role="alert"></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:.55rem;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:10px" data-i18n="pay_choose">Choose Payment Method</div>
+      <div class="pay-methods">
+        <div class="pay-method bkash" onclick="selectMethod('bkash')">
+          <div class="pm-logo"></div>
+          <div class="pm-name" style="color:var(--bkash)">bKash</div>
+          <div class="pm-sub" data-i18n="pay_mobile">Mobile Banking</div>
+        </div>
+        <div class="pay-method nagad" onclick="selectMethod('nagad')">
+          <div class="pm-logo"></div>
+          <div class="pm-name" style="color:var(--nagad)">Nagad</div>
+          <div class="pm-sub" data-i18n="pay_mobile">Mobile Banking</div>
+        </div>
+      </div>
+      <div class="pay-input-section" id="pay-input-sec">
+        <div class="piw">
+          <label id="pay-num-label" data-i18n="pay_num_bkash">bKash Number</label>
+          <input type="tel" id="pay-number" placeholder="01XXXXXXXXX" maxlength="11" oninput="checkPayReady()">
+          <div class="pay-hint" data-i18n="pay_hint">Send money to: <b id="pay-merchant">01779-SCTMS</b></div>
+        </div>
+        <button class="btn-pay" id="btn-send-otp" onclick="sendOTP()" disabled data-i18n="btn_send_otp">Send OTP -></button>
+      </div>
+    </div>
+    <div class="otp-section" id="otp-section">
+      <div class="otp-ico"></div>
+      <div class="otp-text" data-i18n="otp_text">OTP sent to <strong id="otp-phone"></strong><br><small>Demo OTP: 123456</small></div>
+      <div class="otp-inputs">
+        <input type="text" maxlength="1" oninput="otpInput(this,0)" id="otp0">
+        <input type="text" maxlength="1" oninput="otpInput(this,1)" id="otp1">
+        <input type="text" maxlength="1" oninput="otpInput(this,2)" id="otp2">
+        <input type="text" maxlength="1" oninput="otpInput(this,3)" id="otp3">
+        <input type="text" maxlength="1" oninput="otpInput(this,4)" id="otp4">
+        <input type="text" maxlength="1" oninput="otpInput(this,5)" id="otp5">
+      </div>
+      <button class="btn-pay" id="btn-verify-otp" onclick="verifyOTP()" disabled data-i18n="btn_verify_pay">Verify & Pay -></button>
+    </div>
+    <div class="processing-anim" id="processing-anim">
+      <div class="proc-spinner"></div>
+      <div class="proc-text" data-i18n="proc_title">Processing Payment</div>
+      <div class="proc-sub" data-i18n="proc_sub">Please wait, do not close this window</div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="overlay" id="success-overlay">
+  <div class="modal success-modal" style="text-align:center">
+    <div class="success-ico"></div>
+    <div class="s-title" data-i18n="succ_title">Booking Confirmed!</div>
+    <div class="s-sub" data-i18n="succ_sub">Your ticket has been booked successfully</div>
+    <div class="ticket-card" id="ticket-card">
+      <div class="ticket-head">
+        <div class="ticket-id" id="t-id">BK-#</div>
+        <div class="ticket-status" data-i18n="succ_status">CONFIRMED</div>
+      </div>
+      <div class="ticket-route" id="t-route">  </div>
+      <div class="ticket-grid">
+        <div><div class="ti-label" data-i18n="lbl_date">Date</div><div class="ti-val" id="t-date"></div></div>
+        <div><div class="ti-label" data-i18n="lbl_dep">Departure</div><div class="ti-val" id="t-dep"></div></div>
+        <div><div class="ti-label" data-i18n="lbl_arr">Arrival</div><div class="ti-val" id="t-arr"></div></div>
+        <div><div class="ti-label" data-i18n="lbl_vehicle">Vehicle</div><div class="ti-val" id="t-vehicle"></div></div>
+        <div><div class="ti-label" data-i18n="lbl_seat">Seat</div><div class="ti-val" id="t-seat"></div></div>
+        <div><div class="ti-label" data-i18n="lbl_fare">Fare</div><div class="ti-val" id="t-fare"></div></div>
+      </div>
+      <hr class="ticket-div">
+      <div class="t-barcode" id="t-barcode"></div>
+    </div>
+    <div class="s-btns">
+      <button class="btn-pdf" onclick="openTicketPrint()" data-i18n="btn_view_ticket"> View & Print Ticket</button>
+      <button class="btn-dash" onclick="location.href='dashboard.html'" data-i18n="btn_go_dash">Go to Dashboard -></button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:5000/api';
+let selSeat=null, curSched=null, booked=[], lastBooking=null, selMethod=null;
+const i18n={
+  en:{
+    nav_dash:'Dashboard',nav_signout:'Sign Out',
+    tag_book:'// Ticket Booking',title_search:'Search & Book',
+    lbl_from:'From',lbl_to:'To',lbl_date:'Journey Date',btn_search:'Search ->',
+    seat_title:'Select Seat',btn_close:'Close',seat_avail:'Available',seat_taken:'Taken',seat_selected:'Selected',
+    seat_label:'Selected Seat',seat_none:'None selected',btn_continue_pay:'Continue to Payment ->',
+    pay_title:'Payment',pay_total:'Total Amount',promo_label:'Promo Code',promo_apply:'Apply',
+    pay_choose:'Choose Payment Method',pay_mobile:'Mobile Banking',pay_num_bkash:'bKash Number',pay_num_nagad:'Nagad Number',
+    pay_hint:'Send money to: <b id="pay-merchant">01779-SCTMS</b>',btn_send_otp:'Send OTP ->',
+    otp_text:'OTP sent to <strong id="otp-phone"></strong><br><small>Demo OTP: 123456</small>',
+    btn_verify_pay:'Verify & Pay ->',proc_title:'Processing Payment',proc_sub:'Please wait, do not close this window',
+    succ_title:'Booking Confirmed!',succ_sub:'Your ticket has been booked successfully',succ_status:'CONFIRMED',
+    lbl_dep:'Departure',lbl_arr:'Arrival',lbl_vehicle:'Vehicle',lbl_seat:'Seat',lbl_fare:'Fare',
+    btn_view_ticket:'View & Print Ticket',btn_go_dash:'Go to Dashboard ->',
+    err_fill:'Please fill all fields.',err_same:'Origin and Destination cannot be the same.',
+    err_method:'Select a payment method to continue.',
+    err_phone:'Enter a valid 11-digit mobile number.',
+    otp_sent:'OTP sent.',otp_invalid:'Invalid OTP. Demo: 123456.',
+    server_err:'Server error.',promo_invalid:'Invalid code',
+    promo_applied:'"{code}" applied  {off} off! Final: {fare}',
+    promo_applied_dev:'"{code}" applied  {off} off! (dev mode)',
+    seat_prefix:'Seat ',
+    result_show:'Showing',result_route:'{o} -> {d}',
+    no_results:'No Results',no_results_msg:'No schedules found for {o} -> {d} on {dt}.',
+    conn_err:'Connection Error',conn_msg:'Is the backend running?'
+  },
+  bn:{
+    nav_dash:'ড্যাশবোর্ড',nav_signout:'সাইন আউট',
+    tag_book:'// টিকিট বুকিং',title_search:'সার্চ ও বুকিং',
+    lbl_from:'যাত্রা শুরু',lbl_to:'গন্তব্য',lbl_date:'যাত্রার তারিখ',btn_search:'সার্চ ->',
+    seat_title:'সিট নির্বাচন',btn_close:'বন্ধ',seat_avail:'খালি',seat_taken:'দখল',seat_selected:'নির্বাচিত',
+    seat_label:'নির্বাচিত সিট',seat_none:'কোনটি নির্বাচন হয়নি',btn_continue_pay:'পেমেন্টে যান ->',
+    pay_title:'পেমেন্ট',pay_total:'মোট পরিমাণ',promo_label:'প্রোমো কোড',promo_apply:'অ্যাপ্লাই',
+    pay_choose:'পেমেন্ট মেথড বাছাই করুন',pay_mobile:'মোবাইল ব্যাংকিং',pay_num_bkash:'বিকাশ নম্বর',pay_num_nagad:'নগদ নম্বর',
+    pay_hint:'Send money to: <b id="pay-merchant">01779-SCTMS</b>',btn_send_otp:'ওটিপি পাঠান ->',
+    otp_text:'ওটিপি পাঠানো হয়েছে <strong id="otp-phone"></strong><br><small>ডেমো ওটিপি: 123456</small>',
+    btn_verify_pay:'ভেরিফাই ও পে ->',proc_title:'পেমেন্ট প্রসেসিং',proc_sub:'অনুগ্রহ করে অপেক্ষা করুন',
+    succ_title:'বুকিং কনফার্ম!',succ_sub:'আপনার টিকিট সফলভাবে বুক হয়েছে',succ_status:'কনফার্মড',
+    lbl_dep:'ছাড়ার সময়',lbl_arr:'পৌঁছানোর সময়',lbl_vehicle:'গাড়ি',lbl_seat:'সিট',lbl_fare:'ভাড়া',
+    btn_view_ticket:'টিকিট দেখুন ও প্রিন্ট করুন',btn_go_dash:'ড্যাশবোর্ডে যান ->',
+    err_fill:'সবগুলো ঘর পূরণ করুন।',err_same:'Origin এবং Destination একই হতে পারে না।',
+    err_method:'পেমেন্ট মেথড নির্বাচন করুন।',
+    err_phone:'সঠিক ১১ ডিজিটের নম্বর দিন।',
+    otp_sent:'ওটিপি পাঠানো হয়েছে।',otp_invalid:'ভুল ওটিপি। ডেমো: 123456।',
+    server_err:'সার্ভার সমস্যা।',promo_invalid:'ভুল কোড',
+    promo_applied:'"{code}" অ্যাপ্লাই হয়েছে  {off} ছাড়! ফাইনাল: {fare}',
+    promo_applied_dev:'"{code}" অ্যাপ্লাই হয়েছে  {off} ছাড়! (ডেমো মোড)',
+    seat_prefix:'সিট ',
+    result_show:'দেখানো হচ্ছে',result_route:'{o} -> {d}',
+    no_results:'কোন ফলাফল নেই',no_results_msg:'{o} -> {d} রুটে {dt} তারিখে কোন শিডিউল পাওয়া যায়নি।',
+    conn_err:'সংযোগ সমস্যা',conn_msg:'ব্যাকএন্ড চলছে তো?'
+  }
+};
+let curLang=localStorage.getItem('sctms_lang')||'en';
+function t(k){return (i18n[curLang]&&i18n[curLang][k])||i18n.en[k]||k;}
+function applyLang(){
+  document.documentElement.lang=curLang;
+  const toggle=document.getElementById('lang-toggle');
+  toggle.textContent=curLang==='en'?'EN':'BN';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    const val=t(key);
+    if(val.includes('<')) el.innerHTML=val; else el.textContent=val;
+  });
+  document.getElementById('pay-num-label').textContent=selMethod==='nagad'?t('pay_num_nagad'):t('pay_num_bkash');
+}
+document.getElementById('lang-toggle').addEventListener('click',()=>{
+  curLang=curLang==='en'?'bn':'en';
+  localStorage.setItem('sctms_lang',curLang);
+  applyLang();
+  const o=document.getElementById('origin').value;
+  const d=document.getElementById('destination').value;
+  const dt=document.getElementById('jdate').value;
+  if(o&&d&&dt) search();
+});
+applyLang();
+
+// Init — local date fix (valueAsDate UTC bug এড়াতে)
+const _td = new Date();
+const _localDate = _td.getFullYear()+'-'+String(_td.getMonth()+1).padStart(2,'0')+'-'+String(_td.getDate()).padStart(2,'0');
+document.getElementById('jdate').value = _localDate;
+document.getElementById('jdate').min   = _localDate;
+const token = localStorage.getItem('sctms_token');
+const user = JSON.parse(localStorage.getItem('sctms_user')||'{}');
+if(!token) location.href='login.html';
+const _navDash = document.getElementById('nav-dash');
+if(_navDash && user.role==='admin') _navDash.href='dashboard-admin.html';
+
+// Pre-fill from URL params
+const params = new URLSearchParams(location.search);
+if(params.get('from') && document.querySelector('#origin option[value="'+params.get('from')+'"], #origin option')){
+  const o=document.getElementById('origin');
+  for(const opt of o.options) if(opt.value===params.get('from')||opt.text===params.get('from')){o.value=opt.value;break;}
+}
+if(params.get('to')){
+  const d=document.getElementById('destination');
+  for(const opt of d.options) if(opt.value===params.get('to')||opt.text===params.get('to')){d.value=opt.value;break;}
+}
+if(params.get('date')) document.getElementById('jdate').value=params.get('date');
+['origin','destination','jdate'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('input',clearSearchAlert);
+  el.addEventListener('change',clearSearchAlert);
+});
+
+function logout(){ localStorage.clear(); location.href='index.html'; }
+function fmt(n){return Number(n||0).toLocaleString();}
+function ft(t){if(!t)return'';const d=new Date(t);return d.getUTCHours().toString().padStart(2,'0')+':'+d.getUTCMinutes().toString().padStart(2,'0');}
+function calcDur(d,a){const m=Math.round((new Date(a)-new Date(d))/60000);if(m<=0)return'';return `${Math.floor(m/60)}h ${m%60}m`;}
+function aIco(a){const m={'AC':'','WiFi':'','Charg':'','Food':'','Meal':'','Reclin':'','Luxury':'','Blanket':''};for(const k of Object.keys(m))if(a.includes(k))return m[k];return'';}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3500);}
+function setSearchAlert(msg){
+  const a=document.getElementById('search-alert');
+  a.textContent=msg;
+  a.style.display='block';
+}
+function clearSearchAlert(){
+  const a=document.getElementById('search-alert');
+  a.style.display='none';a.textContent='';
+  document.getElementById('origin').classList.remove('field-error');
+  document.getElementById('destination').classList.remove('field-error');
+  document.getElementById('jdate').classList.remove('field-error');
+}
+function setPayAlert(msg){
+  const a=document.getElementById('pay-alert');
+  a.textContent=msg;
+  a.style.display='block';
+}
+function clearPayAlert(){
+  const a=document.getElementById('pay-alert');
+  a.style.display='none';a.textContent='';
+}
+
+async function search(){
+  const o=document.getElementById('origin').value, d=document.getElementById('destination').value, dt=document.getElementById('jdate').value;
+  clearSearchAlert();
+  if(!o||!d||!dt){
+    if(!o) document.getElementById('origin').classList.add('field-error');
+    if(!d) document.getElementById('destination').classList.add('field-error');
+    if(!dt) document.getElementById('jdate').classList.add('field-error');
+    setSearchAlert(t('err_fill'));return;
+  }
+  if(o===d){
+    document.getElementById('origin').classList.add('field-error');
+    document.getElementById('destination').classList.add('field-error');
+    setSearchAlert(t('err_same'));return;
+  }
+  const area=document.getElementById('results');
+  area.innerHTML='<div class="spinner"></div>';
+  try{
+    const res=await fetch(`${API}/schedules/search?origin=${encodeURIComponent(o)}&destination=${encodeURIComponent(d)}&date=${dt}`,{headers:{'Authorization':'Bearer '+token}});
+    const data=await res.json();
+    if(!res.ok||!data.count){
+      area.innerHTML=`<div class="empty"><div class="empty-ico"></div><h3>${t('no_results')}</h3><p>${t('no_results_msg').replace('{o}',o).replace('{d}',d).replace('{dt}',dt)}</p></div>`;
+      return;
+    }
+    const p=data.count!==1?'s':'';
+    area.innerHTML=`<div class="rcount">${t('result_show')} <strong>${data.count} result${p}</strong> ${t('result_route').replace('{o}',o).replace('{d}',d)}</div>`+data.schedules.map(renderCard).join('');
+  }catch{
+    area.innerHTML=`<div class="empty"><div class="empty-ico"></div><h3>${t('conn_err')}</h3><p>${t('conn_msg')} <code style="font-family:JetBrains Mono;font-size:.8em">node server.js</code></p></div>`;
+  }
+}
+
+function renderCard(s){
+  const isSold=s.AvailableSeats===0, isLow=!isSold&&s.AvailableSeats<=5;
+  const sc=isSold?'sb-full':isLow?'sb-low':'sb-ok';
+  const st=isSold?(curLang==='bn'?'সোল্ড আউট':'Sold Out'):`${s.AvailableSeats} ${curLang==='bn'?'সিট বাকি':'seats left'}`;
+  const isViaStop = s.MatchType==='via_stop';
+
+  // Boarding/dropping time — use BoardingTime if stop-based
+  const depShow = isViaStop && s.BoardingTime ? ft(s.BoardingTime) : ft(s.DepartureTime);
+  const arrShow = isViaStop && s.DroppingTime ? ft(s.DroppingTime) : ft(s.ArrivalTime);
+  const routeShow = isViaStop
+    ? `${s.BoardingStop} → ${s.DroppingStop}`
+    : `${s.Origin} → ${s.Destination}`;
+
+  const dur=calcDur(
+    isViaStop&&s.BoardingTime ? s.BoardingTime : s.DepartureTime,
+    isViaStop&&s.DroppingTime ? s.DroppingTime : s.ArrivalTime
+  );
+  const amen=(s.Amenities||'').split(',').filter(Boolean).slice(0,4).map(a=>`<span class="amen">${aIco(a.trim())} ${a.trim()}</span>`).join('');
+
+  // Via-stop badge
+  const stopBadge = isViaStop ? `
+    <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.15);border-radius:6px;font-size:.72rem;color:#1e40af;margin-bottom:6px">
+      <span>🚏</span>
+      <span>এই গাড়ি <strong>${s.Origin}→${s.Destination}</strong> যাচ্ছে — <strong>${s.BoardingStop}</strong> থেকে উঠুন</span>
+    </div>` : '';
+
+  return `<div class="rc"${isSold?' style="opacity:0.65"':''}>
+    ${stopBadge}
+    <div class="rc-main">
+      <div class="rc-ico ${s.VehicleType}"></div>
+      <div><div class="rc-vname">${s.VehicleName}</div><div class="rc-route">${routeShow}</div></div>
+      <div class="rc-t"><div class="t">${depShow}</div><div class="l">${t('lbl_dep')}</div></div>
+      <div class="rc-dur"><div class="line"></div><div class="d">${dur}</div></div>
+      <div class="rc-t"><div class="t">${arrShow}</div><div class="l">${t('lbl_arr')}</div></div>
+      <div class="rc-p"><div class="pl">${t('lbl_from')}</div><div class="pv">৳${fmt(s.Fare)}</div></div>
+      ${isSold
+        ? `<button class="btn-sold">${curLang==='bn'?'সোল্ড আউট':'Sold Out'}</button>`
+        : `<button class="btn-sel" onclick='openModal(JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(s))}")))'>${curLang==='bn'?'সিট নির্বাচন':'Select Seat'}</button>`}
+    </div>
+    <div class="rc-foot">${amen}<span class="seats-badge ${sc}">${st}</span></div>
+  </div>`;
+}
+
+async function openModal(s){
+  curSched=s; selectedSeats=[];
+  document.getElementById('m-route').textContent=`${s.Origin} -> ${s.Destination}`;
+  document.getElementById('m-time').textContent=`${ft(s.DepartureTime)}  ${ft(s.ArrivalTime)}  ${s.VehicleName}`;
+  document.getElementById('m-price').textContent=`BDT ${s.Fare} per seat`;
+  document.getElementById('sel-lbl').textContent=t('seat_none');
+  document.getElementById('confirm-btn').disabled=true;
+  try{const r=await fetch(`${API}/schedules/${s.ScheduleID}/seats`,{headers:{'Authorization':'Bearer '+token}});const d=await r.json();booked=d.bookedSeats||[];}catch{booked=[];}
+  buildSeatMap(s.VehicleType, s.TotalSeats||(s.VehicleType==='bus'?40:72));
+  document.getElementById('overlay').classList.add('open');
+}
+
+function buildSeatMap(type, total){
+  const container=document.getElementById('seat-container');
+  const isBus=type!=='train', cols=isBus?4:6, leftCols=isBus?2:3;
+  const rowCount=Math.ceil(total/cols);
+  let html=`<div class="bus-front"><div class="bf-label">Door - Front</div><span style="font-size:1.4rem">${isBus?'':''}</span></div><div class="seat-rows">`;
+  for(let row=0;row<rowCount;row++){
+    const rowLabel=String.fromCharCode(65+row);
+    html+=`<div class="seat-row-wrap"><div class="row-label">${rowLabel}</div><div class="seat-row ${isBus?'bus-row':'train-row'}">`;
+    for(let c=0;c<cols+1;c++){
+      if(c===leftCols){html+=`<div class="aisle"></div>`;continue;}
+      const cc=c>leftCols?c-1:c;
+      const seatNum=row*cols+cc+1;
+      if(seatNum>total){html+=`<div></div>`;continue;}
+      const n=seatNum<10?'0'+seatNum:''+seatNum;
+      const isTaken=booked.includes(n)||booked.includes(seatNum)||booked.includes(String(seatNum));
+      const colLabel=cc<leftCols?cc+1:cc-leftCols+1;
+      html+=`<div class="seat${isTaken?' taken':''}" ${isTaken?'':'onclick="selSeatFn(\''+n+'\',this)"'} title="Seat ${rowLabel}${colLabel}">${rowLabel}${colLabel}</div>`;
+    }
+    html+=`</div></div>`;
+  }
+  html+=`</div>`;
+  container.innerHTML=html;
+}
+
+let selectedSeats = [];
+const MAX_SEATS = 4;
+
+function selSeatFn(n,el){
+  const idx = selectedSeats.indexOf(n);
+  if(idx > -1) {
+    selectedSeats.splice(idx, 1);
+    el.classList.remove('selected');
+  } else if(selectedSeats.length < MAX_SEATS) {
+    selectedSeats.push(n);
+    el.classList.add('selected');
+  } else {
+    toast(`Maximum ${MAX_SEATS} seats allowed`);
+    return;
+  }
+  
+  if(selectedSeats.length === 0) {
+    document.getElementById('sel-lbl').textContent=t('seat_none');
+    document.getElementById('confirm-btn').disabled=true;
+  } else {
+    const seatDisplay = selectedSeats.join(', ');
+    document.getElementById('sel-lbl').textContent=seatDisplay+` (${selectedSeats.length} seat${selectedSeats.length>1?'s':''})`;
+    document.getElementById('confirm-btn').disabled=false;
+  }
+}
+
+function closeModal(){document.getElementById('overlay').classList.remove('open');}
+
+function goToPayment(){
+  if(!selectedSeats.length||!curSched) return;
+  closeModal();
+  selMethod=null; _promoDiscount=0; _promoCode='';
+  document.querySelectorAll('.pay-method').forEach(m=>m.classList.remove('active'));
+  document.getElementById('pay-input-sec').classList.remove('show');
+  document.getElementById('otp-section').classList.remove('show');
+  document.getElementById('processing-anim').classList.remove('show');
+  document.getElementById('pay-step-1').style.display='block';
+  document.getElementById('pay-number').value='';
+  document.getElementById('promo-input').value='';
+  document.getElementById('promo-result').style.display='none';
+  clearPayAlert();
+  for(let i=0;i<6;i++) document.getElementById('otp'+i).value='';
+  
+  const baseFare = (curSched?.Fare || 0) * selectedSeats.length;
+  const platformFee = Math.round(selectedSeats.length * 10); // 10 BDT per seat
+  const subtotal = baseFare + platformFee;
+  
+  document.getElementById('pay-amount-val').innerHTML=`<div style="margin-bottom:8px">Subtotal: BDT ${baseFare}</div><div style="font-size:.9rem;color:var(--tx2);">Platform Fee: BDT ${platformFee}</div><div style="border-top:1px solid var(--br);padding-top:8px;margin-top:8px;font-size:1.1rem;font-weight:600">Total: BDT ${subtotal}</div>`;
+  document.getElementById('pay-details').textContent=`${curSched.Origin} -> ${curSched.Destination}  Seats: ${selectedSeats.join(', ')} - ${document.getElementById('jdate').value}`;
+  document.getElementById('pay-overlay').classList.add('open');
+}
+
+function closePayModal(){ document.getElementById('pay-overlay').classList.remove('open'); document.getElementById('overlay').classList.add('open'); _promoDiscount=0; }
+
+let _promoDiscount = 0, _promoCode = '';
+async function applyPromo(){
+  const code = document.getElementById('promo-input').value.trim();
+  if(!code) return;
+  const fare = curSched?.Fare || 0;
+  const el = document.getElementById('promo-result');
+  try{
+    const res = await fetch(`${API}/promo/validate`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({code,fare})});
+    const d = await res.json();
+    if(res.ok && d.valid){
+      _promoDiscount = d.discount;
+      _promoCode = code;
+      const finalFare = d.finalFare;
+      el.style.display='block';
+      el.style.background='rgba(42,122,75,.06)';
+      el.style.border='1px solid rgba(42,122,75,.15)';
+      el.style.color='var(--gn)';
+      el.textContent=t('promo_applied').replace('{code}',code).replace('{off}',d.discount).replace('{fare}',finalFare);
+      document.getElementById('pay-amount-val').textContent=`BDT ${finalFare}`;
+    } else {
+      el.style.display='block';
+      el.style.background='rgba(192,57,43,.05)';
+      el.style.border='1px solid rgba(192,57,43,.12)';
+      el.style.color='var(--rd)';
+      el.textContent=' '+(d.message||t('promo_invalid'));
+      _promoDiscount=0; _promoCode='';
+    }
+  } catch {
+    // Dev: accept any promo with 10% off
+    _promoDiscount = Math.round(fare*0.1);
+    _promoCode = code;
+    el.style.display='block';
+    el.style.background='rgba(42,122,75,.06)';
+    el.style.color='var(--gn)';
+    el.textContent=t('promo_applied_dev').replace('{code}',code).replace('{off}',_promoDiscount);
+    document.getElementById('pay-amount-val').textContent=`BDT ${fare-_promoDiscount}`;
+  }
+}
+
+function selectMethod(method){
+  selMethod=method;
+  document.querySelectorAll('.pay-method').forEach(m=>m.classList.remove('active'));
+  document.querySelector(`.pay-method.${method}`).classList.add('active');
+  document.getElementById('pay-input-sec').classList.add('show');
+  const isBkash=method==='bkash';
+  document.getElementById('pay-num-label').textContent=isBkash?t('pay_num_bkash'):t('pay_num_nagad');
+  document.getElementById('pay-merchant').textContent=isBkash?'01779-SCTMS':'01700-SCTMS';
+  const btn=document.getElementById('btn-send-otp');
+  btn.className=`btn-pay ${isBkash?'bkash-btn':'nagad-btn'}`;
+  btn.textContent=t('btn_send_otp');
+  clearPayAlert();
+  checkPayReady();
+}
+
+function checkPayReady(){
+  const num=document.getElementById('pay-number').value.replace(/\D/g,'');
+  document.getElementById('pay-number').value=num;
+  document.getElementById('btn-send-otp').disabled=!selMethod||num.length<11;
+}
+
+function sendOTP(){
+  if(!selMethod){setPayAlert(t('err_method'));return;}
+  const num=document.getElementById('pay-number').value;
+  if(num.length<11){setPayAlert(t('err_phone'));return;}
+  clearPayAlert();
+  document.getElementById('otp-phone').textContent=num;
+  document.getElementById('pay-step-1').style.display='none';
+  document.getElementById('otp-section').classList.add('show');
+  document.getElementById('otp0').focus();
+  toast(t('otp_sent'));
+}
+
+function otpInput(el,idx){
+  el.value=el.value.replace(/\D/g,'');
+  if(el.value&&idx<5) document.getElementById('otp'+(idx+1)).focus();
+  const otp=Array.from({length:6},(_,i)=>document.getElementById('otp'+i).value).join('');
+  const btn=document.getElementById('btn-verify-otp');
+  btn.disabled=otp.length<6;
+  btn.className=`btn-pay ${selMethod==='bkash'?'bkash-btn':'nagad-btn'}`;
+  btn.textContent=t('btn_verify_pay');
+}
+
+async function verifyOTP(){
+  const otp=Array.from({length:6},(_,i)=>document.getElementById('otp'+i).value).join('');
+  if(otp!=='123456'){toast(t('otp_invalid'));return;}
+  document.getElementById('otp-section').classList.remove('show');
+  document.getElementById('processing-anim').classList.add('show');
+  await new Promise(r=>setTimeout(r,2000));
+  await processBooking();
+}
+
+async function processBooking(){
+  try{
+    const baseFare = (curSched.Fare || 0) * selectedSeats.length;
+    const platformFee = Math.round(selectedSeats.length * 10);
+    const subtotal = baseFare + platformFee;
+    const finalFare = subtotal - (_promoDiscount||0);
+    const res=await fetch(`${API}/bookings`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({scheduleID:curSched.ScheduleID,seatNumbers:selectedSeats,totalFare:finalFare,platformFee:platformFee,paymentMethod:selMethod||'bkash',journeyDate:document.getElementById('jdate').value,promoCode:_promoCode||undefined})
+    });
+    if(res.ok && _promoCode){ fetch(`${API}/promo/use`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({code:_promoCode})}).catch(()=>{}); }
+    const data=await res.json();
+    if(res.ok){
+      lastBooking={bookingID:data.bookingID,sched:curSched,seats:selectedSeats,jdate:document.getElementById('jdate').value,method:selMethod};
+      document.getElementById('pay-overlay').classList.remove('open');
+      showSuccess(lastBooking);
+    }else{
+      document.getElementById('processing-anim').classList.remove('show');
+      document.getElementById('otp-section').classList.add('show');
+      toast(' '+data.message);
+    }
+  }catch{ toast(t('server_err')); }
+}
+
+function showSuccess(bk){
+  document.getElementById('t-id').textContent=`BK-${bk.bookingID}`;
+  document.getElementById('t-route').textContent=`${bk.sched.Origin} -> ${bk.sched.Destination}`;
+  document.getElementById('t-date').textContent=bk.jdate;
+  document.getElementById('t-dep').textContent=ft(bk.sched.DepartureTime);
+  document.getElementById('t-arr').textContent=ft(bk.sched.ArrivalTime);
+  document.getElementById('t-vehicle').textContent=bk.sched.VehicleName;
+  document.getElementById('t-seat').textContent=t('seat_prefix')+bk.seat;
+  document.getElementById('t-fare').textContent='BDT '+bk.sched.Fare;
+  const bc=document.getElementById('t-barcode'); bc.innerHTML='';
+  [20,10,16,6,24,12,20,8,16,10,24,6,14,20,10,16,6,24,12,10].forEach(h=>{
+    const b=document.createElement('div');b.className='bc-bar';b.style.height=h+'px';bc.appendChild(b);
+  });
+  document.getElementById('success-overlay').classList.add('open');
+}
+
+function openTicketPrint(){
+  if(!lastBooking) return;
+  const b=lastBooking;
+  const p=new URLSearchParams({id:b.bookingID,from:b.sched.Origin,to:b.sched.Destination,date:b.jdate,seat:b.seat,dep:ft(b.sched.DepartureTime),arr:ft(b.sched.ArrivalTime),fare:b.sched.Fare,vehicle:b.sched.VehicleName,method:b.method||'bkash',name:user.firstName||'Passenger'});
+  window.open('ticket-print.html?'+p.toString(),'_blank');
+}
+
+// Auto-search if URL has params
+if(params.get('scheduleId')||params.get('from')) search();
+else search();
+
+function toggleMobileNav(){
+  const menu = document.getElementById('mob-menu');
+  const hb = document.getElementById('hamburger');
+  menu.classList.toggle('open');
+  hb.classList.toggle('open');
+}
+
+// mob menu init
+const _mobMenu = document.getElementById('mob-menu');
+if(_mobMenu) _mobMenu.innerHTML=`
+              <a href="routes.html"> Back to Routes</a>
+              ${localStorage.getItem('sctms_token')?`<a href="dashboard.html">Dashboard</a><button onclick="logout()">Sign Out</button>`:`<a href="login.html">Sign In</a>`}`;
+</script>
+</body>
+</html>
+
+
+

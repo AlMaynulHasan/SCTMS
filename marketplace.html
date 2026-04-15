@@ -1,0 +1,1071 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ticket Exchange - SCTMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Figtree:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FDFBF8;--bg2:#F7F4EF;--bg3:#F0EDE6;
+  --nv:#0F1729;--nv2:#1B2340;
+  --gd:#A07828;--gd2:#C49A32;
+  --tx:#0F1729;--tx2:#5C6478;--tx3:rgba(15,23,41,0.28);
+  --br:rgba(15,23,41,0.09);--br2:rgba(160,120,40,0.22);
+  --gn:#2A7A4B;--rd:#C0392B;--bl:#2563EB;--og:#D97706;
+  --sf:#fff;
+  --sh:0 1px 3px rgba(15,23,41,0.05),0 6px 20px rgba(15,23,41,0.06);
+}
+body{background:var(--bg);color:var(--tx);font-family:'Figtree','Noto Sans Bengali',sans-serif;min-height:100vh}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(253,251,248,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--br);padding:0 40px;height:62px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.nav-left{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.nav-back-wrapper{display:flex;align-items:center;justify-content:center}
+#nav-back{padding:6px 12px;font-size:.72rem}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.logo-mark{width:26px;height:26px;border-radius:5px;background:var(--nv);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:.85rem;font-weight:700;color:#fff}
+.logo-word{font-family:'Fraunces',serif;font-size:.95rem;font-weight:600;color:var(--nv);letter-spacing:2px;text-transform:uppercase}
+.logo-word em{color:var(--gd2);font-style:normal}
+.nav-links{display:flex;gap:4px;align-items:center}
+.nav-link{padding:6px 12px;border-radius:6px;font-size:.82rem;color:var(--tx2);text-decoration:none;transition:all .18s;font-weight:500}
+.nav-link:hover{background:var(--bg2);color:var(--nv)}
+.nav-link.active{color:var(--nv);background:var(--bg2)}
+.nav-right{display:flex;gap:8px;align-items:center}
+.btn-ghost{padding:7px 16px;border-radius:6px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-family:'Figtree',sans-serif;font-size:.8rem;text-decoration:none;transition:all .18s;cursor:pointer}
+.btn-ghost:hover{border-color:var(--nv);color:var(--nv)}
+.btn-solid{padding:7px 18px;border-radius:6px;border:none;background:var(--nv);color:#fff;font-family:'Figtree',sans-serif;font-size:.8rem;font-weight:600;text-decoration:none;cursor:pointer;transition:all .18s}
+.btn-solid:hover{background:var(--nv2)}
+.lang-toggle{
+  padding:7px 12px;border-radius:6px;border:1px solid var(--br);
+  background:transparent;color:var(--tx2);font-family:'JetBrains Mono',monospace;
+  font-size:.7rem;letter-spacing:1px;cursor:pointer;transition:all .18s
+}
+.lang-toggle:hover{border-color:var(--nv);color:var(--nv)}
+.nb{width:8px;height:8px;border-radius:50%;background:var(--rd);border:2px solid var(--bg);position:absolute;top:0;right:0;display:none}
+.nav-ic{position:relative;width:34px;height:34px;border-radius:7px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:.88rem;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.nav-ic:hover{border-color:var(--nv);color:var(--nv)}
+
+/* HERO BAND */
+.hero-band{background:var(--nv);padding:44px 40px 40px;position:relative;overflow:hidden}
+.hero-band::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(160,120,40,0.08);pointer-events:none}
+.hero-band::after{content:'';position:absolute;bottom:-80px;left:10%;width:200px;height:200px;border-radius:50%;background:rgba(37,99,235,0.05);pointer-events:none}
+.hb-tag{display:inline-flex;align-items:center;gap:7px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);font-family:'JetBrains Mono',monospace;font-size:.55rem;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.hb-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:#4ade80;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hb-title{font-family:'Fraunces',serif;font-size:2rem;font-weight:600;color:#fff;line-height:1.2;margin-bottom:8px}
+.hb-title em{color:var(--gd2);font-style:italic}
+.hb-sub{font-size:.86rem;color:rgba(255,255,255,0.5);font-weight:300;max-width:520px;line-height:1.6;margin-bottom:24px}
+.hb-pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);font-size:.72rem;color:rgba(255,255,255,0.5);font-family:'JetBrains Mono',monospace;letter-spacing:.5px}
+.pill span{color:rgba(255,255,255,0.85);font-weight:500}
+.hb-btn{position:absolute;bottom:32px;right:40px}
+
+/* MAIN LAYOUT */
+.main{max-width:1200px;margin:0 auto;padding:32px 40px 80px}
+.tabs-row{display:flex;gap:6px;margin-bottom:24px;border-bottom:1px solid var(--br);padding-bottom:0}
+.tab{padding:10px 18px;font-size:.84rem;font-weight:500;color:var(--tx2);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;position:relative;top:1px;white-space:nowrap}
+.tab:hover{color:var(--nv)}
+.tab.active{color:var(--nv);border-bottom-color:var(--nv)}
+.tab .tc{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--bg3);color:var(--tx2);font-size:.58rem;font-family:'JetBrains Mono',monospace;margin-left:6px;font-weight:700}
+.tab.active .tc{background:var(--nv);color:#fff}
+.panel{display:none}.panel.active{display:block}
+
+/* FILTERS */
+.filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.fi{padding:7px 13px;border-radius:7px;border:1px solid var(--br);background:var(--sf);font-family:'Figtree',sans-serif;font-size:.8rem;color:var(--tx);outline:none;cursor:pointer;-webkit-appearance:none;transition:border .18s}
+.fi:focus{border-color:var(--nv)}
+.fi-search{width:260px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235C6478' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:12px center;padding-left:34px}
+.fcnt{font-size:.72rem;color:var(--tx3);font-family:'JetBrains Mono',monospace;margin-left:auto}
+
+/* LISTING GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+
+/* LISTING CARD */
+.lcard{background:var(--sf);border:1px solid var(--br);border-radius:12px;overflow:hidden;transition:all .2s;cursor:pointer}
+.lcard:hover{box-shadow:var(--sh);border-color:rgba(15,23,41,0.14);transform:translateY(-2px)}
+.lcard-top{padding:18px 20px 14px;border-bottom:1px solid var(--br)}
+.lc-type{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.type-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:1px;text-transform:uppercase}
+.tb-swap{background:rgba(37,99,235,0.07);color:var(--bl);border:1px solid rgba(37,99,235,0.12)}
+.tb-pay{background:rgba(160,120,40,0.08);color:var(--gd);border:1px solid rgba(160,120,40,0.15)}
+.lc-exp{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--tx3)}
+.lc-route{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--nv);margin-bottom:3px}
+.lc-meta{font-size:.74rem;color:var(--tx2);display:flex;gap:12px;flex-wrap:wrap}
+.lc-meta span{display:flex;align-items:center;gap:4px}
+.lcard-mid{padding:12px 20px;background:var(--bg2);display:flex;gap:20px}
+.lm-item{flex:1}
+.lm-label{font-family:'JetBrains Mono',monospace;font-size:.5rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--tx3);margin-bottom:3px}
+.lm-val{font-size:.82rem;font-weight:500;color:var(--nv)}
+.lcard-bot{padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lc-user{display:flex;align-items:center;gap:8px}
+.lc-av{width:26px;height:26px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:var(--nv);font-family:'Fraunces',serif;flex-shrink:0;border:1px solid var(--br)}
+.lc-nm{font-size:.78rem;color:var(--tx2);font-weight:500}
+.lc-fare{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--gd);font-weight:500}
+.btn-req{padding:7px 16px;border-radius:6px;border:none;background:var(--nv);color:#fff;font-family:'Figtree',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn-req:hover{background:var(--nv2)}
+.btn-req.own{background:var(--bg2);color:var(--tx2);border:1px solid var(--br);cursor:default}
+
+/* MY LISTING */
+.mlist{display:flex;flex-direction:column;gap:12px}
+.ml-card{background:var(--sf);border:1px solid var(--br);border-radius:10px;overflow:hidden}
+.mlc-head{padding:16px 20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--br)}
+.mlc-route{font-size:.9rem;font-weight:600;color:var(--nv);flex:1}
+.mlc-meta{font-size:.72rem;color:var(--tx2);margin-top:2px}
+.mlc-actions{display:flex;gap:6px}
+.btn-rm{padding:6px 12px;border-radius:5px;border:1px solid rgba(192,57,43,.18);background:transparent;color:var(--rd);font-size:.74rem;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .15s}
+.btn-rm:hover{background:rgba(192,57,43,.06)}
+.reqs-wrap{padding:0}
+.req-row{padding:13px 20px;border-bottom:1px solid rgba(15,23,41,.04);display:flex;align-items:center;gap:12px}
+.req-row:last-child{border-bottom:none}
+.rr-av{width:30px;height:30px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:.88rem;font-weight:700;color:var(--nv);flex-shrink:0;border:1px solid var(--br)}
+.rr-info{flex:1}
+.rr-nm{font-size:.82rem;font-weight:500;color:var(--nv)}
+.rr-rt{font-size:.72rem;color:var(--tx2);margin-top:1px}
+.rr-price{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--gd);margin-top:2px}
+.rr-btns{display:flex;gap:5px}
+.btn-acc{padding:5px 12px;border-radius:5px;border:1px solid rgba(42,122,75,.2);background:rgba(42,122,75,.06);color:var(--gn);font-size:.74rem;font-weight:600;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .15s}
+.btn-acc:hover{background:rgba(42,122,75,.12)}
+.btn-dec{padding:5px 11px;border-radius:5px;border:1px solid rgba(192,57,43,.15);background:transparent;color:var(--rd);font-size:.74rem;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .15s}
+.btn-dec:hover{background:rgba(192,57,43,.05)}
+.no-req{padding:20px;text-align:center;font-size:.78rem;color:var(--tx3);font-style:italic}
+.status-chip{padding:3px 9px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:.58rem;font-weight:500}
+.sc-p{background:rgba(217,119,6,.08);color:var(--og);border:1px solid rgba(217,119,6,.12)}
+.sc-a{background:rgba(42,122,75,.08);color:var(--gn);border:1px solid rgba(42,122,75,.12)}
+.sc-r{background:rgba(192,57,43,.07);color:var(--rd);border:1px solid rgba(192,57,43,.1)}
+.sc-e{background:rgba(37,99,235,.07);color:var(--bl);border:1px solid rgba(37,99,235,.1)}
+
+/* SENT REQUESTS */
+.sent-list{display:flex;flex-direction:column;gap:10px}
+.sent-card{background:var(--sf);border:1px solid var(--br);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px}
+.sc-ico{font-size:1.1rem;flex-shrink:0}
+.sc-info{flex:1}
+.sc-title{font-size:.86rem;font-weight:500;color:var(--nv)}
+.sc-sub{font-size:.72rem;color:var(--tx2);margin-top:2px}
+.sc-price{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--gd);margin-top:2px}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(15,23,41,0.55);backdrop-filter:blur(10px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--sf);border:1px solid var(--br);border-radius:14px;padding:28px;width:540px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:translateY(10px);transition:transform .22s;box-shadow:0 24px 64px rgba(15,23,41,0.18)}
+.overlay.open .modal{transform:translateY(0)}
+.mhd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.mtitle{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:600;color:var(--nv);line-height:1.3}
+.mclose{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:1rem;padding:2px;transition:color .15s;flex-shrink:0}
+.mclose:hover{color:var(--nv)}
+.fg{margin-bottom:13px}
+.fg label{display:block;font-family:'JetBrains Mono',monospace;font-size:.53rem;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:5px}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--bg2);border:1.5px solid var(--br);border-radius:7px;padding:10px 13px;color:var(--nv);font-family:'Figtree',sans-serif;font-size:.86rem;outline:none;transition:all .18s;-webkit-appearance:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--nv);background:var(--sf);box-shadow:0 0 0 3px rgba(15,23,41,0.05)}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fm{padding:10px 12px;border-radius:6px;font-size:.78rem;margin-bottom:12px;display:none;line-height:1.5}
+.fm.ok{background:rgba(42,122,75,.07);color:var(--gn);border:1px solid rgba(42,122,75,.12)}
+.fm.err{background:rgba(192,57,43,.06);color:var(--rd);border:1px solid rgba(192,57,43,.1)}
+.ma{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
+.btn-sub{padding:10px 22px;border-radius:7px;border:none;background:var(--nv);color:#fff;font-family:'Figtree',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .18s}
+.btn-sub:hover{background:var(--nv2)}
+.btn-cm{padding:10px 18px;border-radius:7px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-family:'Figtree',sans-serif;font-size:.86rem;cursor:pointer;transition:all .18s}
+.btn-cm:hover{border-color:var(--nv);color:var(--nv)}
+
+/* booking picker */
+.bk-pick{border:1.5px solid var(--br);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.bp-item{padding:12px 14px;border-bottom:1px solid rgba(15,23,41,.05);cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:10px}
+.bp-item:last-child{border-bottom:none}
+.bp-item:hover{background:var(--bg2)}
+.bp-item.sel{background:rgba(15,23,41,.04);border-left:3px solid var(--nv)}
+.bp-ico{font-size:1rem;flex-shrink:0}
+.bp-info{flex:1}
+.bp-rt{font-size:.84rem;font-weight:500;color:var(--nv)}
+.bp-mt{font-size:.72rem;color:var(--tx2);margin-top:1px}
+.bp-fare{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--gd)}
+
+/* exchange type toggle */
+.type-toggle{display:flex;gap:6px;margin-bottom:6px}
+.tt-btn{flex:1;padding:10px;border-radius:7px;border:1.5px solid var(--br);background:transparent;cursor:pointer;text-align:center;transition:all .18s;font-family:'Figtree',sans-serif}
+.tt-btn .tt-ico{font-size:1.1rem;display:block;margin-bottom:4px}
+.tt-btn .tt-lbl{font-size:.78rem;font-weight:600;color:var(--nv)}
+.tt-btn .tt-sub{font-size:.66rem;color:var(--tx2);margin-top:1px}
+.tt-btn.sel{border-color:var(--nv);background:rgba(15,23,41,.04)}
+.tt-btn.sel .tt-lbl{color:var(--nv)}
+.price-row{display:none}
+
+/* DETAIL MODAL content */
+.dm-route{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600;color:var(--nv);margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--br)}
+.dm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.dm-cell{padding:10px 12px;background:var(--bg2);border-radius:6px}
+.dm-lbl{font-family:'JetBrains Mono',monospace;font-size:.5rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--tx3);margin-bottom:3px}
+.dm-val{font-size:.82rem;font-weight:500;color:var(--nv)}
+.dm-full{grid-column:1/-1}
+.dm-want{padding:12px 14px;background:rgba(37,99,235,.05);border:1px solid rgba(37,99,235,.1);border-radius:7px;margin-bottom:14px}
+.dm-want-lbl{font-family:'JetBrains Mono',monospace;font-size:.52rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--bl);margin-bottom:4px}
+.dm-want-val{font-size:.82rem;color:var(--nv)}
+.price-tag{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:rgba(160,120,40,.08);border:1px solid rgba(160,120,40,.15);font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--gd);margin-bottom:14px}
+
+/* empty/error */
+.empty{padding:60px 20px;text-align:center}
+.empty .ei{font-size:2.4rem;margin-bottom:12px}
+.empty p{font-size:.84rem;color:var(--tx2);margin-bottom:16px;line-height:1.6;max-width:320px;margin-left:auto;margin-right:auto}
+.empty-cta{padding:9px 20px;border-radius:7px;border:none;background:var(--nv);color:#fff;font-family:'Figtree',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .18s;text-decoration:none;display:inline-block}
+.empty-cta:hover{background:var(--nv2)}
+.spinner{width:24px;height:24px;border:2px solid var(--br);border-top-color:var(--nv);border-radius:50%;animation:spin .8s linear infinite;margin:44px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* DISCLAIMER BAND */
+.disc-band{background:rgba(192,57,43,0.04);border:1px solid rgba(192,57,43,0.12);border-radius:10px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;margin-bottom:24px}
+.disc-ico{font-size:1rem;flex-shrink:0;margin-top:1px}
+.disc-txt{font-size:.76rem;color:var(--tx2);line-height:1.6}
+.disc-txt strong{color:var(--rd);font-weight:600}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--nv);color:#fff;border-radius:8px;padding:11px 18px;font-size:.82rem;transform:translateY(60px);opacity:0;transition:all .3s;z-index:9999;border-left:3px solid var(--gd);max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-left-color:var(--gn)}.toast.err{border-left-color:var(--rd)}
+
+/* sign-in wall */
+.signin-wall{background:var(--sf);border:1px solid var(--br);border-radius:12px;padding:48px 32px;text-align:center;margin-top:32px}
+.sw-ico{font-size:2.4rem;margin-bottom:12px}
+.sw-t{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:600;color:var(--nv);margin-bottom:8px}
+.sw-s{font-size:.84rem;color:var(--tx2);margin-bottom:20px}
+
+@media(max-width:900px){nav{padding:0 20px}.main{padding:20px 20px 60px}.hb-btn{position:static;margin-top:20px}.hero-band{padding:32px 20px}.grid{grid-template-columns:1fr}}
+@media(max-width:600px){.fg-row{grid-template-columns:1fr}.dm-grid{grid-template-columns:1fr}.tabs-row{overflow-x:auto;gap:0}.tab{padding:10px 12px;font-size:.78rem}.hb-title{font-size:1.5rem}.filters{flex-direction:column;align-items:stretch}.fi-search{width:100%}.fi{width:100%}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <div class="nav-back-wrapper">
+      <a href="index.html" class="nav-link" id="nav-back">← SCTMS</a>
+    </div>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-mark">S</div>
+      <div class="logo-word">SC<em>T</em>MS</div>
+    </a>
+  </div>
+  <div class="nav-links">
+    <a href="routes.html" class="nav-link" data-i18n="nav_routes">Schedules</a>
+    <a href="marketplace.html" class="nav-link active" data-i18n="nav_market">Ticket Exchange</a>
+  </div>
+  <div class="nav-right" id="nav-right">
+    <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
+    <a href="login.html" class="btn-ghost" id="nav-signin" data-i18n="nav_signin">Sign In</a>
+    <a href="register.html" class="btn-solid" id="nav-reg" data-i18n="nav_register">Register</a>
+  </div>
+</nav>
+
+<!-- HERO BAND -->
+<div class="hero-band">
+  <div class="hb-tag" data-i18n="hb_tag">Ticket Exchange Platform</div>
+  <div class="hb-title" data-i18n-html="hb_title">Exchange your ticket<br>directly with <em>other passengers</em></div>
+  <p class="hb-sub" data-i18n="hb_sub">Passenger-to-passenger ticket exchange -- no company involvement, only exchange. List your confirmed ticket and find someone who wants it.</p>
+  <div class="hb-pills">
+    <div class="pill"><span data-i18n="pill_active">Active listings:</span> <span id="stat-active"></span></div>
+    <div class="pill"><span data-i18n="pill_done">Completed today:</span> <span id="stat-done"></span></div>
+  </div>
+  <div class="hb-btn">
+    <button class="btn-solid" id="list-btn" onclick="openListModal()" style="padding:10px 22px;font-size:.84rem" data-i18n="btn_list">+ List My Ticket</button>
+  </div>
+</div>
+
+<!-- DISCLAIMER -->
+<div class="main">
+  <div class="disc-band">
+    <div class="disc-ico"></div>
+    <div class="disc-txt"><strong>Important:</strong> This is a passenger-to-passenger exchange platform. SCTMS is not involved in these transactions. Once a swap is accepted by both parties, seat assignments update automatically. Any payment difference is agreed directly between the two passengers -- SCTMS does not handle or guarantee any money transfer.</div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-row">
+    <div class="tab active" onclick="showTab('browse',this)">Browse Listings <span class="tc" id="tc-browse"></span></div>
+    <div class="tab" id="tab-my" onclick="showTab('mine',this)">My Listings <span class="tc" id="tc-mine">0</span></div>
+    <div class="tab" id="tab-sent" onclick="showTab('sent',this)">My Requests <span class="tc" id="tc-sent">0</span></div>
+  </div>
+
+  <!-- BROWSE -->
+  <div class="panel active" id="panel-browse">
+    <div class="filters">
+      <input type="search" class="fi fi-search" id="f-search" placeholder="Search route or city" oninput="applyFilter()">
+      <select class="fi" id="f-type" onchange="applyFilter()" style="display:none"></select>
+      <select class="fi" id="f-veh" onchange="applyFilter()">
+        <option value="">Bus & Train</option>
+        <option value="bus">Bus only</option>
+        <option value="train">Train only</option>
+      </select>
+      <span class="fcnt" id="browse-cnt"></span>
+    </div>
+    <div class="grid" id="browse-grid"><div class="spinner"></div></div>
+  </div>
+
+  <!-- MY LISTINGS -->
+  <div class="panel" id="panel-mine">
+    <div id="mine-list"><div class="spinner"></div></div>
+  </div>
+
+  <!-- SENT REQUESTS -->
+  <div class="panel" id="panel-sent">
+    <div id="sent-list"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- LIST TICKET MODAL -->
+<div class="overlay" id="modal-list" onclick="if(event.target===this)closeM('list')">
+  <div class="modal">
+    <div class="mhd">
+      <div class="mtitle">List a Ticket</div>
+      <button class="mclose" onclick="closeM('list')">X</button>
+    </div>
+    <div class="fm" id="list-msg"></div>
+
+    <div class="fg"><label>Select a confirmed ticket *</label></div>
+    <div class="bk-pick" id="bk-picker"><div class="spinner"></div></div>
+
+    <div class="fg"><label>Listing Type *</label>
+      <div class="type-toggle">
+        <button class="tt-btn sel" id="tt-swap" onclick="selListType('swap')">
+          <span class="tt-ico"></span>
+          <span class="tt-lbl">Exchange</span>
+          <span class="tt-sub">Exchange with another trip</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="sell-section">
+      <!-- Smart Price Suggestion Box -->
+      <div id="price-suggest-box" style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:9px;background:rgba(160,120,40,.06);border:1px solid rgba(160,120,40,.18)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.55rem;text-transform:uppercase;letter-spacing:2px;color:var(--gd)">Smart Price Suggestion</span>
+          <span id="price-hours-badge" style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--tx2)"></span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px" id="price-tiers"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(255,255,255,.6);border-radius:6px">
+          <span style="font-size:.76rem;color:var(--tx2)">Suggested price</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="price-suggested" style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--nv)"></span>
+            <button onclick="useSuggestedPrice()" style="padding:3px 10px;border-radius:4px;border:1px solid var(--gd);background:rgba(160,120,40,.08);color:var(--gd);font-size:.68rem;font-family:'JetBrains Mono',monospace;cursor:pointer">Use</button>
+          </div>
+        </div>
+        <!-- Platform fee breakdown -->
+        <div style="margin-top:8px;padding:8px 10px;background:rgba(15,23,41,.03);border-radius:6px;font-size:.72rem;color:var(--tx2)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+            <span>Asking price</span><span id="fee-asking" style="font-family:'JetBrains Mono',monospace;color:var(--nv)"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+            <span>Platform fee (5%)</span><span id="fee-platform" style="font-family:'JetBrains Mono',monospace;color:var(--rd)"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-weight:600">
+            <span>You receive</span><span id="fee-seller" style="font-family:'JetBrains Mono',monospace;color:var(--gn)"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>Asking Price (BDT) *</label>
+        <input type="number" id="pay-amt" placeholder="e.g. 450" min="1" max="99999" oninput="updateFeeBreakdown()">
+        <div style="font-size:.72rem;color:var(--tx2);margin-top:4px" id="price-cap-note"></div>
+      </div>
+    </div>
+
+    <div id="swap-section" style="display:none">
+      <div class="fg">
+        <label>Preferred route or time (optional)</label>
+        <input type="text" id="want-desc" placeholder="e.g. Dhaka -> Sylhet, Oct 10, AC bus">
+      </div>
+      <div class="fg">
+        <label>Note (optional)</label>
+        <textarea id="list-note" rows="2" placeholder="Any extra information for the buyer" style="resize:none;width:100%;background:var(--bg2);border:1.5px solid var(--br);border-radius:8px;padding:10px 12px;font-family:'Figtree',sans-serif;font-size:.88rem;outline:none"></textarea>
+      </div>
+    </div>
+
+    <div class="ma">
+      <button class="btn-cm" onclick="closeM('list')">Cancel</button>
+      <button class="btn-sub" onclick="submitList()">Post Listing</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL / REQUEST MODAL -->
+<div class="overlay" id="modal-detail" onclick="if(event.target===this)closeM('detail')">
+  <div class="modal">
+    <div class="mhd">
+      <div class="mtitle">Ticket Listing</div>
+      <button class="mclose" onclick="closeM('detail')">X</button>
+    </div>
+    <div id="detail-body"></div>
+    <div id="detail-req-wrap" style="display:none">
+      <div class="bk-pick" id="req-picker"></div>
+      <div class="fg" id="req-input-wrap">
+        <label id="req-input-label">Payment Reference *</label>
+        <input type="text" id="req-msg" placeholder="bKash/Nagad transaction ID">
+      </div>
+      <div class="fm" id="req-form-msg"></div>
+    </div>
+    <div class="ma" id="detail-act"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:5000/api';
+const token = localStorage.getItem('sctms_token');
+const user = JSON.parse(localStorage.getItem('sctms_user') || '{}');
+const i18n={
+  en:{
+    nav_routes:'Schedules',nav_market:'Ticket Exchange',nav_signin:'Sign In',nav_register:'Register',nav_back:'← Back',
+    hb_tag:'P2P Ticket Exchange',hb_title:'Swap your ticket,<br>skip the <em>cancellation fee</em>',
+    hb_sub:'Passenger-to-passenger ticket exchange -- no company involvement, no 50-75% cancellation cut. List your confirmed ticket, find someone who wants it, and swap directly.',
+    pill_active:'Active listings:',pill_done:'Completed today:',pill_any:'Any route:',pill_full:'Full ticket swap',
+    btn_list:'+ List My Ticket',btn_signout:'Sign Out'
+  },
+  bn:{
+    nav_routes:'শিডিউল',nav_market:'টিকিট এক্সচেঞ্জ',nav_signin:'সাইন ইন',nav_register:'রেজিস্টার',nav_back:'← ফিরুন',
+    hb_tag:'পিয়ার টু পিয়ার এক্সচেঞ্জ',hb_title:'টিকিট বদলান,<br>এড়িয়ে যান <em>ক্যানসেল ফি</em>',
+    hb_sub:'যাত্রী-থেকে-যাত্রী এক্সচেঞ্জ -- কোম্পানির হস্তক্ষেপ নেই। কনফার্মড টিকিট লিস্ট করুন এবং সরাসরি সুয়াপ করুন।',
+    pill_active:'অ্যাকটিভ লিস্টিং:',pill_done:'আজ সম্পন্ন:',pill_any:'সব রুট:',pill_full:'ফুল টিকিট সুয়াপ',
+    btn_list:'+ টিকিট লিস্ট করুন',btn_signout:'সাইন আউট'
+  }
+};
+let curLang=localStorage.getItem('sctms_lang')||'en';
+function t(k){return (i18n[curLang]&&i18n[curLang][k])||i18n.en[k]||k;}
+function applyLang(){
+  document.documentElement.lang=curLang;
+  const toggle=document.getElementById('lang-toggle');
+  if(toggle) toggle.textContent=curLang==='en'?'EN':'BN';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    const val=t(key);
+    if(val.includes('<')) el.innerHTML=val; else el.textContent=val;
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+    el.innerHTML=t(el.getAttribute('data-i18n-html'));
+  });
+}
+document.getElementById('lang-toggle').addEventListener('click',()=>{
+  curLang=curLang==='en'?'bn':'en';
+  localStorage.setItem('sctms_lang',curLang);
+  applyLang();
+});
+applyLang();
+
+//  helpers 
+function H(){ return {'Authorization':'Bearer '+token,'Content-Type':'application/json'}; }
+function toast(msg, type='ok'){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show '+type; clearTimeout(t._t); t._t=setTimeout(()=>t.className='toast',3200); }
+function showMsg(id, msg, type){ const e=document.getElementById(id); e.textContent=msg; e.className='fm '+type; e.style.display='block'; }
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fdate(t){ if(!t) return ''; const d=new Date(t); return `${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}`; }
+function ft(t){ if(!t) return ''; const d=new Date(t); return d.getUTCHours().toString().padStart(2,'0')+':'+d.getUTCMinutes().toString().padStart(2,'0'); }
+function fmt(n){ return Number(n||0).toLocaleString(); }
+function openM(id){ document.getElementById('modal-'+id).classList.add('open'); }
+function closeM(id){ document.getElementById('modal-'+id).classList.remove('open'); }
+function daysLeft(dateStr){ const d=new Date(dateStr); const now=new Date(); now.setHours(0,0,0,0); d.setHours(0,0,0,0); return Math.round((d-now)/(1000*60*60*24)); }
+
+//  nav setup 
+if(token && user.firstName){
+  const nr = document.getElementById('nav-right');
+  nr.innerHTML = `
+    <button class="lang-toggle" id="lang-toggle" type="button">${curLang==='en'?'EN':'BN'}</button>
+    <a href="${user.role==='admin'?'dashboard-admin.html':'dashboard.html'}" class="btn-ghost">${user.firstName}</a>
+    <button onclick="logout()" class="btn-solid" style="background:transparent;color:var(--tx2);border:1px solid var(--br)" data-i18n="btn_signout">${t('btn_signout')}</button>
+  `;
+  document.getElementById('lang-toggle').addEventListener('click',()=>{
+    curLang=curLang==='en'?'bn':'en';
+    localStorage.setItem('sctms_lang',curLang);
+    applyLang();
+  });
+  applyLang();
+}
+function logout(){ localStorage.clear(); location.href='login.html'; }
+
+//  state 
+let _listings = [];
+let _myBk = [];
+let _selBk = null;
+let _listType = 'sell';   // 'sell' | 'swap'
+let _detailListing = null;
+let _reqSelBk = null;     // for swap offer
+
+// 
+// BROWSE
+// 
+async function loadBrowse(){
+  const grid = document.getElementById('browse-grid');
+  grid.innerHTML = '<div class="spinner"></div>';
+  try{
+    const r = await fetch(`${API}/transfer/marketplace`, {headers: H()});
+    if(r.ok){
+      const raw = await r.json();
+      _listings = Array.isArray(raw) ? raw : (raw.listings || []);
+    } else { _listings = []; }
+    const today = new Date(); today.setHours(0,0,0,0);
+    _listings = _listings.filter(l => !l.JourneyDate || new Date(l.JourneyDate) >= today);
+    document.getElementById('stat-active').textContent = _listings.length;
+    document.getElementById('tc-browse').textContent = _listings.length;
+    renderBrowse(_listings);
+  } catch(e){
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="ei"></div><p>Could not load listings.</p><button class="empty-cta" onclick="loadBrowse()">Retry</button></div>`;
+  }
+}
+
+function renderBrowse(data){
+  const grid = document.getElementById('browse-grid');
+  document.getElementById('browse-cnt').textContent = data.length + ' listings';
+  if(!data.length){
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="ei"></div><p>No active listings right now.</p>${token?`<button class="empty-cta" onclick="openListModal()">+ List My Ticket</button>`:`<a href="login.html" class="empty-cta">Sign in to list</a>`}</div>`;
+    return;
+  }
+  grid.innerHTML = data.map(l => buildCard(l)).join('');
+}
+
+function buildCard(l){
+  const isOwn = token && l.SellerID === user.userID;
+  const dl = daysLeft(l.JourneyDate);
+  const dlColor = dl <= 1 ? 'var(--rd)' : dl <= 3 ? 'var(--og)' : 'var(--tx3)';
+  const vType = (l.VehicleType||'').toLowerCase();
+  const lj = JSON.stringify(l).replace(/'/g,"&#39;").replace(/"/g,"&quot;");
+  const routeStr = `${l.Origin||'Unknown'} -> ${l.Destination||'Unknown'}`;
+  const typeLabel = vType==='train' ? 'TRAIN' : 'BUS';
+  return `<div class="lcard" onclick='openDetail(JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(l))}")))'>
+    <div class="lcard-top">
+      <div class="lc-type">
+        <span class="type-badge ${(l.AskingPrice==0||l.ListingType==='swap')?'tb-swap':'tb-pay'}">${(l.AskingPrice==0||l.ListingType==='swap')?'Swap':'Sell'}</span>
+        <span class="lc-exp" style="color:${dlColor}">${dl===0?'Today':dl===1?'Tomorrow':dl>0?'in '+dl+'d':'Expired'}</span>
+      </div>
+      <div class="lc-route">${routeStr}</div>
+      <div class="lc-meta">
+        <span>${typeLabel} ${l.VehicleName||l.VehicleType||''}</span>
+        <span>${fdate(l.JourneyDate)}</span>
+        <span>Seat ${l.SeatNumber||''}</span>
+      </div>
+    </div>
+    <div class="lcard-mid">
+      <div class="lm-item"><div class="lm-label">Asking Price</div><div class="lm-val" style="color:var(--gd);font-family:'JetBrains Mono',monospace">BDT ${fmt(l.AskingPrice||0)}</div></div>
+      <div class="lm-item"><div class="lm-label">Original Fare</div><div class="lm-val" style="font-family:'JetBrains Mono',monospace;color:var(--tx2)">BDT ${fmt(l.TotalFare||0)}</div></div>
+    </div>
+    <div class="lcard-bot">
+      <div class="lc-user">
+        <div class="lc-av">${(l.SellerName||l.FirstName||'?')[0].toUpperCase()}</div>
+        <span class="lc-nm">${l.SellerName||l.FirstName||''}</span>
+      </div>
+      ${isOwn
+        ? `<button class="btn-req own" onclick="event.stopPropagation()">Your listing</button>`
+        : token
+          ? `<button class="btn-req" onclick="event.stopPropagation();openDetail(JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(l))}')))">Request</button>`
+          : `<a href="login.html" class="btn-req" style="text-decoration:none">Sign in</a>`
+      }
+    </div>
+  </div>`;
+}
+
+function applyFilter(){
+  const q = (document.getElementById('f-search').value||'').toLowerCase();
+  const veh = document.getElementById('f-veh').value;
+  const filtered = _listings.filter(l => {
+    const routeStr = `${l.Origin||'Unknown'} -> ${l.Destination||'Unknown'} ${l.VehicleName||''}`.toLowerCase();
+    const matchQ = !q || routeStr.includes(q);
+    const matchVeh = !veh || (l.VehicleType||'').toLowerCase()===veh;
+    return matchQ && matchVeh;
+  });
+  renderBrowse(filtered);
+}
+
+function showTab(name, el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else{
+    const map={browse:'tc-browse',mine:'tc-mine',sent:'tc-sent'};
+    const target = document.getElementById(map[name])?.parentElement;
+    if(target) target.classList.add('active');
+  }
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const p = document.getElementById('panel-'+name);
+  if(p) p.classList.add('active');
+  if(name==='browse') loadBrowse();
+  if(name==='mine') loadMine();
+  if(name==='sent') loadSent();
+}
+
+// 
+// DETAIL + BUY
+// 
+function openDetail(l){
+  _detailListing = l;
+  const isOwn = token && l.SellerID === user.userID;
+  const dl = daysLeft(l.JourneyDate);
+  const isSwap = l.AskingPrice == 0 || l.ListingType === 'swap';
+  const fee    = Math.round((l.AskingPrice||0) * 0.05);
+  const hoursLeft = l.HoursUntilDep !== undefined ? l.HoursUntilDep : null;
+
+  // Auto-drop indicator
+  let dropBadge = '';
+  if(!isSwap && hoursLeft !== null){
+    const pct = hoursLeft>=24?100:hoursLeft>=12?80:hoursLeft>=6?60:hoursLeft>=3?40:hoursLeft>=1?25:10;
+    dropBadge = `<span style="margin-left:8px;padding:2px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:.6rem;
+      background:${pct<60?'rgba(192,57,43,.08)':'rgba(42,122,75,.07)'};
+      color:${pct<60?'var(--rd)':'var(--gn)'}">
+      ⏱ ${hoursLeft}h left · ${pct}% of fare
+    </span>`;
+  }
+
+  document.getElementById('detail-body').innerHTML = `
+    <div class="dm-route">${l.Origin||'Unknown'} → ${l.Destination||'Unknown'}</div>
+
+    ${!isSwap ? `
+    <div style="margin-bottom:14px;padding:12px 14px;border-radius:9px;background:rgba(160,120,40,.05);border:1px solid rgba(160,120,40,.15)">
+      <div style="display:flex;align-items:center;margin-bottom:8px">
+        <span style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600;color:var(--nv)">৳${fmt(l.AskingPrice)}</span>
+        ${dropBadge}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;font-size:.72rem;color:var(--tx2)">
+        <div style="display:flex;justify-content:space-between">
+          <span>You pay</span>
+          <span style="font-family:'JetBrains Mono',monospace;color:var(--nv)">৳${fmt(l.AskingPrice)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span>Platform fee (5%)</span>
+          <span style="font-family:'JetBrains Mono',monospace;color:var(--tx2)">৳${fee} → SCTMS</span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span>Seller receives</span>
+          <span style="font-family:'JetBrains Mono',monospace;color:var(--gn)">৳${(l.AskingPrice||0)-fee}</span>
+        </div>
+      </div>
+    </div>` : `
+    <div class="price-tag">Swap listing <strong style="color:var(--bl)">Free exchange</strong></div>`}
+
+    <div class="dm-grid">
+      <div class="dm-cell"><div class="dm-lbl">Vehicle</div><div class="dm-val">${l.VehicleName||''}</div></div>
+      <div class="dm-cell"><div class="dm-lbl">Type</div><div class="dm-val">${l.VehicleType||''}</div></div>
+      <div class="dm-cell"><div class="dm-lbl">Journey Date</div><div class="dm-val">${fdate(l.JourneyDate)}</div></div>
+      <div class="dm-cell"><div class="dm-lbl">Seat</div><div class="dm-val" style="font-family:'JetBrains Mono',monospace;color:var(--gd)">${l.SeatNumber||''}</div></div>
+      <div class="dm-cell"><div class="dm-lbl">Original Fare</div><div class="dm-val" style="font-family:'JetBrains Mono',monospace">৳${fmt(l.TotalFare||0)}</div></div>
+      <div class="dm-cell"><div class="dm-lbl">Expires</div><div class="dm-val" style="color:${dl<=1?'var(--rd)':'var(--tx)'}">${dl===0?'Today':dl===1?'Tomorrow':dl+' days left'}</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg2);border-radius:6px;font-size:.76rem;color:var(--tx2)">
+      <span>🔒 Ticket locked in marketplace</span>
+      <span style="margin-left:auto">Seller: <strong style="color:var(--nv)">${l.SellerName||'Unknown'}</strong></span>
+    </div>
+  `;
+
+  document.getElementById('detail-req-wrap').style.display = 'none';
+  document.getElementById('req-form-msg').style.display = 'none';
+  _reqSelBk = null;
+
+  const actEl = document.getElementById('detail-act');
+
+  if(!token){
+    actEl.innerHTML = `<button class="btn-cm" onclick="closeM('detail')">Close</button><a href="login.html" class="btn-sub" style="text-decoration:none">Sign in to ${isSwap?'Swap':'Buy'}</a>`;
+  } else if(isOwn){
+    actEl.innerHTML = `<button class="btn-cm" onclick="closeM('detail')">Close</button><button class="btn-sub" style="background:var(--rd)" onclick="removeListing(${l.ListingID})">Remove Listing</button>`;
+  } else if(isSwap){
+    // Swap  offer your ticket
+    document.getElementById('detail-req-wrap').style.display = 'block';
+    document.getElementById('req-input-wrap').style.display = 'none';
+    loadSwapPicker();
+    actEl.innerHTML = `<button class="btn-cm" onclick="closeM('detail')">Cancel</button><button class="btn-sub" onclick="submitSwap()">Offer Swap</button>`;
+  } else {
+    // Buy  payment ref
+    document.getElementById('detail-req-wrap').style.display = 'block';
+    document.getElementById('req-input-wrap').style.display = 'block';
+    document.getElementById('req-picker').innerHTML = `
+      <div style="background:var(--bg2);border:1px solid var(--br);border-radius:8px;padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:.8rem;font-weight:600;color:var(--nv);margin-bottom:4px">Payment Info</div>
+        <div style="font-size:.76rem;color:var(--tx2);margin-bottom:10px">Pay <strong style="color:var(--gd)">BDT ${fmt(l.AskingPrice)}</strong> via bKash/Nagad and enter the transaction ID below.</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--tx2);margin-bottom:4px">MERCHANT</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:1rem;color:var(--nv);font-weight:700">01779-SCTMS</div>
+      </div>
+    `;
+    document.getElementById('req-msg').placeholder = 'bKash/Nagad transaction ID';
+    document.getElementById('req-input-label').textContent = 'Payment Reference *';
+    actEl.innerHTML = `<button class="btn-cm" onclick="closeM('detail')">Cancel</button><button class="btn-sub" onclick="submitBuy()">Buy Ticket</button>`;
+  }
+  openM('detail');
+}
+
+async function loadSwapPicker(){
+  const picker = document.getElementById('req-picker');
+  picker.innerHTML = '<div class="spinner"></div>';
+  if(!_myBk.length) await fetchMyBk();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const eligible = _myBk.filter(b=>(b.Status||b.BookingStatus)==='confirmed' && new Date(b.JourneyDate)>=today);
+  if(!eligible.length){
+    picker.innerHTML = '<div style="padding:14px;font-size:.78rem;color:var(--tx2);text-align:center">No confirmed tickets to offer. <a href="routes.html" style="color:var(--nv)">Book a ticket</a></div>';
+    return;
+  }
+  picker.innerHTML = `<div style="font-size:.8rem;font-weight:600;color:var(--nv);margin-bottom:8px">Select a ticket to offer:</div>`
+    + eligible.map(b=>`
+    <div class="bp-item" id="rp-${b.BookingID}" onclick="selReqBk(${b.BookingID})">
+      <div class="bp-ico">${(b.VehicleType||'').toLowerCase()==='train'?'TRAIN':'BUS'}</div>
+      <div class="bp-info">
+        <div class="bp-rt">${b.Origin||'Unknown'} -> ${b.Destination||'Unknown'}</div>
+        <div class="bp-mt">${fdate(b.JourneyDate)}  Seat ${b.SeatNumber||''}  ${b.VehicleName||''}</div>
+      </div>
+      <div class="bp-fare">BDT ${fmt(b.TotalFare)}</div>
+    </div>`).join('');
+}
+
+function selReqBk(id){
+  _reqSelBk = _myBk.find(b=>b.BookingID===id);
+  document.querySelectorAll('#req-picker .bp-item').forEach(el=>el.classList.remove('sel'));
+  const el = document.getElementById('rp-'+id);
+  if(el) el.classList.add('sel');
+}
+
+async function submitSwap(){
+  if(!_reqSelBk){ showMsg('req-form-msg','Select a ticket to offer.','err'); return; }
+  if(!_detailListing) return;
+  try{
+    const res = await fetch(`${API}/transfer/swap-request/${_detailListing.ListingID}`, {
+      method:'POST', headers:H(),
+      body:JSON.stringify({ offeredBookingID: _reqSelBk.BookingID, message: '' })
+    });
+    const data = await res.json();
+    if(!res.ok){ showMsg('req-form-msg', data.message||'Swap request failed.','err'); return; }
+    closeM('detail');
+    toast('Swap request sent. Waiting for seller approval.');
+    loadBrowse();
+    document.getElementById('tc-sent').textContent = (+document.getElementById('tc-sent').textContent||0)+1;
+  } catch{ showMsg('req-form-msg','Server error.','err'); }
+}
+
+async function submitBuy(){
+  const paymentRef = document.getElementById('req-msg').value.trim();
+  if(!paymentRef){ showMsg('req-form-msg','Payment reference or transaction ID is required.','err'); return; }
+  if(!_detailListing) return;
+  try{
+    const res = await fetch(`${API}/transfer/request/${_detailListing.ListingID}`, {
+      method:'POST', headers:H(),
+      body:JSON.stringify({ paymentRef })
+    });
+    const data = await res.json();
+    if(!res.ok){ showMsg('req-form-msg', data.message||'Purchase failed.','err'); return; }
+    closeM('detail');
+    toast('Ticket purchased. Check your dashboard.');
+    loadBrowse(); loadMine();
+  } catch{ showMsg('req-form-msg','Server error. Try again.','err'); }
+}
+
+async function removeListing(id){
+  if(!confirm('Remove this listing?')) return;
+  try{
+    const res = await fetch(`${API}/transfer/cancel/${id}`, {method:'DELETE', headers:H()});
+    if(!res.ok) throw new Error();
+    closeM('detail');
+    toast('Listing removed.');
+    loadBrowse(); loadMine();
+  } catch{ toast('Could not remove listing.','err'); }
+}
+
+// 
+// LIST A TICKET
+// 
+async function openListModal(){
+  if(!token){ location.href='login.html'; return; }
+  document.getElementById('list-msg').style.display='none';
+  document.getElementById('pay-amt').value='';
+  document.getElementById('want-desc').value='';
+  document.getElementById('list-note').value='';
+  _selBk=null;
+  openM('list');
+  await fetchMyBk();
+  buildBkPicker();
+}
+
+async function fetchMyBk(){
+  try{
+    const res = await fetch(`${API}/bookings/my`, {headers:H()});
+    const d = await res.json();
+    _myBk = Array.isArray(d) ? d : (d.bookings||[]);
+  } catch{ _myBk=[]; }
+}
+
+function buildBkPicker(){
+  const picker = document.getElementById('bk-picker');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const eligible = _myBk.filter(b=>(b.Status||b.BookingStatus)==='confirmed' && new Date(b.JourneyDate)>=today);
+  if(!eligible.length){
+    picker.innerHTML='<div style="padding:16px;font-size:.78rem;color:var(--tx2);text-align:center">No confirmed future bookings. <a href="routes.html" style="color:var(--nv)">Book a ticket</a></div>';
+    return;
+  }
+  picker.innerHTML = eligible.map(b=>`
+    <div class="bp-item" id="bp-${b.BookingID}" onclick="selBk(${b.BookingID})">
+      <div class="bp-ico">${(b.VehicleType||'').toLowerCase()==='train'?'TRAIN':'BUS'}</div>
+      <div class="bp-info">
+        <div class="bp-rt">${b.Origin||'Unknown'} -> ${b.Destination||'Unknown'}</div>
+        <div class="bp-mt">${fdate(b.JourneyDate)}  Seat ${b.SeatNumber||''}  ${b.VehicleName||''}</div>
+      </div>
+      <div class="bp-fare">BDT ${fmt(b.TotalFare)}</div>
+    </div>`).join('');
+}
+
+function selBk(id){
+  _selBk = _myBk.find(b=>b.BookingID===id);
+  document.querySelectorAll('#bk-picker .bp-item').forEach(el=>el.classList.remove('sel'));
+  const el = document.getElementById('bp-'+id);
+  if(el) el.classList.add('sel');
+  if(_selBk && _listType==='sell'){
+    document.getElementById('pay-amt').value = _selBk.TotalFare || '';
+    fetchSmartPrice(_selBk.BookingID);
+    updateFeeBreakdown();
+  }
+}
+
+let _suggestedPrice = null;
+
+async function fetchSmartPrice(bookingID){
+  const box = document.getElementById('price-suggest-box');
+  box.style.display = 'block';
+  document.getElementById('price-tiers').innerHTML = '<span style="font-size:.7rem;color:var(--tx2)">Loading...</span>';
+  try{
+    const res = await fetch(`${API}/transfer/price-suggestion?bookingID=${bookingID}`, {headers:H()});
+    if(!res.ok){ box.style.display='none'; return; }
+    const d = await res.json();
+
+    _suggestedPrice = d.suggestedPrice;
+
+    // Hours badge
+    const hb = document.getElementById('price-hours-badge');
+    hb.textContent = d.hoursLeft !== null ? `⏱ ${d.hoursLeft}h until departure` : '';
+
+    // Price tiers
+    const tiers = d.tiers || [];
+    document.getElementById('price-tiers').innerHTML = tiers.map(t=>{
+      const isActive = d.hoursLeft !== null && d.hoursLeft >= t.minHours &&
+        (tiers.indexOf(t) === tiers.length-1 || d.hoursLeft < tiers[tiers.indexOf(t)-1]?.minHours);
+      return `<div style="padding:3px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:.58rem;
+        background:${isActive?'var(--nv)':'rgba(15,23,41,.06)'};
+        color:${isActive?'#fff':'var(--tx2)'}">
+        ${t.label}: ${t.pct}%
+      </div>`;
+    }).join('');
+
+    // Suggested price
+    document.getElementById('price-suggested').textContent = `৳${d.suggestedPrice}`;
+
+    // Cap note
+    document.getElementById('price-cap-note').textContent =
+      `Max: ৳${d.originalFare} (original fare — no scalping)`;
+
+    updateFeeBreakdown();
+  }catch{
+    document.getElementById('price-suggest-box').style.display='none';
+  }
+}
+
+function useSuggestedPrice(){
+  if(_suggestedPrice){
+    document.getElementById('pay-amt').value = _suggestedPrice;
+    updateFeeBreakdown();
+  }
+}
+
+function updateFeeBreakdown(){
+  const amt = parseFloat(document.getElementById('pay-amt').value) || 0;
+  if(!amt){ return; }
+  const fee    = Math.round(amt * 0.05);
+  const seller = amt - fee;
+  document.getElementById('fee-asking').textContent   = `৳${amt}`;
+  document.getElementById('fee-platform').textContent = `- ৳${fee}`;
+  document.getElementById('fee-seller').textContent   = `৳${seller}`;
+}
+
+function selListType(t){
+  _listType = t;
+  document.getElementById('tt-sell').classList.toggle('sel', t==='sell');
+  document.getElementById('tt-swap').classList.toggle('sel', t==='swap');
+  document.getElementById('sell-section').style.display = t==='sell' ? 'block' : 'none';
+  document.getElementById('swap-section').style.display = t==='swap' ? 'block' : 'none';
+  if(_selBk && t==='sell'){
+    document.getElementById('pay-amt').value = _selBk.TotalFare || '';
+    fetchSmartPrice(_selBk.BookingID);
+    updateFeeBreakdown();
+  } else {
+    document.getElementById('price-suggest-box').style.display = 'none';
+  }
+}
+
+async function submitList(){
+  if(!_selBk){ showMsg('list-msg','Select a ticket to list.','err'); return; }
+
+  let endpoint, body;
+
+  if(_listType === 'sell'){
+    const askingPrice = parseFloat(document.getElementById('pay-amt').value);
+    if(!askingPrice||askingPrice<=0){ showMsg('list-msg','Enter a valid asking price.','err'); return; }
+    if(askingPrice > parseFloat(_selBk.TotalFare)){
+      showMsg('list-msg',`Asking price cannot exceed original fare (BDT ${_selBk.TotalFare}).`,'err'); return;
+    }
+    endpoint = `${API}/transfer/list`;
+    body = { bookingID: _selBk.BookingID, askingPrice };
+  } else {
+    // swap
+    endpoint = `${API}/transfer/list-swap`;
+    body = {
+      bookingID: _selBk.BookingID,
+      wantDescription: (document.getElementById('want-desc')||{}).value || '',
+      note: (document.getElementById('list-note')||{}).value || ''
+    };
+  }
+
+  try{
+    const res = await fetch(endpoint, {method:'POST', headers:H(), body:JSON.stringify(body)});
+    const data = await res.json();
+    if(!res.ok){ showMsg('list-msg', data.message||'Could not create listing.','err'); return; }
+    closeM('list');
+    if(_listType==='sell' && data.sellerReceives){
+      toast(`Listed! You'll receive ৳${data.sellerReceives} after 5% platform fee.`);
+    } else {
+      toast(`Ticket ${_listType==='sell'?'listed for sale':'listed for swap'}. Booking is now locked.`);
+    }
+    _suggestedPrice = null;
+    loadBrowse(); loadMine();
+    document.getElementById('tc-mine').textContent = (+document.getElementById('tc-mine').textContent||0)+1;
+  } catch{ showMsg('list-msg','Server error. Try again.','err'); }
+}
+
+// 
+// MY LISTINGS
+// 
+async function loadMine(){
+  if(!token){
+    document.getElementById('mine-list').innerHTML=`<div class="signin-wall"><div class="sw-ico"></div><div class="sw-t">Sign in to see your listings</div><a href="login.html" class="empty-cta">Sign In</a></div>`;
+    return;
+  }
+  document.getElementById('mine-list').innerHTML='<div class="spinner"></div>';
+  try{
+    const [listRes, swapReqRes] = await Promise.all([
+      fetch(`${API}/transfer/my-listings`, {headers:H()}),
+      fetch(`${API}/transfer/my-swap-requests`, {headers:H()}).catch(()=>null)
+    ]);
+    const data = listRes.ok ? await listRes.json() : [];
+    const arr = Array.isArray(data) ? data : (data.listings||[]);
+    const swapReqs = swapReqRes && swapReqRes.ok ? await swapReqRes.json() : [];
+    const swapArr = Array.isArray(swapReqs) ? swapReqs : [];
+
+    let html = '';
+
+    // Pending swap requests section
+    if(swapArr.length){
+      html += `<div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:10px;padding:0 2px">Incoming Swap Requests (${swapArr.length})</div>`;
+      html += swapArr.map(r=>`
+        <div class="ex-card" style="border-left:3px solid var(--gd)">
+          <div class="ex-top">
+            <div class="ex-route">Swap Request from <strong>${r.BuyerName||''}</strong></div>
+            <span class="ex-st st-pending">pending</span>
+          </div>
+          <div class="ex-meta">
+            <span> Requested: ${fdate(r.RequestedAt)}</span>
+            <span style="font-size:.72rem;color:var(--tx2)">${r.BuyerEmail||''}</span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn-sub" style="font-size:.76rem;padding:7px 16px" onclick="acceptSwap(${r.TransferID})">Accept</button>
+            <button class="btn-cm" style="font-size:.76rem;padding:7px 14px" onclick="declineSwap(${r.TransferID})">Decline</button>
+          </div>
+        </div>`).join('');
+      html += `<div style="height:16px"></div>`;
+    }
+
+    if(!arr.length && !swapArr.length){
+      document.getElementById('mine-list').innerHTML=`<div class="empty"><div class="ei"></div><p>No active listings yet.</p><button class="empty-cta" onclick="openListModal()">+ List My Ticket</button></div>`;
+      return;
+    }
+
+    if(arr.length){
+      html += `<div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:10px;padding:0 2px">My Listings</div>`;
+      html += arr.map(l=>`
+        <div class="ex-card">
+          <div class="ex-top">
+            <div class="ex-route">${l.Origin||'Unknown'} -> ${l.Destination||'Unknown'}</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:.6rem;padding:2px 7px;border-radius:4px;background:${l.AskingPrice==0?'rgba(160,120,40,.1)':'rgba(37,99,235,.08)'};color:${l.AskingPrice==0?'var(--gd)':'var(--bl)'}">${l.AskingPrice==0?'Swap':'Sell'}</span>
+              <span class="ex-st st-${(l.ListingStatus||l.Status||'open').toLowerCase()}">${l.ListingStatus||l.Status||'open'}</span>
+            </div>
+          </div>
+          <div class="ex-meta">
+            <span>${fdate(l.JourneyDate)}</span>
+            <span>Seat ${l.SeatNumber||''}</span>
+            ${l.AskingPrice>0?`<span><strong>BDT ${fmt(l.AskingPrice)}</strong></span>`:'<span>Free swap</span>'}
+            <span style="color:var(--tx3);font-size:.72rem">${l.VehicleName||''}</span>
+          </div>
+          ${(l.ListingStatus||l.Status)==='open'?`<div style="margin-top:10px"><button class="btn-cm" style="font-size:.76rem;padding:6px 14px" onclick="removeListing(${l.ListingID})">Remove Listing</button></div>`:''}
+        </div>`).join('');
+    }
+
+    document.getElementById('mine-list').innerHTML = html;
+    document.getElementById('tc-mine').textContent = arr.filter(l=>(l.ListingStatus||l.Status)==='open').length + (swapArr.length ? ` (${swapArr.length})` : '');
+  } catch(e){
+    document.getElementById('mine-list').innerHTML=`<div class="empty"><div class="ei"></div><p>Could not load listings.</p></div>`;
+  }
+}
+
+async function acceptSwap(transferID){
+  if(!confirm('Accept this swap request? The seat will be reassigned.')) return;
+  try{
+    const res = await fetch(`${API}/transfer/swap-request/${transferID}`, {method:'PUT', headers:H(), body:JSON.stringify({action:'accept'})});
+    const d = await res.json();
+    if(!res.ok){ toast(d.message||'Error','err'); return; }
+    toast('Swap approved. Seats updated.');
+    loadMine();
+  } catch{ toast('Server error','err'); }
+}
+
+async function declineSwap(transferID){
+  try{
+    const res = await fetch(`${API}/transfer/swap-request/${transferID}`, {method:'PUT', headers:H(), body:JSON.stringify({action:'decline'})});
+    if(!res.ok){ const d=await res.json(); toast(d.message||'Error','err'); return; }
+    toast('Swap request declined');
+    loadMine();
+  } catch{ toast('Server error','err'); }
+}
+
+// 
+// MY PURCHASES (sent requests)
+// 
+async function loadSent(){
+  if(!token){
+    document.getElementById('sent-list').innerHTML=`<div class="signin-wall"><div class="sw-ico"></div><div class="sw-t">Sign in to see your purchases</div><a href="login.html" class="empty-cta">Sign In</a></div>`;
+    return;
+  }
+  document.getElementById('sent-list').innerHTML='<div class="spinner"></div>';
+  try{
+    const res = await fetch(`${API}/transfer/my-transfers`, {headers:H()});
+    const data = await res.json();
+    const arr = Array.isArray(data) ? data : (data.transfers||[]);
+    if(!arr.length){
+      document.getElementById('sent-list').innerHTML=`<div class="empty"><div class="ei"></div><p>No purchases yet.</p><button class="empty-cta" onclick="showTab('browse',document.querySelector('.tab'))">Browse Listings</button></div>`;
+      return;
+    }
+    document.getElementById('sent-list').innerHTML = arr.map(t=>`
+      <div class="ex-card">
+        <div class="ex-top">
+          <div class="ex-route">${t.Origin||'Unknown'} -> ${t.Destination||'Unknown'}</div>
+          <span class="ex-st st-${(t.TransferStatus||'completed').toLowerCase()}">${t.TransferStatus||'completed'}</span>
+        </div>
+        <div class="ex-meta">
+          <span>${fdate(t.JourneyDate||t.RequestedAt)}</span>
+          <span>Seat ${t.SeatNumber||''}</span>
+          <span>Paid: <strong>BDT ${fmt(t.AskingPrice||t.AmountPaid||0)}</strong></span>
+        </div>
+      </div>`).join('');
+    document.getElementById('tc-sent').textContent = arr.length;
+  } catch{
+    document.getElementById('sent-list').innerHTML=`<div class="empty"><div class="ei"></div><p>Could not load purchases.</p></div>`;
+  }
+}
+
+//  init 
+loadBrowse();
+
+// counter init
+fetch(`${API}/transfer/my-listings`,{headers:H()}).then(r=>r.ok?r.json():null).then(d=>{
+  if(d){ const arr=Array.isArray(d)?d:(d.listings||[]); document.getElementById('tc-mine').textContent=arr.filter(l=>(l.ListingStatus||l.Status)==='open').length; }
+}).catch(()=>{});
+fetch(`${API}/transfer/my-transfers`,{headers:H()}).then(r=>r.ok?r.json():null).then(d=>{
+  if(d){ const arr=Array.isArray(d)?d:(d.transfers||[]); document.getElementById('tc-sent').textContent=arr.length; }
+}).catch(()=>{});
+</script>
+</body>
+</html>
+
+

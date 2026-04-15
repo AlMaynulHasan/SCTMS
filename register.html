@@ -1,0 +1,684 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Create your SCTMS account and verify your email.">
+<title>Register - SCTMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Figtree:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FDFBF8;--bg2:#F7F4EF;--bg3:#F0EDE6;--surface:#fff;
+  --navy:#0F1729;--navy2:#1B2340;
+  --gold:#A07828;--gold2:#C49A32;--gold-dim:rgba(160,120,40,0.07);
+  --text:#0F1729;--text2:#5C6478;--text3:rgba(15,23,41,0.32);
+  --border:rgba(15,23,41,0.09);--border2:rgba(160,120,40,0.22);
+  --green:#2A7A4B;--red:#C0392B;
+}
+body{background:var(--bg);color:var(--text);font-family:'Figtree','Noto Sans Bengali',sans-serif;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 20px 60px}
+button{font-family:inherit}
+button:focus-visible,a:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+
+.top-nav{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  width:100%;max-width:600px;margin-bottom:36px;
+}
+.back-link{display:flex;align-items:center;gap:6px;text-decoration:none;
+  color:var(--text2);font-size:0.82rem;transition:color 0.18s}
+.back-link:hover{color:var(--navy)}
+.nav-logo-sm{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;
+  color:var(--navy);letter-spacing:2px;text-transform:uppercase}
+.nav-logo-sm em{color:var(--gold);font-style:normal}
+.lang-toggle{padding:8px 12px;border-radius:8px;border:1px solid var(--border);
+  background:#fff;color:var(--navy);font-size:0.78rem;cursor:pointer;
+  transition:all 0.18s;font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+.lang-toggle:hover{border-color:var(--navy);background:var(--bg2)}
+
+/* STEPS */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:36px;width:100%;max-width:600px}
+.step{display:flex;align-items:center;gap:8px;flex:1}
+.step-num{
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:500;
+  border:1.5px solid var(--border);background:var(--surface);
+  color:var(--text3);transition:all 0.3s;
+}
+.step-label{font-size:0.72rem;color:var(--text3);font-weight:400;transition:color 0.3s;white-space:nowrap}
+.step.active .step-num{border-color:var(--navy);background:var(--navy);color:#fff}
+.step.active .step-label{color:var(--navy);font-weight:600}
+.step.done .step-num{border-color:var(--green);background:var(--green);color:#fff}
+.step.done .step-label{color:var(--green)}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 4px;flex-shrink:1}
+.step-line.done{background:var(--green)}
+
+/* CARD */
+.form-card{
+  width:100%;max-width:600px;
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:36px;box-shadow:0 2px 8px rgba(15,23,41,0.06),0 16px 40px rgba(15,23,41,0.07);
+}
+.step-title{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:600;
+  color:var(--navy);margin-bottom:4px;letter-spacing:-0.2px}
+.step-sub{font-size:0.82rem;color:var(--text2);margin-bottom:24px;font-weight:300}
+
+.fg{margin-bottom:14px}
+.fg label{display:block;font-family:'JetBrains Mono',monospace;font-size:0.55rem;
+  text-transform:uppercase;letter-spacing:2px;color:var(--text2);margin-bottom:6px}
+.fg input,.fg select{
+  width:100%;background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:8px;padding:11px 14px;color:var(--navy);
+  font-family:'Figtree',sans-serif;font-size:0.88rem;outline:none;
+  transition:all 0.18s;-webkit-appearance:none;
+}
+.fg input:focus,.fg select:focus{border-color:var(--navy);background:var(--surface);
+  box-shadow:0 0 0 3px rgba(15,23,41,0.06)}
+.fg select option{background:var(--surface)}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* OTP */
+.otp-row{display:flex;gap:8px;justify-content:center;margin:8px 0 16px}
+.otp-box{
+  width:52px;height:58px;border-radius:10px;border:1.5px solid var(--border);
+  background:var(--bg2);text-align:center;
+  font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:500;
+  color:var(--navy);outline:none;transition:all 0.18s;
+}
+.otp-box:focus{border-color:var(--navy);background:var(--surface);box-shadow:0 0 0 3px rgba(15,23,41,0.06)}
+.otp-box.filled{border-color:var(--gold);background:var(--gold-dim)}
+.otp-timer{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--text2);
+  text-align:center;margin-bottom:12px}
+.otp-hint{background:var(--gold-dim);border:1px solid var(--border2);border-radius:8px;
+  padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:0.7rem;
+  color:var(--gold);text-align:center;margin-bottom:12px;display:none}
+.resend-btn{background:none;border:none;font-size:0.78rem;color:var(--navy);
+  cursor:pointer;text-decoration:underline;display:block;margin:0 auto;font-family:'Figtree',sans-serif}
+.resend-btn:disabled{color:var(--text3);cursor:not-allowed;text-decoration:none}
+.verified-badge{display:none;align-items:center;justify-content:center;gap:8px;
+  padding:10px;background:rgba(42,122,75,0.07);border:1px solid rgba(42,122,75,0.15);
+  border-radius:8px;color:var(--green);font-size:0.82rem;font-weight:600;margin-bottom:12px}
+
+/* Password strength */
+.pw-bar-wrap{height:3px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden}
+.pw-bar{height:100%;border-radius:2px;transition:all 0.3s;width:0}
+.pw-label{font-size:0.65rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-top:4px}
+
+/* Buttons */
+.btn-next{
+  width:100%;padding:13px;border-radius:8px;border:none;
+  background:var(--navy);color:#fff;
+  font-family:'Figtree',sans-serif;font-size:0.92rem;font-weight:600;
+  cursor:pointer;transition:all 0.2s;margin-top:8px;
+}
+.btn-next:hover{background:var(--navy2);transform:translateY(-1px);box-shadow:0 8px 24px rgba(15,23,41,0.16)}
+.btn-otp{
+  width:100%;padding:12px;border-radius:8px;border:1.5px solid var(--navy);
+  background:transparent;color:var(--navy);
+  font-family:'Figtree',sans-serif;font-size:0.88rem;font-weight:600;
+  cursor:pointer;transition:all 0.2s;margin-top:6px;
+}
+.btn-otp:hover{background:var(--navy);color:#fff}
+
+.err-box{background:rgba(192,57,43,0.06);border:1px solid rgba(192,57,43,0.12);
+  border-radius:7px;padding:10px 13px;color:var(--red);font-size:0.8rem;
+  margin-bottom:14px;display:none}
+
+/* SUCCESS */
+.success-screen{text-align:center;padding:20px 0}
+.success-ico{width:72px;height:72px;border-radius:50%;background:rgba(42,122,75,0.08);
+  border:2px solid rgba(42,122,75,0.2);
+  display:flex;align-items:center;justify-content:center;font-size:2rem;
+  margin:0 auto 20px}
+.success-screen h2{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:600;
+  color:var(--navy);margin-bottom:8px}
+.success-screen p{font-size:0.84rem;color:var(--text2);margin-bottom:28px;font-weight:300}
+.btn-signin-now{
+  display:inline-block;padding:13px 40px;border-radius:8px;
+  background:var(--navy);color:#fff;text-decoration:none;
+  font-family:'Figtree',sans-serif;font-size:0.92rem;font-weight:600;
+  transition:all 0.2s;
+}
+.btn-signin-now:hover{background:var(--navy2)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.form-card{animation:fadeUp 0.4s ease both}
+
+@media(max-width:480px){.fg-row{grid-template-columns:1fr}.otp-box{width:44px;height:52px;font-size:1.2rem}}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="index.html" class="back-link" id="signin-instead" data-i18n="nav_back" style="display:flex;align-items:center;gap:4px">← Back to Home</a>
+  <div class="nav-logo-sm">SC<em>T</em>MS</div>
+  <button class="lang-toggle" id="lang-toggle" type="button">বাংলা</button>
+</div>
+
+<!-- STEP INDICATORS -->
+<div class="steps">
+  <div class="step active" id="step-ind-1">
+    <div class="step-num">1</div>
+    <div class="step-label" id="step-label-1">Personal</div>
+  </div>
+  <div class="step-line" id="line-1"></div>
+  <div class="step" id="step-ind-2">
+    <div class="step-num">2</div>
+    <div class="step-label" id="step-label-2">Contact</div>
+  </div>
+  <div class="step-line" id="line-2"></div>
+  <div class="step" id="step-ind-3">
+    <div class="step-num">3</div>
+    <div class="step-label" id="step-label-3">Verify</div>
+  </div>
+  <div class="step-line" id="line-3"></div>
+  <div class="step" id="step-ind-4">
+    <div class="step-num">4</div>
+    <div class="step-label" id="step-label-4">Password</div>
+  </div>
+</div>
+
+<div class="form-card" id="form-card">
+
+  <!-- STEP 1 -->
+  <div id="s1">
+    <div class="step-title" id="s1-title">Personal Info</div>
+    <p class="step-sub" id="s1-sub">Let's start with your basic details.</p>
+    <div class="err-box" id="err1"></div>
+    <div class="fg-row">
+      <div class="fg"><label id="lbl-fname">First Name *</label><input type="text" id="fname" placeholder="Maynul"></div>
+      <div class="fg"><label id="lbl-lname">Last Name</label><input type="text" id="lname" placeholder="Hasan"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label id="lbl-dob">Date of Birth</label><input type="date" id="dob"></div>
+      <div class="fg"><label id="lbl-gender">Gender</label>
+        <select id="gender">
+          <option value="" id="opt-gender">Select</option>
+          <option value="male" id="opt-male">Male</option>
+          <option value="female" id="opt-female">Female</option>
+          <option value="other" id="opt-other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label id="lbl-nid">NID Number</label><input type="text" id="nid" placeholder="National ID (optional)"></div>
+    <button class="btn-next" onclick="next(1)" id="btn-continue">Continue</button>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="s2" style="display:none">
+    <div class="step-title" id="s2-title">Contact Details</div>
+    <p class="step-sub" id="s2-sub">Email অথবা Phone number দিয়ে verify করুন।</p>
+    <div class="err-box" id="err2"></div>
+
+    <!-- Email / Phone toggle -->
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button type="button" id="tab-email" onclick="setContactTab('email')"
+        style="flex:1;padding:9px;border-radius:7px;border:1.5px solid var(--navy);background:var(--navy);color:#fff;font-family:'Figtree',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer">
+        📧 Email
+      </button>
+      <button type="button" id="tab-phone" onclick="setContactTab('phone')"
+        style="flex:1;padding:9px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:var(--text2);font-family:'Figtree',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer">
+        📱 Phone
+      </button>
+    </div>
+
+    <div id="email-input-wrap" class="fg">
+      <label id="lbl-email">Email Address *</label>
+      <input type="email" id="email" placeholder="you@gmail.com">
+    </div>
+    <div id="phone-input-wrap" class="fg" style="display:none">
+      <label id="lbl-phone">Phone Number *</label>
+      <input type="tel" id="phone-otp" placeholder="01XXXXXXXXX">
+      <div style="font-size:.7rem;color:var(--text2);margin-top:4px">Demo mode: OTP server console এ দেখাবে</div>
+    </div>
+
+    <div class="fg"><label id="lbl-phone-extra" style="display:none">Phone Number (optional)</label>
+      <input type="tel" id="phone" placeholder="01XXXXXXXXX" style="display:none">
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label id="lbl-district">District</label>
+        <select id="district"><option value="" id="opt-district">Select district</option>
+          <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
+          <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
+          <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
+          <option>Cox's Bazar</option><option>Jessore</option><option>Bogura</option>
+          <option>Dinajpur</option><option>Panchagarh</option><option>Thakurgaon</option>
+          <option>Tangail</option><option>Faridpur</option><option>Narayanganj</option>
+          <option>Narsingdi</option><option>Brahmanbaria</option><option>Feni</option>
+          <option>Habiganj</option><option>Sirajganj</option><option>Natore</option>
+          <option>Nawabganj</option><option>Pabna</option><option>Barisal</option>
+          <option>Bhola</option><option>Jhalokati</option><option>Patuakhali</option>
+          <option>Pirojpur</option><option>Kushtia</option><option>Magura</option>
+          <option>Meherpur</option><option>Narail</option><option>Satkhira</option>
+          <option>Bagerhat</option><option>Chuadanga</option>          <option>Gaibandha</option><option>Kurigram</option>
+          <option>Lalmonirhat</option><option>Nilphamari</option><option>Sunamganj</option>
+          <option>Moulvibazar</option><option>Jamalpur</option><option>Netrokona</option>
+          <option>Sherpur</option><option>Kishoreganj</option><option>Madaripur</option>
+          <option>Munshiganj</option><option>Rajbari</option><option>Shariatpur</option>
+          <option>Manikganj</option><option>Noakhali</option><option>Chandpur</option>
+          <option>Lakshmipur</option><option>Bandarban</option><option>Khagrachari</option>
+          <option>Pirojpur</option>
+        </select>
+      </div>
+      <div class="fg"><label id="lbl-area">Area</label><input type="text" id="area" placeholder="Mirpur, Dhanmondi..."></div>
+    </div>
+    <div class="fg"><label id="lbl-address">Address</label><input type="text" id="address" placeholder="Road, Block, House no."></div>
+    <button class="btn-otp" onclick="sendOTP()" id="btn-send-otp">Send Verification Code</button>
+  </div>
+
+  <!-- STEP 3 -->
+  <div id="s3" style="display:none">
+    <div class="step-title" id="s3-title">Verify Email</div>
+    <p class="step-sub" id="s3-sub">Enter the 6-digit code sent to <strong id="otp-email-show"></strong></p>
+    <div class="err-box" id="err3"></div>
+    <div class="otp-hint" id="otp-hint"></div>
+    <div class="otp-row">
+      <input class="otp-box" type="text" maxlength="1" id="o1">
+      <input class="otp-box" type="text" maxlength="1" id="o2">
+      <input class="otp-box" type="text" maxlength="1" id="o3">
+      <input class="otp-box" type="text" maxlength="1" id="o4">
+      <input class="otp-box" type="text" maxlength="1" id="o5">
+      <input class="otp-box" type="text" maxlength="1" id="o6">
+    </div>
+    <div class="verified-badge" id="verified-badge">Email verified successfully</div>
+    <div class="otp-timer" id="otp-timer">Code expires in 05:00</div>
+    <button class="resend-btn" id="resend-btn" onclick="sendOTP(true)" disabled>Resend code</button>
+    <button class="btn-next" onclick="verifyOTP()" style="margin-top:16px" id="btn-verify">Verify & Continue</button>
+  </div>
+
+  <!-- STEP 4 -->
+  <div id="s4" style="display:none">
+    <div class="step-title" id="s4-title">Create Password</div>
+    <p class="step-sub" id="s4-sub">Choose a strong password for your account.</p>
+    <div class="err-box" id="err4"></div>
+    <div class="fg">
+      <label id="lbl-pw1">Password *</label>
+      <input type="password" id="pw1" placeholder="Min. 8 characters" oninput="checkStrength(this.value)">
+      <div class="pw-bar-wrap"><div class="pw-bar" id="pw-bar"></div></div>
+      <div class="pw-label" id="pw-lbl">Enter a password</div>
+    </div>
+    <div class="fg">
+      <label id="lbl-pw2">Confirm Password *</label>
+      <input type="password" id="pw2" placeholder="Repeat password">
+    </div>
+    <button class="btn-next" onclick="submit()" id="btn-create">Create Account</button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="s-success" style="display:none">
+    <div class="success-screen">
+      <div class="success-ico"></div>
+      <h2 id="success-title">Account Created!</h2>
+      <p id="success-sub">Welcome to SCTMS. You can now sign in and start booking tickets.</p>
+      <a href="login.html" class="btn-signin-now" id="btn-signin-now">Sign In Now</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API='http://localhost:5000/api';
+let curStep=1, otpTimer=null, otpGenerated='', otpVerified=false;
+
+const I18N = {
+  en: {
+    signin_instead: 'Sign in instead',
+    step_personal: 'Personal',
+    step_contact: 'Contact',
+    step_verify: 'Verify',
+    step_password: 'Password',
+    s1_title: 'Personal Info',
+    s1_sub: 'Let\'s start with your basic details.',
+    fname: 'First Name *',
+    lname: 'Last Name',
+    dob: 'Date of Birth',
+    gender: 'Gender',
+    gender_select: 'Select',
+    male: 'Male',
+    female: 'Female',
+    other: 'Other',
+    nid: 'NID Number',
+    passenger: 'Passenger',
+    continue: 'Continue',
+    s2_title: 'Contact Details',
+    s2_sub: 'We\'ll send a verification code to your email.',
+    email: 'Email Address *',
+    phone: 'Phone Number',
+    district: 'District',
+    district_select: 'Select district',
+    area: 'Area',
+    address: 'Address',
+    send_code: 'Send Verification Code',
+    s3_title: 'Verify Email',
+    verified: 'Email verified successfully',
+    resend: 'Resend code',
+    verify_continue: 'Verify & Continue',
+    s4_title: 'Create Password',
+    s4_sub: 'Choose a strong password for your account.',
+    pw1: 'Password *',
+    pw2: 'Confirm Password *',
+    pw_hint: 'Enter a password',
+    create: 'Create Account',
+    success_title: 'Account Created!',
+    success_sub: 'Welcome to SCTMS. You can now sign in and start booking tickets.',
+    signin_now: 'Sign In Now',
+    err_fname: 'First name required.',
+    err_email: 'Email address required.',
+    err_otp: 'Enter the 6-digit code.',
+    err_pw_len: 'Password must be at least 8 characters.',
+    err_pw_match: 'Passwords do not match.',
+    err_send: 'Failed to send OTP.',
+    err_server: 'Server error. Is the backend running?'
+  },
+  bn: {
+    signin_instead: 'সাইন ইন করুন',
+    step_personal: 'ব্যক্তিগত',
+    step_contact: 'যোগাযোগ',
+    step_verify: 'ভেরিফাই',
+    step_password: 'পাসওয়ার্ড',
+    s1_title: 'ব্যক্তিগত তথ্য',
+    s1_sub: 'আপনার মৌলিক তথ্য দিয়ে শুরু করি।',
+    fname: 'নাম *',
+    lname: 'পদবি',
+    dob: 'জন্ম তারিখ',
+    gender: 'লিঙ্গ',
+    gender_select: 'নির্বাচন করুন',
+    male: 'পুরুষ',
+    female: 'নারী',
+    other: 'অন্যান্য',
+    nid: 'এনআইডি নম্বর',
+    passenger: 'যাত্রী',
+    continue: 'চালিয়ে যান',
+    s2_title: 'যোগাযোগের তথ্য',
+    s2_sub: 'আমরা আপনার ইমেইলে ভেরিফিকেশন কোড পাঠাব।',
+    email: 'ইমেইল ঠিকানা *',
+    phone: 'ফোন নম্বর',
+    district: 'জেলা',
+    district_select: 'জেলা নির্বাচন করুন',
+    area: 'এলাকা',
+    address: 'ঠিকানা',
+    send_code: 'ভেরিফিকেশন কোড পাঠান',
+    s3_title: 'ইমেইল ভেরিফাই',
+    verified: 'ইমেইল সফলভাবে ভেরিফাই হয়েছে',
+    resend: 'আবার পাঠান',
+    verify_continue: 'ভেরিফাই করে এগিয়ে যান',
+    s4_title: 'পাসওয়ার্ড তৈরি করুন',
+    s4_sub: 'আপনার অ্যাকাউন্টের জন্য একটি শক্তিশালী পাসওয়ার্ড দিন।',
+    pw1: 'পাসওয়ার্ড *',
+    pw2: 'পাসওয়ার্ড নিশ্চিত করুন *',
+    pw_hint: 'পাসওয়ার্ড লিখুন',
+    create: 'অ্যাকাউন্ট তৈরি করুন',
+    success_title: 'অ্যাকাউন্ট তৈরি হয়েছে!',
+    success_sub: 'এখন আপনি সাইন ইন করে টিকিট বুক করতে পারবেন।',
+    signin_now: 'এখন সাইন ইন',
+    err_fname: 'নাম দিতে হবে।',
+    err_email: 'ইমেইল দিতে হবে।',
+    err_otp: '৬-সংখ্যার কোড দিন।',
+    err_pw_len: 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষর হতে হবে।',
+    err_pw_match: 'পাসওয়ার্ড মেলেনি।',
+    err_send: 'ওটিপি পাঠানো যায়নি।',
+    err_server: 'সার্ভার সমস্যা। ব্যাকএন্ড চালু আছে?'
+  }
+};
+let lang = localStorage.getItem('sctms_lang') || 'en';
+function t(k){return (I18N[lang]&&I18N[lang][k])||I18N.en[k]||k;}
+function applyLang(){
+  document.documentElement.lang = lang === 'bn' ? 'bn' : 'en';
+  document.getElementById('signin-instead').textContent = t('signin_instead');
+  document.getElementById('step-label-1').textContent = t('step_personal');
+  document.getElementById('step-label-2').textContent = t('step_contact');
+  document.getElementById('step-label-3').textContent = t('step_verify');
+  document.getElementById('step-label-4').textContent = t('step_password');
+  document.getElementById('s1-title').textContent = t('s1_title');
+  document.getElementById('s1-sub').textContent = t('s1_sub');
+  document.getElementById('lbl-fname').textContent = t('fname');
+  document.getElementById('lbl-lname').textContent = t('lname');
+  document.getElementById('lbl-dob').textContent = t('dob');
+  document.getElementById('lbl-gender').textContent = t('gender');
+  document.getElementById('opt-gender').textContent = t('gender_select');
+  document.getElementById('opt-male').textContent = t('male');
+  document.getElementById('opt-female').textContent = t('female');
+  document.getElementById('opt-other').textContent = t('other');
+  document.getElementById('lbl-nid').textContent = t('nid');
+  document.getElementById('btn-continue').textContent = t('continue');
+
+  document.getElementById('s2-title').textContent = t('s2_title');
+  document.getElementById('s2-sub').textContent = t('s2_sub');
+  document.getElementById('lbl-email').textContent = t('email');
+  document.getElementById('lbl-phone').textContent = t('phone');
+  document.getElementById('lbl-district').textContent = t('district');
+  document.getElementById('opt-district').textContent = t('district_select');
+  document.getElementById('lbl-area').textContent = t('area');
+  document.getElementById('lbl-address').textContent = t('address');
+  document.getElementById('btn-send-otp').textContent = t('send_code');
+
+  document.getElementById('s3-title').textContent = t('s3_title');
+  document.getElementById('verified-badge').textContent = t('verified');
+  document.getElementById('resend-btn').textContent = t('resend');
+  document.getElementById('btn-verify').textContent = t('verify_continue');
+
+  document.getElementById('s4-title').textContent = t('s4_title');
+  document.getElementById('s4-sub').textContent = t('s4_sub');
+  document.getElementById('lbl-pw1').textContent = t('pw1');
+  document.getElementById('lbl-pw2').textContent = t('pw2');
+  document.getElementById('pw-lbl').textContent = t('pw_hint');
+  document.getElementById('btn-create').textContent = t('create');
+
+  document.getElementById('success-title').textContent = t('success_title');
+  document.getElementById('success-sub').textContent = t('success_sub');
+  document.getElementById('btn-signin-now').textContent = t('signin_now');
+
+  document.getElementById('lang-toggle').textContent = (lang==='en') ? 'বাংলা' : 'English';
+}
+function toggleLang(){
+  lang = (lang === 'en') ? 'bn' : 'en';
+  localStorage.setItem('sctms_lang', lang);
+  applyLang();
+}
+applyLang();
+
+function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.style.display='block';}
+function hideErr(id){document.getElementById(id).style.display='none';}
+
+function setStep(n){
+  for(let i=1;i<=4;i++){
+    document.getElementById('s'+i).style.display=i===n?'block':'none';
+    const ind=document.getElementById('step-ind-'+i);
+    ind.className='step'+(i===n?' active':i<n?' done':'');
+  }
+  document.querySelectorAll('.step-line').forEach((l,i)=>{l.className='step-line'+(i+1<n?' done':'');});
+  curStep=n;
+}
+
+function next(s){
+  hideErr('err'+s);
+  if(s===1){
+    if(!document.getElementById('fname').value.trim()){showErr('err1',t('err_fname'));return;}
+    setStep(2);
+  }
+}
+
+let _contactTab = 'email'; // 'email' | 'phone'
+
+function setContactTab(tab) {
+  _contactTab = tab;
+  const isEmail = tab === 'email';
+  document.getElementById('tab-email').style.cssText = isEmail
+    ? 'flex:1;padding:9px;border-radius:7px;border:1.5px solid var(--navy);background:var(--navy);color:#fff;font-family:Figtree,sans-serif;font-size:.82rem;font-weight:600;cursor:pointer'
+    : 'flex:1;padding:9px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:var(--text2);font-family:Figtree,sans-serif;font-size:.82rem;font-weight:500;cursor:pointer';
+  document.getElementById('tab-phone').style.cssText = !isEmail
+    ? 'flex:1;padding:9px;border-radius:7px;border:1.5px solid var(--navy);background:var(--navy);color:#fff;font-family:Figtree,sans-serif;font-size:.82rem;font-weight:600;cursor:pointer'
+    : 'flex:1;padding:9px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:var(--text2);font-family:Figtree,sans-serif;font-size:.82rem;font-weight:500;cursor:pointer';
+  document.getElementById('email-input-wrap').style.display = isEmail ? 'block' : 'none';
+  document.getElementById('phone-input-wrap').style.display = !isEmail ? 'block' : 'none';
+}
+
+async function sendOTP(resend=false){
+  hideErr('err2');
+  const isEmail = _contactTab === 'email';
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone-otp').value.trim();
+  const contact = isEmail ? email : phone;
+
+  if (!contact) { showErr('err2', isEmail ? t('err_email') : 'Phone number দিন।'); return; }
+  if (isEmail && !contact.includes('@')) { showErr('err2', 'Valid email দিন।'); return; }
+  if (!isEmail && !/^01[3-9]\d{8}$/.test(contact)) { showErr('err2', 'Valid BD phone number দিন (01XXXXXXXXX)।'); return; }
+
+  const btn = document.getElementById('btn-send-otp');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    const body = isEmail ? { email: contact } : { phone: contact };
+    const res = await fetch(`${API}/auth/send-register-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    btn.disabled = false;
+    btn.textContent = resend ? 'Resend Code' : 'Send Verification Code';
+
+    if (!res.ok) { showErr('err2', data.message || t('err_send')); return; }
+
+    otpGenerated = data.otp || ''; // dev mode তে otp আসে
+    const showAddr = isEmail ? contact : contact;
+    document.getElementById('otp-email-show').textContent = showAddr;
+
+    if (otpGenerated) {
+      document.getElementById('otp-hint').textContent = 'Dev OTP: ' + otpGenerated;
+      document.getElementById('otp-hint').style.display = 'block';
+    } else {
+      document.getElementById('otp-hint').style.display = 'none';
+      // Real email sent — show success message
+      document.getElementById('otp-hint').textContent = isEmail
+        ? `✅ OTP পাঠানো হয়েছে ${contact} এ। Inbox (+ Spam) চেক করুন।`
+        : `✅ OTP পাঠানো হয়েছে। Server console এ দেখুন।`;
+      document.getElementById('otp-hint').style.display = 'block';
+      document.getElementById('otp-hint').style.color = 'var(--green)';
+    }
+    setStep(3);
+    startTimer();
+  } catch {
+    btn.disabled = false;
+    btn.textContent = 'Send Verification Code';
+    // Offline fallback — generate local OTP for testing
+    otpGenerated = Math.floor(100000 + Math.random() * 900000).toString();
+    document.getElementById('otp-email-show').textContent = contact;
+    document.getElementById('otp-hint').textContent = 'Dev OTP (offline): ' + otpGenerated;
+    document.getElementById('otp-hint').style.display = 'block';
+    setStep(3); startTimer();
+  }
+}
+
+function startTimer(){
+  clearInterval(otpTimer);
+  let sec=300;
+  document.getElementById('resend-btn').disabled=true;
+  otpTimer=setInterval(()=>{
+    sec--;
+    const m=String(Math.floor(sec/60)).padStart(2,'0');
+    const s=String(sec%60).padStart(2,'0');
+    document.getElementById('otp-timer').textContent=`Code expires in ${m}:${s}`;
+    if(sec<=0){clearInterval(otpTimer);document.getElementById('otp-timer').textContent='Code expired.';document.getElementById('resend-btn').disabled=false;}
+  },1000);
+}
+
+['o1','o2','o3','o4','o5','o6'].forEach((id,i,arr)=>{
+  const el=document.getElementById(id);
+  el.addEventListener('input',e=>{
+    el.classList.toggle('filled',el.value!=='');
+    if(el.value&&i<arr.length-1)document.getElementById(arr[i+1]).focus();
+  });
+  el.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();});
+  el.addEventListener('paste',e=>{
+    e.preventDefault();
+    const d=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+    d.split('').forEach((c,j)=>{const b=document.getElementById(arr[j]);if(b){b.value=c;b.classList.toggle('filled',true);}});
+  });
+});
+
+function getOTP(){return ['o1','o2','o3','o4','o5','o6'].map(id=>document.getElementById(id).value).join('');}
+
+async function verifyOTP(){
+  hideErr('err3');
+  const entered = getOTP();
+  if(entered.length !== 6){ showErr('err3', t('err_otp')); return; }
+
+  const isEmail   = _contactTab === 'email';
+  const contact   = isEmail
+    ? document.getElementById('email').value.trim()
+    : document.getElementById('phone-otp').value.trim();
+
+  // Dev mode — local check
+  if(otpGenerated && entered === otpGenerated){
+    otpVerified = true;
+    clearInterval(otpTimer);
+    document.getElementById('verified-badge').style.display = 'flex';
+    document.getElementById('otp-timer').style.display = 'none';
+    setTimeout(() => setStep(4), 700);
+    return;
+  }
+
+  // Real mode — verify via API
+  try {
+    const body = isEmail ? { email: contact, otp: entered } : { phone: contact, otp: entered };
+    const res = await fetch(`${API}/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if(!res.ok){ showErr('err3', data.message || 'Invalid OTP।'); return; }
+    otpVerified = true;
+    clearInterval(otpTimer);
+    document.getElementById('verified-badge').style.display = 'flex';
+    document.getElementById('otp-timer').style.display = 'none';
+    setTimeout(() => setStep(4), 700);
+  } catch {
+    showErr('err3', 'Server error। আবার চেষ্টা করুন।');
+  }
+}
+
+function checkStrength(pw){
+  const checks=[pw.length>=8,/[A-Z]/.test(pw),/[0-9]/.test(pw),/[^A-Za-z0-9]/.test(pw)];
+  const score=checks.filter(Boolean).length;
+  const cfg=[[0,'0%','transparent',''],[1,'25%','#C0392B','Weak'],[2,'50%','#D97706','Fair'],[3,'75%','var(--blue)','Good'],[4,'100%','var(--green)','Strong']][score];
+  const bar=document.getElementById('pw-bar');
+  bar.style.width=cfg[1];bar.style.background=cfg[2];
+  document.getElementById('pw-lbl').textContent=cfg[3]||t('pw_hint');document.getElementById('pw-lbl').style.color=cfg[2];
+}
+
+async function submit(){
+  hideErr('err4');
+  const pw1=document.getElementById('pw1').value;
+  const pw2=document.getElementById('pw2').value;
+  if(pw1.length<8){showErr('err4',t('err_pw_len'));return;}
+  if(pw1!==pw2){showErr('err4',t('err_pw_match'));return;}
+  const body={
+    firstName:document.getElementById('fname').value.trim(),
+    lastName:document.getElementById('lname').value.trim(),
+    email:document.getElementById('email').value.trim(),
+    password:pw1,
+    phone:document.getElementById('phone').value.trim(),
+    dob:document.getElementById('dob').value,
+    gender:document.getElementById('gender').value,
+    nid:document.getElementById('nid').value.trim(),
+    district:document.getElementById('district').value,
+    area:document.getElementById('area').value.trim(),
+    address:document.getElementById('address').value.trim(),
+  };
+  try{
+    const res=await fetch(`${API}/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data=await res.json();
+    if(!res.ok){showErr('err4',data.message||'Registration failed.');return;}
+    document.getElementById('s4').style.display='none';
+    document.getElementById('s-success').style.display='block';
+  }catch{showErr('err4',t('err_server'));}
+}
+
+document.getElementById('lang-toggle').addEventListener('click',toggleLang);
+</script>
+</body>
+</html>
