@@ -834,7 +834,7 @@ async function processBooking(){
     if(res.ok && _promoCode){ fetch(`${API}/promo/use`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({code:_promoCode})}).catch(()=>{}); }
     const data=await res.json();
     if(res.ok){
-      lastBooking={bookingID:data.bookingID,sched:curSched,seats:selectedSeats,jdate:document.getElementById('jdate').value,method:selMethod};
+      lastBooking={bookingID:data.bookingID,bookingIDs:data.bookingIDs||[data.bookingID],sched:curSched,seats:[...selectedSeats],jdate:document.getElementById('jdate').value,method:selMethod};
       document.getElementById('pay-overlay').classList.remove('open');
       showSuccess(lastBooking);
     }else{
@@ -852,8 +852,8 @@ function showSuccess(bk){
   document.getElementById('t-dep').textContent=ft(bk.sched.DepartureTime);
   document.getElementById('t-arr').textContent=ft(bk.sched.ArrivalTime);
   document.getElementById('t-vehicle').textContent=bk.sched.VehicleName;
-  document.getElementById('t-seat').textContent=t('seat_prefix')+bk.seat;
-  document.getElementById('t-fare').textContent='BDT '+bk.sched.Fare;
+  document.getElementById('t-seat').textContent=t('seat_prefix')+(Array.isArray(bk.seats)?bk.seats.join(', '):bk.seat);
+  document.getElementById('t-fare').textContent='BDT '+((bk.sched.Fare || 0) * (Array.isArray(bk.seats)?bk.seats.length:1));
   const bc=document.getElementById('t-barcode'); bc.innerHTML='';
   [20,10,16,6,24,12,20,8,16,10,24,6,14,20,10,16,6,24,12,10].forEach(h=>{
     const b=document.createElement('div');b.className='bc-bar';b.style.height=h+'px';bc.appendChild(b);
@@ -864,7 +864,7 @@ function showSuccess(bk){
 function openTicketPrint(){
   if(!lastBooking) return;
   const b=lastBooking;
-  const p=new URLSearchParams({id:b.bookingID,from:b.sched.Origin,to:b.sched.Destination,date:b.jdate,seat:b.seat,dep:ft(b.sched.DepartureTime),arr:ft(b.sched.ArrivalTime),fare:b.sched.Fare,vehicle:b.sched.VehicleName,method:b.method||'bkash',name:user.firstName||'Passenger'});
+  const p=new URLSearchParams({id:b.bookingID,ids:(b.bookingIDs||[b.bookingID]).filter(Boolean).join(','),from:b.sched.Origin,to:b.sched.Destination,date:b.jdate,seat:Array.isArray(b.seats)?b.seats.join(', '):b.seat,dep:ft(b.sched.DepartureTime),arr:ft(b.sched.ArrivalTime),fare:(b.sched.Fare || 0) * (Array.isArray(b.seats)?b.seats.length:1),vehicle:b.sched.VehicleName,method:b.method||'bkash',name:user.firstName||'Passenger'});
   window.open('ticket-print.html?'+p.toString(),'_blank');
 }
 

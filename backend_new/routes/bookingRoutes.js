@@ -6,10 +6,13 @@ const { createNotification } = require('./notificationRoutes');
 
 /* ── BOOK TICKET ── */
 router.post('/', protect, async (req, res) => {
-    const { scheduleID, seatNumber, totalFare, paymentMethod, journeyDate, boardingStop, droppingStop } = req.body;
+    const { scheduleID, seatNumber, seatNumbers, totalFare, paymentMethod, journeyDate, boardingStop, droppingStop } = req.body;
     const userID = req.user.userID;
+    const seats = [...new Set(Array.isArray(seatNumbers)
+        ? seatNumbers.map(s => String(s).trim()).filter(Boolean)
+        : (seatNumber ? [String(seatNumber).trim()] : []))];
 
-    if (!scheduleID || !seatNumber || !totalFare || !journeyDate)
+    if (!scheduleID || !seats.length || !totalFare || !journeyDate)
         return res.status(400).json({ message: 'scheduleID, seatNumber, totalFare, journeyDate দিন।' });
 
     try {
@@ -18,78 +21,102 @@ router.post('/', protect, async (req, res) => {
         // Hold আছে কিনা check — অন্য user এর hold থাকলে block
         await pool.request().query(`UPDATE SeatHolds SET Status='expired' WHERE Status='active' AND ExpiresAt < GETDATE()`);
 
-        const holdCheck = await pool.request()
-            .input('ScheduleID',  sql.Int,     scheduleID)
-            .input('SeatNumber',  sql.NVarChar, seatNumber)
-            .input('JourneyDate', sql.Date,     journeyDate)
-            .input('UserID',      sql.Int,      userID)
-            .query(`
-                SELECT HoldID, UserID FROM SeatHolds
-                WHERE ScheduleID=@ScheduleID AND SeatNumber=@SeatNumber 
-                AND JourneyDate=@JourneyDate AND Status='active'
-            `);
+        const placeholders = seats.map((_, i) => `@Seat${i}`).join(',');
+        const holdReq = pool.request()
+            .input('ScheduleID',  sql.Int, scheduleID)
+            .input('JourneyDate', sql.Date, journeyDate)
+            .input('UserID',      sql.Int, userID);
+        seats.forEach((seat, i) => holdReq.input(`Seat${i}`, sql.NVarChar, seat));
 
-        if (holdCheck.recordset.length > 0 && holdCheck.recordset[0].UserID !== userID)
-            return res.status(409).json({ message: 'এই seat অন্য কেউ hold করেছে।' });
+        const holdCheck = await holdReq.query(`
+            SELECT SeatNumber, UserID FROM SeatHolds
+            WHERE ScheduleID=@ScheduleID AND SeatNumber IN (${placeholders})
+            AND JourneyDate=@JourneyDate AND Status='active'
+        `);
 
-        const result = await pool.request()
-            .input('UserID',      sql.Int,           userID)
-            .input('ScheduleID',  sql.Int,           scheduleID)
-            .input('SeatNumber',  sql.NVarChar,      seatNumber)
-            .input('TotalFare',   sql.Decimal(10,2), totalFare)
-            .input('JourneyDate', sql.Date,          journeyDate)
-            .input('Method',      sql.NVarChar,      paymentMethod || 'bkash')
-            .execute('sp_BookTicket');
+        const blocked = holdCheck.recordset.find(h => h.UserID !== userID);
+        if (blocked)
+            return res.status(409).json({ message: `Seat ${blocked.SeatNumber} অন্য কেউ hold করেছে।` });
 
-        const bookingID = result.recordset[0].BookingID;
+        const bookedReq = pool.request()
+            .input('ScheduleID',  sql.Int, scheduleID)
+            .input('JourneyDate', sql.Date, journeyDate);
+        seats.forEach((seat, i) => bookedReq.input(`BookedSeat${i}`, sql.NVarChar, seat));
+        const bookedPlaceholders = seats.map((_, i) => `@BookedSeat${i}`).join(',');
+        const bookedCheck = await bookedReq.query(`
+            SELECT SeatNumber FROM Bookings
+            WHERE ScheduleID=@ScheduleID AND JourneyDate=@JourneyDate
+            AND Status!='cancelled' AND SeatNumber IN (${bookedPlaceholders})
+        `);
 
-        // BoardingStop / DroppingStop save (graceful fallback)
-        if (boardingStop || droppingStop) {
+        if (bookedCheck.recordset.length)
+            return res.status(400).json({ message: `Seat ${bookedCheck.recordset[0].SeatNumber} আগে থেকেই নেওয়া হয়েছে।` });
+
+        const farePerSeat = Number(totalFare) / seats.length;
+        const bookingIDs = [];
+        const refCodes = [];
+        const year = new Date().getFullYear();
+
+        for (const seat of seats) {
+            const result = await pool.request()
+                .input('UserID',      sql.Int,           userID)
+                .input('ScheduleID',  sql.Int,           scheduleID)
+                .input('SeatNumber',  sql.NVarChar,      seat)
+                .input('TotalFare',   sql.Decimal(10,2), farePerSeat)
+                .input('JourneyDate', sql.Date,          journeyDate)
+                .input('Method',      sql.NVarChar,      paymentMethod || 'bkash')
+                .execute('sp_BookTicket');
+
+            const bookingID = result.recordset[0].BookingID;
+            const refCode = `BK-${year}-${String(bookingID).padStart(6, '0')}`;
+            bookingIDs.push(bookingID);
+            refCodes.push(refCode);
+
+            // BoardingStop / DroppingStop save (graceful fallback)
+            if (boardingStop || droppingStop) {
+                await pool.request()
+                    .input('BookingID',    sql.Int,      bookingID)
+                    .input('BoardingStop', sql.NVarChar,  boardingStop  || null)
+                    .input('DroppingStop', sql.NVarChar,  droppingStop  || null)
+                    .query(`UPDATE Bookings
+                            SET BoardingStop = @BoardingStop,
+                                DroppingStop = @DroppingStop
+                            WHERE BookingID  = @BookingID`)
+                    .catch(() => {}); // column না থাকলেও চলবে
+            }
+
+            // Store RefCode if column exists (graceful fallback)
+            try {
+                await pool.request()
+                    .input('BookingID', sql.Int,      bookingID)
+                    .input('RefCode',   sql.NVarChar,  refCode)
+                    .query(`UPDATE Bookings SET RefCode = @RefCode WHERE BookingID = @BookingID`);
+            } catch {
+                // RefCode column not yet added — run migration SQL to add it
+            }
+
+            // Hold release করো
             await pool.request()
-                .input('BookingID',    sql.Int,      bookingID)
-                .input('BoardingStop', sql.NVarChar,  boardingStop  || null)
-                .input('DroppingStop', sql.NVarChar,  droppingStop  || null)
-                .query(`UPDATE Bookings
-                        SET BoardingStop = @BoardingStop,
-                            DroppingStop = @DroppingStop
-                        WHERE BookingID  = @BookingID`)
-                .catch(() => {}); // column না থাকলেও চলবে
+                .input('ScheduleID',  sql.Int,     scheduleID)
+                .input('SeatNumber',  sql.NVarChar, seat)
+                .input('JourneyDate', sql.Date,     journeyDate)
+                .input('UserID',      sql.Int,      userID)
+                .query(`UPDATE SeatHolds SET Status='released' WHERE ScheduleID=@ScheduleID AND SeatNumber=@SeatNumber AND JourneyDate=@JourneyDate AND UserID=@UserID`);
+
+            createNotification(pool, userID, 'booking_confirmed',
+                `Ticket confirmed! ${refCode} — Seat ${seat}`,
+                { bookingID, refCode, seatNumber: seat, scheduleID }
+            );
         }
-
-        // ── Booking Reference Code — BK-2026-000142 ──
-        const year    = new Date().getFullYear();
-        const refCode = `BK-${year}-${String(bookingID).padStart(6, '0')}`;
-
-        // Store RefCode if column exists (graceful fallback)
-        try {
-            await pool.request()
-                .input('BookingID', sql.Int,      bookingID)
-                .input('RefCode',   sql.NVarChar,  refCode)
-                .query(`UPDATE Bookings SET RefCode = @RefCode WHERE BookingID = @BookingID`);
-        } catch {
-            // RefCode column not yet added — run migration SQL to add it
-        }
-
-        // Hold release করো
-        await pool.request()
-            .input('ScheduleID',  sql.Int,     scheduleID)
-            .input('SeatNumber',  sql.NVarChar, seatNumber)
-            .input('JourneyDate', sql.Date,     journeyDate)
-            .input('UserID',      sql.Int,      userID)
-            .query(`UPDATE SeatHolds SET Status='released' WHERE ScheduleID=@ScheduleID AND SeatNumber=@SeatNumber AND JourneyDate=@JourneyDate AND UserID=@UserID`);
 
         res.status(201).json({
             message:   'Ticket সফলভাবে book হয়েছে!',
-            bookingID,
-            refCode,
-            reference: refCode
+            bookingID: bookingIDs[0],
+            bookingIDs,
+            refCode: refCodes[0],
+            refCodes,
+            reference: refCodes[0]
         });
-
-        // Notification (async, non-blocking)
-        poolPromise.then(pool => createNotification(pool, userID, 'booking_confirmed',
-            `Ticket confirmed! ${refCode} — Seat ${seatNumber}`,
-            { bookingID, refCode, seatNumber, scheduleID }
-        ));
 
     } catch (err) {
         if (err.message.includes('No seats available'))
@@ -313,4 +340,3 @@ router.put('/:id/mark-used', protect, async (req, res) => {
 });
 
 module.exports = router;
-

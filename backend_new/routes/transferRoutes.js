@@ -218,9 +218,12 @@ router.post('/list', protect, async (req, res) => {
         await transaction.begin();
         try {
             // ✅ TICKET LOCK — Booking status → 'listed'
-            await transaction.request()
+            const lock = await transaction.request()
                 .input('BookingID', sql.Int, bookingID)
-                .query(`UPDATE Bookings SET Status = 'listed' WHERE BookingID = @BookingID`);
+                .query(`UPDATE Bookings SET Status = 'listed' WHERE BookingID = @BookingID AND Status = 'confirmed'`);
+            if (!lock.rowsAffected[0]) {
+                throw new Error('Ticket is no longer available to list.');
+            }
 
             // Create listing
             const result = await transaction.request()
@@ -314,9 +317,12 @@ router.post('/list-swap', protect, async (req, res) => {
         await transaction.begin();
         try {
             // ✅ TICKET LOCK
-            await transaction.request()
+            const lock = await transaction.request()
                 .input('BookingID', sql.Int, bookingID)
-                .query(`UPDATE Bookings SET Status = 'listed' WHERE BookingID = @BookingID`);
+                .query(`UPDATE Bookings SET Status = 'listed' WHERE BookingID = @BookingID AND Status = 'confirmed'`);
+            if (!lock.rowsAffected[0]) {
+                throw new Error('Ticket is no longer available to list.');
+            }
 
             const result = await transaction.request()
                 .input('BookingID',       sql.Int,           bookingID)
@@ -627,9 +633,12 @@ router.post('/swap-request/:listingID', protect, async (req, res) => {
             `);
 
         // ✅ Offered booking lock
-        await pool.request()
+        const offeredLock = await pool.request()
             .input('BookingID', sql.Int, offeredBookingID)
             .query(`UPDATE Bookings SET Status = 'listed' WHERE BookingID = @BookingID AND Status = 'confirmed'`);
+        if (!offeredLock.rowsAffected[0]) {
+            return res.status(409).json({ message: 'Offered ticket আর available নেই।' });
+        }
 
         res.status(201).json({
             message:    'Swap request পাঠানো হয়েছে! Seller accept করলে swap হবে।',

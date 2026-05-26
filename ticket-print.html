@@ -22,7 +22,8 @@ body{background:#E8E3D8;font-family:'Figtree',sans-serif;min-height:100vh;displa
 .back-btn:hover{border-color:var(--nv);color:var(--nv)}
 .print-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 22px;border-radius:7px;border:none;background:var(--nv);color:var(--cr);font-family:'Figtree',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.3px}
 .print-btn:hover{background:var(--nv3);transform:translateY(-1px);box-shadow:0 6px 18px rgba(15,23,41,.22)}
-.ticket{width:100%;max-width:760px;background:var(--cr);border-radius:0;box-shadow:0 20px 60px rgba(15,23,41,.18),0 4px 16px rgba(15,23,41,.08);position:relative;}
+.ticket{width:100%;max-width:760px;background:var(--cr);border-radius:0;box-shadow:0 20px 60px rgba(15,23,41,.18),0 4px 16px rgba(15,23,41,.08);position:relative;margin-bottom:28px;break-inside:avoid;page-break-inside:avoid;}
+.ticket + .ticket{page-break-before:always;}
 .tk-top{background:var(--nv);padding:0;display:flex;height:8px;}
 .tk-top-seg{flex:1;height:100%;}
 .tk-top-seg:nth-child(1){background:var(--gd2)}
@@ -91,7 +92,7 @@ body{background:#E8E3D8;font-family:'Figtree',sans-serif;min-height:100vh;displa
 .sv-dot{width:6px;height:6px;border-radius:50%;}
 .sv-ok{color:#5de88b;} .sv-ok .sv-dot{background:#5de88b;}
 .tk-bot{height:6px;background:linear-gradient(90deg,var(--gd2) 0%,var(--nv) 50%,var(--gd2) 100%);}
-@media print{.toolbar{display:none;}.ticket{box-shadow:none;}}
+@media print{body{background:#fff;padding:0}.toolbar{display:none;}.ticket{box-shadow:none;margin-bottom:0}.ticket + .ticket{page-break-before:always;}}
 </style>
 </head>
 <body>
@@ -163,8 +164,8 @@ body{background:#E8E3D8;font-family:'Figtree',sans-serif;min-height:100vh;displa
 <script>
 var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-function el(id){return document.getElementById(id);}
-function s(id,v){var e=el(id);if(e&&v!==null&&v!==undefined)e.textContent=v;}
+function el(id,root){return (root||document).querySelector('#'+id);}
+function s(id,v,root){var e=el(id,root);if(e&&v!==null&&v!==undefined)e.textContent=v;}
 
 // ── TIME: handles "1970-01-01T06:00:00Z", "2026-03-20T08:00:00Z", "08:00", "08:00:00"
 function ft(t){
@@ -203,71 +204,83 @@ function ic(n){
   return map[n]||(n?n.slice(0,3).toUpperCase():'???');
 }
 
-function genQR(text){
-  var c=el('qr-container');
+function genQR(text,root){
+  var c=el('qr-container',root);
   c.innerHTML='';
   try{
     new QRCode(c,{text:text,width:64,height:64,colorDark:'#0F1729',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
   }catch(e){}
 }
 
-function genBarcode(seed){
+function genBarcode(seed,root){
   var h='';
   for(var i=0;i<60;i++){
     var x=Math.sin(seed*31+i*17)*10000; x=x-Math.floor(x);
     h+='<div class="bc-bar" style="width:2px;height:'+(20+x*60)+'%"></div>';
   }
-  el('bc-bars').innerHTML=h;
-  el('bc-num').textContent=String(seed).padStart(6,'0')+' '+Math.abs(Math.round(Math.sin(seed)*9999)).toString().padStart(4,'0')+' '+Math.abs(Math.round(Math.cos(seed)*9999)).toString().padStart(4,'0')+' '+Math.abs(Math.round(Math.sin(seed+1)*9999)).toString().padStart(4,'0');
+  el('bc-bars',root).innerHTML=h;
+  el('bc-num',root).textContent=String(seed).padStart(6,'0')+' '+Math.abs(Math.round(Math.sin(seed)*9999)).toString().padStart(4,'0')+' '+Math.abs(Math.round(Math.cos(seed)*9999)).toString().padStart(4,'0')+' '+Math.abs(Math.round(Math.sin(seed+1)*9999)).toString().padStart(4,'0');
 }
 
-function fill(d){
+function fill(d,root){
   var from=d.from||'Dhaka', to=d.to||'Chittagong';
-  s('from-code',ic(from)); s('from-name',from);
-  s('to-code',ic(to));     s('to-name',to);
-  s('dep-time',ft(d.dep));
-  s('arr-time',ft(d.arr));
-  s('dep-date',fd(d.date));
-  s('arr-date',fd(d.date));
-  s('jdate-val',fd(d.date));
-  s('d-from',from);
-  s('d-to',to);
-  s('d-seat',d.seat||'-');
-  s('d-vehicle',d.vehicle||'-');
-  s('d-class',d.vehicleType==='train'?'1st Class':'Economy');
-  s('class-val',d.vehicleType==='train'?'Train':'Bus');
+  s('from-code',ic(from),root); s('from-name',from,root);
+  s('to-code',ic(to),root);     s('to-name',to,root);
+  s('dep-time',ft(d.dep),root);
+  s('arr-time',ft(d.arr),root);
+  s('dep-date',fd(d.date),root);
+  s('arr-date',fd(d.date),root);
+  s('jdate-val',fd(d.date),root);
+  s('d-from',from,root);
+  s('d-to',to,root);
+  s('d-seat',d.seat||'-',root);
+  s('d-vehicle',d.vehicle||'-',root);
+  s('d-class',d.vehicleType==='train'?'1st Class':'Economy',root);
+  s('class-val',d.vehicleType==='train'?'Train':'Bus',root);
   var pm=d.method||'bKash';
   var pml=pm.charAt(0).toUpperCase()+pm.slice(1);
-  s('d-pay',pml);
-  s('fare-method','Via '+pml);
-  s('d-bid','#'+String(d.id||0).padStart(6,'0'));
-  s('d-issued',fd((d.booked||new Date().toISOString()).substring(0,10)));
-  s('fare-num','৳ '+Number(d.fare||0).toLocaleString());
+  s('d-pay',pml,root);
+  s('fare-method','Via '+pml,root);
+  s('d-bid','#'+String(d.id||0).padStart(6,'0'),root);
+  s('d-issued',fd((d.booked||new Date().toISOString()).substring(0,10)),root);
+  s('fare-num','BDT '+Number(d.fare||0).toLocaleString(),root);
   var ref=d.refCode||('BK-'+new Date().getFullYear()+'-'+String(d.id||0).padStart(6,'0'));
-  s('pax-ref',ref);
-  s('stub-route',from+' \u2192 '+to);
-  s('stub-meta',fd(d.date)+'  Seat '+(d.seat||'')+'  '+(d.vehicle||''));
+  s('pax-ref',ref,root);
+  s('stub-route',from+' \u2192 '+to,root);
+  s('stub-meta',fd(d.date)+'  Seat '+(d.seat||'')+'  '+(d.vehicle||''),root);
   // Passenger info from localStorage
   var user=JSON.parse(localStorage.getItem('sctms_user')||'{}');
   var pname=((user.firstName||'Passenger')+' '+(user.lastName||'')).trim();
-  s('pax-name',pname);
-  s('pax-meta',(user.email||'')+' \u2022 '+fd(d.date));
-  el('pax-av').textContent=(pname[0]||'P').toUpperCase();
-  el('th-vtype').textContent=(d.vehicleType==='train'?'Train Express':'Bus Express');
-  el('rv-ico').textContent=(d.vehicleType==='train'?'\uD83D\uDE82':'\uD83D\uDE8C');
-  genQR(ref);
-  genBarcode(parseInt(d.id)||Math.floor(Math.random()*999999));
+  s('pax-name',pname,root);
+  s('pax-meta',(user.email||'')+' \u2022 '+fd(d.date),root);
+  el('pax-av',root).textContent=(pname[0]||'P').toUpperCase();
+  el('th-vtype',root).textContent=(d.vehicleType==='train'?'Train Express':'Bus Express');
+  el('rv-ico',root).textContent=(d.vehicleType==='train'?'\uD83D\uDE82':'\uD83D\uDE8C');
+  genQR(ref,root);
+  genBarcode(parseInt(d.id)||Math.floor(Math.random()*999999),root);
+}
+
+var ticketTemplate=document.getElementById('ticket').cloneNode(true);
+function renderTickets(items){
+  var first=document.getElementById('ticket');
+  document.querySelectorAll('.ticket').forEach(function(t,i){if(i>0)t.remove();});
+  items.forEach(function(item,i){
+    var node=i===0?first:ticketTemplate.cloneNode(true);
+    if(i>0)document.body.insertBefore(node, document.querySelector('script'));
+    fill(item,node);
+  });
 }
 
 // ── INIT ────────────────────────────────────────
 var p=new URLSearchParams(location.search);
 var bId=p.get('id');
+var bIds=(p.get('ids')||'').split(',').map(function(x){return x.trim();}).filter(Boolean);
 var token=localStorage.getItem('sctms_token');
 
 // Step 1: Fill immediately from URL params
 var from=p.get('from'), to=p.get('to');
 if(from||to){
-  fill({
+  renderTickets([{
     id:     bId||'0',
     from:   from||'',
     to:     to||'',
@@ -281,32 +294,38 @@ if(from||to){
     vehicleType: p.get('vtype')||'bus',
     booked: new Date().toISOString(),
     refCode:p.get('refCode')||null
-  });
+  }]);
+}
+
+function bookingToTicket(b){
+  return {
+    id:          b.BookingID,
+    from:        b.Origin,
+    to:          b.Destination,
+    dep:         b.DepartureTime,
+    arr:         b.ArrivalTime,
+    seat:        b.SeatNumber,
+    vehicle:     b.VehicleName,
+    fare:        b.TotalFare,
+    method:      b.PaymentMethod,
+    date:        b.JourneyDate,
+    vehicleType: b.VehicleType,
+    booked:      b.BookedAt,
+    refCode:     b.RefCode
+  };
 }
 
 // Step 2: Fresh data from API (overrides URL params)
-if(token && bId && bId!=='0'){
-  fetch('http://localhost:5000/api/bookings/'+bId,{
-    headers:{Authorization:'Bearer '+token}
-  })
-  .then(function(r){return r.ok?r.json():null;})
-  .then(function(b){
-    if(!b)return;
-    fill({
-      id:          b.BookingID,
-      from:        b.Origin,
-      to:          b.Destination,
-      dep:         b.DepartureTime,
-      arr:         b.ArrivalTime,
-      seat:        b.SeatNumber,
-      vehicle:     b.VehicleName,
-      fare:        b.TotalFare,
-      method:      b.PaymentMethod,
-      date:        b.JourneyDate,
-      vehicleType: b.VehicleType,
-      booked:      b.BookedAt,
-      refCode:     b.RefCode
-    });
+if(token && (bIds.length || (bId && bId!=='0'))){
+  var ids=bIds.length?bIds:[bId];
+  Promise.all(ids.map(function(id){
+    return fetch('http://localhost:5000/api/bookings/'+id,{
+      headers:{Authorization:'Bearer '+token}
+    }).then(function(r){return r.ok?r.json():null;});
+  }))
+  .then(function(rows){
+    var tickets=rows.filter(Boolean).map(bookingToTicket);
+    if(tickets.length)renderTickets(tickets);
   })
   .catch(function(){});
 }
