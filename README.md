@@ -66,6 +66,31 @@ SQL/sctms_backup.sql
 
 Run it against the `SCTMS` database.
 
+## 🚀SSMS Setup Steps
+
+### Step 1 — SSMS এ SA Login Enable করো
+```sql
+ALTER LOGIN sa ENABLE;
+GO
+ALTER LOGIN sa WITH PASSWORD = '12345';
+GO
+```
+
+### Step 2 — SQL Server Authentication Mode Change করো
+SSMS → Server → Right Click → Properties → Security
+→ "SQL Server and Windows Authentication mode" select করো → OK
+
+### Step 3 — SQL Server Restart করো
+SQL Server Configuration Manager → SQL Server Services
+→ SQL Server (SQLEXPRESS) → Right Click → Restart
+
+### Step 4 — TCP/IP Enable করো
+SQL Server Configuration Manager
+→ SQL Server Network Configuration → Protocols for SQLEXPRESS
+→ TCP/IP → Right Click → Enable
+→ TCP/IP → Double Click → IP Addresses tab → IPAll → TCP Port = 1433 → OK
+→ SQL Server Services → SQL Server (SQLEXPRESS) → Restart
+
 ### 3. Configure Backend
 
 ```bash
@@ -101,7 +126,7 @@ From `backend_new/`:
 
 ```bash
 npm install
-npm start
+node server.js
 ```
 
 API health check:
@@ -183,17 +208,6 @@ http://localhost:5000/api
 | POST | `/transfer/swap-request/:listingID` | Offer swap |
 | GET | `/admin/users` | Admin user list |
 
-## Troubleshooting
-
-### Database connection failed
-
-Check:
-
-- SQL Server is running
-- SQL Server Authentication is enabled if using username/password
-- TCP/IP is enabled
-- Port `1433` is open
-- `.env` database values are correct
 
 ### Frontend loads but API does not work
 
@@ -228,6 +242,6 @@ Before running on a new machine:
 2. Copy `backend_new/.env.example` to `backend_new/.env`.
 3. Fill database credentials in `.env`.
 4. Run `npm install` inside `backend_new`.
-5. Run `npm start`.
+5. Run `node server.js`.
 6. Open `index.html` using Live Server.
 
