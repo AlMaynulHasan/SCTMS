@@ -71,6 +71,7 @@ app.use('/api/schedules',                 require('./routes/scheduleRoutes'));
 app.use('/api/bookings',                  require('./routes/bookingRoutes'));
 app.use('/api/transfer',                  require('./routes/transferRoutes'));
 app.use('/api/admin',                     require('./routes/adminRoutes'));
+app.use('/api/users',                     require('./routes/userRoutes'));
 app.use('/api/promo',                     require('./routes/promoRoutes'));
 app.use('/api/vehicles',                  require('./routes/vehicleRoutes'));
 app.use('/api/routes',                    require('./routes/routeRoutes'));
