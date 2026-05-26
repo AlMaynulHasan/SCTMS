@@ -192,7 +192,7 @@ h1 strong{font-weight:700}
   width:100%;background:var(--bg2);border:1.5px solid var(--border);
   border-radius:8px;padding:12px 14px;color:var(--navy);
   font-family:'Figtree',sans-serif;font-size:0.9rem;outline:none;
-  transition:all 0.18s;-webkit-appearance:none;cursor:pointer;
+  transition:all 0.18s;-webkit-appearance:none;appearance:none;cursor:pointer;
 }
 .sf select:focus,.sf input[type=date]:focus{
   border-color:var(--navy);background:#fff;
@@ -209,7 +209,6 @@ h1 strong{font-weight:700}
 .swap-btn:hover{border-color:var(--navy);background:var(--navy);color:#fff;transform:rotate(180deg)}
 
 .sf-bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.sf-date{}
 .sf-pass{position:relative}
 .btn-search{
   width:100%;padding:14px;border-radius:10px;border:none;
@@ -706,7 +705,7 @@ const i18n={
     nav_routes:'Routes',nav_book:'Book',nav_market:'Ticket Exchange',nav_dash:'Dashboard',nav_back:'← Back',
     nav_signin:'Sign In',nav_register:'Register',
     hero_badge:'<div class="hero-badge-dot"></div> Bangladesh Smart Transit &middot; 2026',
-    hero_title:'Travel Across <em>Bangladesh</em><br><strong>Reimagined</strong>',
+    hero_title:'Travel Across <em>Bangladesh</em>',
     hero_sub:'Book bus &amp; train tickets across all major cities &mdash; instantly, seamlessly.',
     tab_bus:'Bus',tab_train:'Train',tab_all:'All',
     lbl_from:'From',lbl_to:'To',opt_city:'&mdash; Select City &mdash;',
@@ -742,7 +741,7 @@ const i18n={
     nav_routes:'রুট',nav_book:'বুকিং',nav_market:'টিকিট এক্সচেঞ্জ',nav_dash:'ড্যাশবোর্ড',nav_back:'← ফিরুন',
     nav_signin:'সাইন ইন',nav_register:'রেজিস্টার',
     hero_badge:'<div class="hero-badge-dot"></div> বাংলাদেশ স্মার্ট ট্রানজিট &middot; ২০২৬',
-    hero_title:'বাংলাদেশ জুড়ে <em>ভ্রমণ</em><br><strong>নতুনভাবে</strong>',
+    hero_title:'বাংলাদেশ জুড়ে <em>ভ্রমণ</em>',
     hero_sub:'সব বড় শহরের বাস ও ট্রেন টিকিট বুক করুন দ্রুত ও সহজভাবে।',
     tab_bus:'বাস',tab_train:'ট্রেন',tab_all:'সব',
     lbl_from:'যাত্রা শুরু',lbl_to:'গন্তব্য',opt_city:'&mdash; শহর নির্বাচন করুন &mdash;',
