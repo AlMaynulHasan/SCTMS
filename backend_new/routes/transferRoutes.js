@@ -15,6 +15,11 @@ const { createNotification } = require('./notificationRoutes');
 
 const PLATFORM_FEE_PCT = 0.05;
 
+function getAffectedRows(result) {
+    if (!result || !Array.isArray(result.rowsAffected)) return 0;
+    return result.rowsAffected.reduce((sum, value) => sum + (typeof value === 'number' ? value : 0), 0);
+}
+
 /** departure datetime দেখে suggested resale price বের করে */
 function suggestedPrice(originalFare, departureDatetime) {
     if (!departureDatetime) return originalFare;
@@ -27,6 +32,37 @@ function suggestedPrice(originalFare, departureDatetime) {
     else if (hoursLeft >=  1) pct = 0.25;
     else                      pct = 0.10;
     return Math.max(1, Math.round(originalFare * pct));
+}
+
+/**
+ * ✅ FIX: JourneyDate (date) + DepartureTime (SQL time type) combine করে
+ * একটা proper DateTime বানায়।
+ * SQL Server-এর time column Node.js-এ 1900-01-01T HH:MM আকারে আসে,
+ * তাই সরাসরি new Date(DepartureTime) করলে past date হয়ে hoursLeft = 0 হয়।
+ */
+function buildDepartureDateTime(journeyDate, departureTime) {
+    if (!journeyDate) return null;
+
+    // JourneyDate থেকে "YYYY-MM-DD" বের করো
+    const dateStr = new Date(journeyDate).toISOString().split('T')[0];
+
+    if (departureTime) {
+        // SQL time type হিসেবে আসলে Date object হবে, time part নাও
+        // e.g. 1900-01-01T06:30:00.000Z → "06:30"
+        let timeStr;
+        if (departureTime instanceof Date) {
+            timeStr = departureTime.toISOString().split('T')[1].substring(0, 5);
+        } else {
+            timeStr = String(departureTime).substring(0, 5); // "HH:MM"
+        }
+        // Local time হিসেবে parse করো (BST = UTC+6)
+        return new Date(`${dateStr}T${timeStr}:00`);
+    }
+
+    // DepartureTime না থাকলে সেই দিনের end of day ধরো
+    const d = new Date(journeyDate);
+    d.setHours(23, 59, 0, 0);
+    return d;
 }
 
 /** listing তৈরির পর waitlist passengers notify করে */
@@ -47,7 +83,6 @@ async function notifyWaitlist(pool, scheduleID, journeyDate) {
 
         if (!wl.recordset.length) return;
 
-        // Status → notified (marketplace এ seat available হয়েছে)
         for (const row of wl.recordset) {
             await pool.request()
                 .input('WaitlistID', sql.Int, row.WaitlistID)
@@ -56,7 +91,6 @@ async function notifyWaitlist(pool, scheduleID, journeyDate) {
                     SET Status = 'marketplace_notified', NotifiedAt = GETDATE()
                     WHERE WaitlistID = @WaitlistID AND Status = 'waiting'
                 `);
-            // Real email এর পরিবর্তে console log (production এ nodemailer দিয়ে পাঠাবে)
             console.log(`📢 [Waitlist→Marketplace] Notified: ${row.FirstName} <${row.Email}>`);
         }
 
@@ -74,7 +108,7 @@ router.get('/marketplace', async (req, res) => {
         const { origin, destination, date } = req.query;
         const pool = await poolPromise;
         let query = `
-            SELECT *, 
+            SELECT *,
                    DATEDIFF(HOUR, GETDATE(), DepartureTime) AS HoursUntilDep
             FROM vw_TicketMarketplace
             WHERE ListingStatus = 'open'
@@ -88,7 +122,6 @@ router.get('/marketplace', async (req, res) => {
         query += ` ORDER BY JourneyDate ASC, DepartureTime ASC`;
         const result = await request.query(query);
 
-        // প্রতিটা listing এ smart price suggestion যোগ করো
         const listings = result.recordset.map(l => ({
             ...l,
             SuggestedPrice: suggestedPrice(l.AskingPrice, l.DepartureTime),
@@ -105,7 +138,6 @@ router.get('/marketplace', async (req, res) => {
 
 // ─────────────────────────────────────────────
 // GET /transfer/price-suggestion?bookingID=X
-// Frontend listing modal এ call করে suggested price আনতে
 // ─────────────────────────────────────────────
 router.get('/price-suggestion', protect, async (req, res) => {
     const { bookingID } = req.query;
@@ -127,12 +159,15 @@ router.get('/price-suggestion', protect, async (req, res) => {
         if (!result.recordset.length)
             return res.status(404).json({ message: 'Booking পাওয়া যায়নি।' });
 
-        const bk  = result.recordset[0];
-        const dep = bk.DepartureTime || bk.JourneyDate;
-        const hoursLeft = dep ? Math.max(0, Math.round((new Date(dep) - new Date()) / 3600000)) : null;
+        const bk = result.recordset[0];
+
+        // ✅ FIX: JourneyDate + DepartureTime সঠিকভাবে combine করো
+        // SQL time type সরাসরি ব্যবহার করলে 1900-01-01 date আসে → hoursLeft=0 bug
+        const dep = buildDepartureDateTime(bk.JourneyDate, bk.DepartureTime);
+        const hoursLeft = dep ? Math.max(0, Math.round((dep - new Date()) / 3600000)) : null;
 
         const tiers = [
-            { label: '24h+ বাকি',  minHours: 24, pct: 100 },
+            { label: '24h+ বাকি',   minHours: 24, pct: 100 },
             { label: '12–24h বাকি', minHours: 12, pct:  80 },
             { label: '6–12h বাকি',  minHours:  6, pct:  60 },
             { label: '3–6h বাকি',   minHours:  3, pct:  40 },
@@ -148,11 +183,12 @@ router.get('/price-suggestion', protect, async (req, res) => {
             sellerReceives: Math.round(bk.TotalFare * (1 - PLATFORM_FEE_PCT)),
             hoursLeft,
             tiers,
-            route: `${bk.Origin} → ${bk.Destination}`,
-            journeyDate: bk.JourneyDate,
+            route:         `${bk.Origin} → ${bk.Destination}`,
+            journeyDate:   bk.JourneyDate,
             departureTime: dep
         });
     } catch (err) {
+        console.error('price-suggestion error:', err.message);
         res.status(500).json({ message: 'Server error.' });
     }
 });
@@ -193,13 +229,13 @@ router.post('/list', protect, async (req, res) => {
         if (jDate < new Date())
             return res.status(400).json({ message: 'অতীতের ticket list করা যাবে না।' });
 
-        // Anti-scalping: asking price > original fare → block
+        // Anti-scalping
         if (parseFloat(askingPrice) > parseFloat(booking.TotalFare))
             return res.status(400).json({
                 message: `Asking price ৳${booking.TotalFare} এর বেশি হতে পারবে না। (Anti-scalping rule)`
             });
 
-        // Duplicate listing check
+        // ✅ FIX: Table column is 'Status' (not ListingStatus)
         const existing = await pool.request()
             .input('BookingID', sql.Int, bookingID)
             .query(`
@@ -217,34 +253,32 @@ router.post('/list', protect, async (req, res) => {
         const transaction = new sql.Transaction(pool);
         await transaction.begin();
         try {
-            // ✅ TICKET LOCK — Booking status → 'listed'
-            const lock = await transaction.request()
-                .input('BookingID', sql.Int, bookingID)
-                .query(`UPDATE Bookings SET Status = 'listed' WHERE BookingID = @BookingID AND Status = 'confirmed'`);
-            if (!lock.rowsAffected[0]) {
-                throw new Error('Ticket is no longer available to list.');
-            }
-
-            // Create listing
+            // ✅ আগে INSERT — trigger চেক করে Status = 'confirmed', এখন ঠিক আছে
             const result = await transaction.request()
-                .input('BookingID',    sql.Int,           bookingID)
-                .input('SellerID',     sql.Int,           sellerID)
-                .input('AskingPrice',  sql.Decimal(10, 2), askingPrice)
-                .input('ExpiresAt',    sql.DateTime,       expiresAt || null)
-                .input('ListingType',  sql.NVarChar,      'sell')
+                .input('BookingID',   sql.Int,            bookingID)
+                .input('SellerID',    sql.Int,            sellerID)
+                .input('AskingPrice', sql.Decimal(10, 2), askingPrice)
+                .input('ExpiresAt',   sql.DateTime,       expiresAt || null)
+                .input('ListingType', sql.NVarChar,       'sell')
                 .query(`
                     INSERT INTO TicketListings (BookingID, SellerID, AskingPrice, ExpiresAt, ListingType)
                     VALUES (@BookingID, @SellerID, @AskingPrice, @ExpiresAt, @ListingType);
                     SELECT SCOPE_IDENTITY() AS ListingID;
                 `);
 
+            // ✅ তারপর TICKET LOCK — INSERT হয়ে গেছে, trigger আর fire হবে না
+            const lock = await transaction.request()
+                .input('BookingID', sql.Int, bookingID)
+                .query(`UPDATE Bookings SET Status = 'listed' WHERE BookingID = @BookingID AND Status = 'confirmed'`);
+            if (!lock.rowsAffected.some(n => n > 0)) {
+                throw new Error('Ticket is no longer available to list.');
+            }
+
             await transaction.commit();
 
-            // Waitlist notify (async, non-blocking)
             if (booking.ScheduleID)
                 notifyWaitlist(pool, booking.ScheduleID, booking.JourneyDate);
 
-            // Notification to seller
             createNotification(pool, sellerID, 'transfer_listed',
                 `Ticket listed! Asking ৳${askingPrice} — Platform fee ৳${platformFee}, you'll receive ৳${sellerReceives}.`,
                 { listingID: result.recordset[0].ListingID, askingPrice, sellerReceives }
@@ -264,7 +298,7 @@ router.post('/list', protect, async (req, res) => {
         }
 
     } catch (err) {
-        console.error(err.message);
+        console.error('list error:', err.message);
         if (err.message.includes('duplicate') || err.message.includes('UNIQUE'))
             return res.status(409).json({ message: 'এই ticket আগেই listed আছে।' });
         res.status(500).json({ message: 'Server error.' });
@@ -303,6 +337,7 @@ router.post('/list-swap', protect, async (req, res) => {
         if (jDate < new Date())
             return res.status(400).json({ message: 'অতীতের ticket list করা যাবে না।' });
 
+        // ✅ FIX: Table column is 'Status' (not ListingStatus)
         const existing = await pool.request()
             .input('BookingID', sql.Int, bookingID)
             .query(`
@@ -316,30 +351,30 @@ router.post('/list-swap', protect, async (req, res) => {
         const transaction = new sql.Transaction(pool);
         await transaction.begin();
         try {
-            // ✅ TICKET LOCK
-            const lock = await transaction.request()
-                .input('BookingID', sql.Int, bookingID)
-                .query(`UPDATE Bookings SET Status = 'listed' WHERE BookingID = @BookingID AND Status = 'confirmed'`);
-            if (!lock.rowsAffected[0]) {
-                throw new Error('Ticket is no longer available to list.');
-            }
-
+            // ✅ আগে INSERT — trigger চেক করে Status = 'confirmed', এখন ঠিক আছে
             const result = await transaction.request()
-                .input('BookingID',       sql.Int,           bookingID)
-                .input('SellerID',        sql.Int,           sellerID)
+                .input('BookingID',       sql.Int,            bookingID)
+                .input('SellerID',        sql.Int,            sellerID)
                 .input('AskingPrice',     sql.Decimal(10, 2), 0)
-                .input('WantDescription', sql.NVarChar,      wantDescription || null)
-                .input('Note',            sql.NVarChar,      note || null)
-                .input('ListingType',     sql.NVarChar,      'swap')
+                .input('WantDescription', sql.NVarChar,       wantDescription || null)
+                .input('Note',            sql.NVarChar,       note || null)
+                .input('ListingType',     sql.NVarChar,       'swap')
                 .query(`
                     INSERT INTO TicketListings (BookingID, SellerID, AskingPrice, WantDescription, Note, ListingType)
                     VALUES (@BookingID, @SellerID, @AskingPrice, @WantDescription, @Note, @ListingType);
                     SELECT SCOPE_IDENTITY() AS ListingID;
                 `);
 
+            // ✅ তারপর TICKET LOCK — INSERT হয়ে গেছে, trigger আর fire হবে না
+            const lock = await transaction.request()
+                .input('BookingID', sql.Int, bookingID)
+                .query(`UPDATE Bookings SET Status = 'listed' WHERE BookingID = @BookingID AND Status = 'confirmed'`);
+            if (!lock.rowsAffected.some(n => n > 0)) {
+                throw new Error('Ticket is no longer available to list.');
+            }
+
             await transaction.commit();
 
-            // Waitlist notify
             if (booking.ScheduleID)
                 notifyWaitlist(pool, booking.ScheduleID, booking.JourneyDate);
 
@@ -359,7 +394,7 @@ router.post('/list-swap', protect, async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// POST /transfer/request/:listingID   (Buy — Sell listing)
+// POST /transfer/request/:listingID   (Buy)
 // ─────────────────────────────────────────────
 router.post('/request/:listingID', protect, async (req, res) => {
     const listingID = parseInt(req.params.listingID);
@@ -384,7 +419,6 @@ router.post('/request/:listingID', protect, async (req, res) => {
         if (listing.SellerID === buyerID)
             return res.status(400).json({ message: 'নিজের ticket নিজে কিনতে পারবেন না।' });
 
-        // Already requested?
         const dup = await pool.request()
             .input('ListingID', sql.Int, listingID)
             .input('BuyerID',   sql.Int, buyerID)
@@ -396,7 +430,6 @@ router.post('/request/:listingID', protect, async (req, res) => {
         if (dup.recordset.length)
             return res.status(409).json({ message: 'আপনি আগেই এই ticket এর জন্য request করেছেন।' });
 
-        // Platform fee
         const askingPrice    = parseFloat(listing.AskingPrice || 0);
         const platformFee    = Math.round(askingPrice * PLATFORM_FEE_PCT * 100) / 100;
         const sellerReceives = Math.round((askingPrice - platformFee) * 100) / 100;
@@ -405,11 +438,11 @@ router.post('/request/:listingID', protect, async (req, res) => {
         await transaction.begin();
         try {
             const tr = await transaction.request()
-                .input('ListingID',     sql.Int,           listingID)
-                .input('BuyerID',       sql.Int,           buyerID)
-                .input('PaymentRef',    sql.NVarChar,       paymentRef)
-                .input('PlatformFee',   sql.Decimal(10, 2), platformFee)
-                .input('SellerReceives',sql.Decimal(10, 2), sellerReceives)
+                .input('ListingID',      sql.Int,            listingID)
+                .input('BuyerID',        sql.Int,            buyerID)
+                .input('PaymentRef',     sql.NVarChar,       paymentRef)
+                .input('PlatformFee',    sql.Decimal(10, 2), platformFee)
+                .input('SellerReceives', sql.Decimal(10, 2), sellerReceives)
                 .query(`
                     INSERT INTO TicketTransfers
                         (ListingID, BuyerID, PaymentRef, PaymentStatus, TransferStatus, PlatformFee, SellerReceives)
@@ -417,7 +450,6 @@ router.post('/request/:listingID', protect, async (req, res) => {
                         (@ListingID, @BuyerID, @PaymentRef, 'paid', 'pending', @PlatformFee, @SellerReceives);
                     SELECT SCOPE_IDENTITY() AS TransferID;
                 `).catch(async () => {
-                    // PlatformFee column না থাকলে without fee insert
                     return await transaction.request()
                         .input('ListingID',  sql.Int,     listingID)
                         .input('BuyerID',    sql.Int,     buyerID)
@@ -435,7 +467,6 @@ router.post('/request/:listingID', protect, async (req, res) => {
                 .input('ListingID', sql.Int, listingID)
                 .query(`UPDATE TicketListings SET Status = 'reserved' WHERE ListingID = @ListingID`);
 
-            // Transfer ownership + unlock new owner's booking
             await transaction.request()
                 .input('BuyerID',   sql.Int, buyerID)
                 .input('BookingID', sql.Int, listing.BookingID)
@@ -455,7 +486,6 @@ router.post('/request/:listingID', protect, async (req, res) => {
 
             await transaction.commit();
 
-            // Notifications — buyer ও seller দুজনকেই
             createNotification(pool, buyerID, 'transfer_completed',
                 `Transfer complete! Ticket (Seat ${listing.SeatNumber}) এখন আপনার নামে। ৳${askingPrice} paid.`,
                 { bookingID: listing.BookingID, seatNumber: listing.SeatNumber, amountPaid: askingPrice }
@@ -482,13 +512,13 @@ router.post('/request/:listingID', protect, async (req, res) => {
         }
 
     } catch (err) {
-        console.error(err.message);
+        console.error('request error:', err.message);
         res.status(500).json({ message: 'Transfer failed: ' + err.message });
     }
 });
 
 // ─────────────────────────────────────────────
-// DELETE /transfer/cancel/:listingID   — listing cancel → ticket unlock
+// DELETE /transfer/cancel/:listingID
 // ─────────────────────────────────────────────
 router.delete('/cancel/:listingID', protect, async (req, res) => {
     const listingID = parseInt(req.params.listingID);
@@ -515,7 +545,7 @@ router.delete('/cancel/:listingID', protect, async (req, res) => {
                 .input('ListingID', sql.Int, listingID)
                 .query(`UPDATE TicketListings SET Status = 'cancelled' WHERE ListingID = @ListingID`);
 
-            // ✅ TICKET UNLOCK — Booking status → 'confirmed'
+            // ✅ TICKET UNLOCK
             await transaction.request()
                 .input('BookingID', sql.Int, bookingID)
                 .query(`UPDATE Bookings SET Status = 'confirmed' WHERE BookingID = @BookingID AND Status = 'listed'`);
@@ -528,6 +558,7 @@ router.delete('/cancel/:listingID', protect, async (req, res) => {
         }
 
     } catch (err) {
+        console.error('cancel error:', err.message);
         res.status(500).json({ message: 'Server error.' });
     }
 });
@@ -550,6 +581,23 @@ router.get('/my-listings', protect, async (req, res) => {
 
         res.json(listings);
     } catch (err) {
+        console.error('my-listings error:', err.message);
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
+
+// ─────────────────────────────────────────────
+// GET /transfer/my-requests
+// ─────────────────────────────────────────────
+router.get('/my-requests', protect, async (req, res) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('BuyerID', sql.Int, req.user.userID)
+            .query(`SELECT * FROM vw_TransferHistory WHERE BuyerID = @BuyerID ORDER BY RequestedAt DESC`);
+        res.json(result.recordset);
+    } catch (err) {
+        console.error('my-requests error:', err.message);
         res.status(500).json({ message: 'Server error.' });
     }
 });
@@ -565,6 +613,7 @@ router.get('/my-transfers', protect, async (req, res) => {
             .query(`SELECT * FROM vw_TransferHistory WHERE BuyerID = @BuyerID ORDER BY RequestedAt DESC`);
         res.json(result.recordset);
     } catch (err) {
+        console.error('my-transfers error:', err.message);
         res.status(500).json({ message: 'Server error.' });
     }
 });
@@ -581,6 +630,7 @@ router.get('/history', protect, async (req, res) => {
             .query(`SELECT TOP 100 * FROM vw_TransferHistory ORDER BY RequestedAt DESC`);
         res.json(result.recordset);
     } catch (err) {
+        console.error('history error:', err.message);
         res.status(500).json({ message: 'Server error.' });
     }
 });
@@ -615,7 +665,7 @@ router.post('/swap-request/:listingID', protect, async (req, res) => {
 
         if (!ls.recordset.length)
             return res.status(404).json({ message: 'Listing পাওয়া যায়নি।' });
-        if (ls.recordset[0].ListingStatus !== 'open')
+        if (ls.recordset[0].Status !== 'open')
             return res.status(400).json({ message: 'এই listing আর available নেই।' });
         if (ls.recordset[0].SellerID === buyerID)
             return res.status(400).json({ message: 'নিজের listing এ request করা যাবে না।' });
@@ -632,11 +682,10 @@ router.post('/swap-request/:listingID', protect, async (req, res) => {
                 SELECT SCOPE_IDENTITY() AS TransferID;
             `);
 
-        // ✅ Offered booking lock
         const offeredLock = await pool.request()
             .input('BookingID', sql.Int, offeredBookingID)
             .query(`UPDATE Bookings SET Status = 'listed' WHERE BookingID = @BookingID AND Status = 'confirmed'`);
-        if (!offeredLock.rowsAffected[0]) {
+        if (!getAffectedRows(offeredLock)) {
             return res.status(409).json({ message: 'Offered ticket আর available নেই।' });
         }
 
@@ -681,7 +730,6 @@ router.put('/swap-request/:transferID', protect, async (req, res) => {
             return res.status(403).json({ message: 'শুধু listing owner accept/decline করতে পারবে।' });
 
         if (action === 'decline') {
-            // Buyer এর offered booking unlock
             const payRef = reqData.PaymentRef || '';
             const match  = payRef.match(/^SWAP:(\d+)/);
             if (match) {
@@ -707,7 +755,6 @@ router.put('/swap-request/:transferID', protect, async (req, res) => {
         const transaction = new sql.Transaction(pool);
         await transaction.begin();
         try {
-            // Swap ownership
             await transaction.request()
                 .input('NewOwner',  sql.Int, buyerID)
                 .input('BookingID', sql.Int, reqData.SellerBookingID)
@@ -730,7 +777,6 @@ router.put('/swap-request/:transferID', protect, async (req, res) => {
                 .input('ListingID', sql.Int, reqData.ListingID)
                 .query(`UPDATE TicketListings SET Status = 'transferred' WHERE ListingID = @ListingID`);
 
-            // Decline অন্য pending requests + unlock their offered bookings
             const others = await transaction.request()
                 .input('ListingID',  sql.Int, reqData.ListingID)
                 .input('TransferID', sql.Int, transferID)
@@ -754,7 +800,6 @@ router.put('/swap-request/:transferID', protect, async (req, res) => {
 
             await transaction.commit();
 
-            // Notifications — both parties
             createNotification(pool, buyerID, 'transfer_completed',
                 `Swap accepted! Your ticket has been exchanged successfully.`,
                 { listingID: reqData.ListingID }
@@ -789,7 +834,6 @@ router.get('/my-swap-requests', protect, async (req, res) => {
                        tl.ListingID, tl.BookingID AS SellerBookingID,
                        r.Origin, r.Destination, b.JourneyDate, b.SeatNumber,
                        u.FirstName + ' ' + u.LastName AS BuyerName, u.Email AS BuyerEmail,
-                       -- Extract offered booking ID from PaymentRef
                        TRY_CAST(
                            SUBSTRING(t.PaymentRef, 6,
                                CASE WHEN CHARINDEX(':', t.PaymentRef, 6) > 0
@@ -810,6 +854,7 @@ router.get('/my-swap-requests', protect, async (req, res) => {
             `);
         res.json(result.recordset);
     } catch (err) {
+        console.error('my-swap-requests error:', err.message);
         res.status(500).json({ message: 'Server error.' });
     }
 });

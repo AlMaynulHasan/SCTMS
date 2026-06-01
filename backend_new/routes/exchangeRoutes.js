@@ -149,8 +149,8 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
                     DECLARE @s1 NVARCHAR(10), @s2 NVARCHAR(10);
                     SELECT @s1 = SeatNumber FROM Bookings WHERE BookingID = @B1;
                     SELECT @s2 = SeatNumber FROM Bookings WHERE BookingID = @B2;
-                    UPDATE Bookings SET SeatNumber = @s2, Status = 'exchanged'  WHERE BookingID = @B1;
-                    UPDATE Bookings SET SeatNumber = @s1, Status = 'confirmed' WHERE BookingID = @B2;
+                    UPDATE Bookings SET SeatNumber = @s2 WHERE BookingID = @B1;
+                    UPDATE Bookings SET SeatNumber = @s1 WHERE BookingID = @B2;
                 `);
         }
 
